@@ -64,3 +64,19 @@ m = rand(size(m));
 f = rand(size(f));
 mbar = rand(size(mbar));
 fbar = rand(size(fbar));
+
+
+f0 = f0(Gc.x);
+f1 = f1(Gc.x);
+
+fiD = fopen('parameters.txt','w');
+f0Id = fopen('f0.txt','w');
+f1Id = fopen('f1.txt','w');
+
+fprintf(fiD,'%d\r\n%d',N,Q);
+fprintf(f0Id,'%12s\r\n',f0);
+fprintf(f1Id,'%12s\r\n',f1);
+
+fclose(fiD);
+fclose(f0Id);
+fclose(f1Id);
