@@ -80,3 +80,10 @@ fprintf(f1Id,'%12s\r\n',f1);
 fclose(fiD);
 fclose(f0Id);
 fclose(f1Id);
+
+dlmread("Y.txt");
+
+[X,Y] = meshgrid(linspace(0,1,501),linspace(0,1,101));
+test = dlmread("test.txt"); % size 21*11
+test = reshape(test,101,501);
+surf(X,Y,test);

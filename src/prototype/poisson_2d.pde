@@ -2,7 +2,7 @@
 // manuel freefem p244
 
 int [int] d(2);
-int test,Nx=500,Qt=200;
+int test,Nx=500,Qt=100;
 real mu = 0.1;
 real s = 0.005;
 
@@ -11,11 +11,6 @@ func f1=exp(-0.5*((x-0.9)/s)^2)/(s*sqrt(2*pi));
 
 ifstream param("parameters.txt");
 param>>test;
-
-cout << "test : " << test << endl;
-
-
-
 
 mesh Th=square(Nx,Qt);
 plot(Th,wait=1);
@@ -39,4 +34,13 @@ problem Poisson(uh,vh,solver=LU) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2
 Poisson;
 
 
+
 plot(uh,wait=1,fill=true,value=true);
+
+ofstream output("test.txt");
+for(int j=0; j<uh[].n;j++) {
+    output << uh[][j]<<endl;
+}
+
+//ofstream out("Y.txt");
+//out<<uh[];
