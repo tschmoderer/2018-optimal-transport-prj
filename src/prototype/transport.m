@@ -3,12 +3,13 @@ close all
 clear
 
 %%% Initialisation %%%
+globals;
 
 d = 1; % dimension du système
 
-N = 5; % Nb de points de discrétisation dans le sens des x
+N = 200; % Nb de points de discrétisation dans le sens des x
 %P = 5; % Nb de points de discrétisation dans le sens des y
-Q = 2; % Nb de points de discrétisation dans le sens de t
+Q = 100; % Nb de points de discrétisation dans le sens de t
 
 %% Grille centrée %%
 Gc.x = [0:N]/N;
@@ -55,35 +56,38 @@ gamma = 0.5; % Doit etre positif
 
 %%% Fin Initialisation %%%
 
-
-%%% Zone de tests %%%
-
-
-%%% Fin zone de tests %%%
 m = rand(size(m));
 f = rand(size(f));
 mbar = rand(size(mbar));
 fbar = rand(size(fbar));
 
-
 f0 = f0(Gc.x);
 f1 = f1(Gc.x);
 
-fiD = fopen('parameters.txt','w');
-f0Id = fopen('f0.txt','w');
-f1Id = fopen('f1.txt','w');
 
-fprintf(fiD,'%d\r\n%d',N,Q);
-fprintf(f0Id,'%12s\r\n',f0);
+% Ecrire les valeurs dans les fichiers.
+fiD = fopen('files/parameters.txt','w');
+f0Id = fopen('files/f0.txt','w');
+f1Id = fopen('files/f1.txt','w');
+
+fprintf(fiD,'%d %d',N,Q); % FreeFem needs 
+fprintf(f0Id,'%12f\n',f0);
 fprintf(f1Id,'%12s\r\n',f1);
 
 fclose(fiD);
 fclose(f0Id);
 fclose(f1Id);
 
-dlmread("Y.txt");
 
-[X,Y] = meshgrid(linspace(0,1,501),linspace(0,1,101));
-test = dlmread("test.txt"); % size 21*11
-test = reshape(test,101,501);
-surf(X,Y,test);
+%%% Zone de tests %%%
+
+% test calcul de la constante %%
+y = dlmread('files/Y.txt'); % size NxQ
+y = reshape(y,N+1,Q+1)';
+
+[X,Y] = meshgrid(Gc.x,Gc.t);
+surf(X,Y,y);
+xlabel('x')
+ylabel('t');
+
+%%% Fin zone de tests %%%

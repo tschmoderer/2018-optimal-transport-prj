@@ -1,4 +1,4 @@
-function f = f0(x);
+function f = f0(x)
 mu = 0.1;
 s = 0.005;
 f = exp(-0.5*((x-mu)/s).^2)/(s*sqrt(2*pi));
