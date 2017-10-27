@@ -98,4 +98,6 @@ y = reshape(y,N+1,Q+1)';
 
 projCY = y;
 
+mex call_poisson_constante.c;
+call_poisson_constante;
 %%% Fin zone de tests %%%
