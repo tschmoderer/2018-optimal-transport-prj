@@ -7,9 +7,9 @@ globals;
 
 d = 1; % dimension du système
 
-N = 200; % Nb de points de discrétisation dans le sens des x
+N = 50; % Nb de points de discrétisation dans le sens des x
 %P = 5; % Nb de points de discrétisation dans le sens des y
-Q = 100; % Nb de points de discrétisation dans le sens de t
+Q = 50; % Nb de points de discrétisation dans le sens de t
 
 %% Grille centrée %%
 Gc.x = [0:N]/N;
@@ -71,8 +71,8 @@ f0Id = fopen('files/f0.txt','w');
 f1Id = fopen('files/f1.txt','w');
 
 fprintf(fiD,'%d %d',N,Q); % FreeFem needs 
-fprintf(f0Id,'%12f\n',f0);
-fprintf(f1Id,'%12s\r\n',f1);
+fprintf(f0Id,'%12f',f0);
+fprintf(f1Id,'%12f',f1);
 
 fclose(fiD);
 fclose(f0Id);
@@ -86,8 +86,16 @@ y = dlmread('files/Y.txt'); % size NxQ
 y = reshape(y,N+1,Q+1)';
 
 [X,Y] = meshgrid(Gc.x,Gc.t);
-surf(X,Y,y);
-xlabel('x')
-ylabel('t');
+% surf(X,Y,y);
+% xlabel('x')
+% ylabel('t');
+
+% application de A* sur y 
+
+[mybar fybar] = divergence_adjoint(y);
+[my fy] = boundary_adjoint(y(:,1),y(:,end),y(1,:),y(end,:),N,Q);
+% ==> c'est donc la constante dans l'application de poisson 
+
+projCY = y;
 
 %%% Fin zone de tests %%%

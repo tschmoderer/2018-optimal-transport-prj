@@ -1,6 +1,6 @@
 function [m f] = projC(mbar,fbar)
-global N;
-global Q;
+globals;
+
 y = dlmread('files/Y.txt'); % size NxQ
 y = reshape(y,Q+1,N+1);
 
