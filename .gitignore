@@ -1,7 +1,8 @@
 # Ajout personnel
 ressources/*
-
-
+src/prototype/exemple_mex/*
+src/prototype/Fortran/*
+src/prototype/C/*
 
 
 ## Core latex/pdflatex auxiliary files:
