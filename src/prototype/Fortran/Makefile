@@ -1,9 +1,10 @@
 FC = gfortran
-FFLAGS  = -o
-LDFLAGS  =
+FFLAGS  = -g -o
+LLFLAGS  = -llapack
 EXEC = transport
 
 .DEFAULT_GOAL = all
+.PHONY = clean
 
 SRCS  =  $(wildcard ∗.f90)
 OBJS = $(SRCS:.f90=.o)
@@ -11,8 +12,8 @@ OBJS = $(SRCS:.f90=.o)
 %.o : %.f90
 	$(FC) $(FFLAGS) −c $<
 
-all : transport.f90 finitial.f90 ffinal.f90 interpolation.f90 interpolation_adjoint.f90
-	$(FC) $(FFLAGS) $(EXEC) transport.f90 finitial.f90 ffinal.f90 interpolation.f90 interpolation_adjoint.f90
+all : *.f90	
+	$(FC) $(FFLAGS) $(EXEC) *.f90 $(LLFLAGS)
 
 clean : 
-	rm *.out *.o $(EXEC) 
+	rm *.out *.o $(EXEC) 		

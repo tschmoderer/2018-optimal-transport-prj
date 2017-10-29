@@ -1,14 +1,26 @@
 program transport
-
 implicit none
-!! Les basiques !!
+
+!! Les basiques -  indices de boucles!!
 integer :: i,j,k;
 
 !!! Initialisation !!!
+
 !! L'espace temps !!
 integer, parameter :: d = 1; ! Dimension du sytème
-integer, parameter :: N = 50; ! Nb de points dans la direction x
-integer, parameter :: Q = 50; ! Nb de points dans la direction t
+integer, parameter :: N = 80; ! Nb de points dans la direction x
+integer, parameter :: Q = 30; ! Nb de points dans la direction t
+
+!   1
+!   |
+!   |
+!   |
+!   t  Q
+!   |
+!   |
+!   |        N
+!   0 ------ x ------ 1
+
 
 !! Paramètres de la méthode !!
 real :: alpha = 1.0; ! Doit etre dans ]0,2[
@@ -24,17 +36,30 @@ real, dimension(-1:N) :: GsX;
 real, dimension(-1:Q) :: GsT;
 
 !! Variables centrées !!
-real, dimension(Q+1,N+1) :: m = 0,f = 0;
+real, dimension(N+1,Q+1) :: m,f; ! N+1 colonnes et Q+1 lignes
 
 !! Variables décentrées !!
-real, dimension(Q+1,N+2) :: mbar = 0;
-real, dimension(Q+2,N+1) :: fbar = 0;
+real, dimension(N+2,Q+1) :: mbar; ! N+2 colonnes et Q+1 lignes
+real, dimension(N+1,Q+2) :: fbar; ! N+1 colonnes et Q+2 lignes
 
 !! Les valeurs aux frontières !!
-real, dimension(N+1) :: f0;
-real, dimension(N+1) :: f1;
+real, dimension(N+1) :: f0; ! La densité initiale --> en bas
+real, dimension(N+1) :: f1; ! la densité finale --> en haut 
 
+!! Variables dans la projection sur C !! 
+real, dimension(N+2,Q+1) :: projCmbar;
+real, dimension(N+1,Q+2) :: projCfbar;
 
+!! variable prximité G2 !!
+real, dimension(N+1,Q+1) :: mt,ft;
+real, dimension(N+2,Q+1) :: mbart;
+real, dimension(N+1,Q+2) :: fbart;
+
+!! Le cout de la solution !!
+real R;
+
+!! Varaiable de la projection sur J !! 
+real, dimension(N+1,Q+1) :: Pm,Pf;
 
 !!! Initialisation des variables !!!
 
@@ -67,8 +92,11 @@ write (0,*), f0;
 write (1,*), f1;
 write (2,*), N, Q;
 
-! call system('cd .. && FreeFem++ poisson_2d.pde && cd Fortran');
+call system('FreeFem++ poisson_2d_constante.pde');
 
+close(unit=0);
+close(unit=1);
+close(unit=2);
 
 !!! Zone de tests !!!
 
@@ -76,8 +104,13 @@ call RANDOM_NUMBER(m);
 call RANDOM_NUMBER(f);
 call RANDOM_NUMBER(mbar);
 call RANDOM_NUMBER(fbar);
-
-
-
+!! call check_adjoint(N,Q); !! test les opérateurs et les adjoints
+!! call cost(R,m,f,N,Q); print *, R; !! test la fonction cout
+!! call proxJ(Pm,Pf,m,f,gamma,N,Q); print *, Pm; !! test l'opérateur de proximité de la fonction cout
+projCmbar = 0; projCfbar = 0;
+call projC(projCmbar,projCfbar,mbar,fbar,N,Q); !! test projection sur C , inch allah ça marche
+!! call proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
+print *, "test"
 !!! Fin Zone de tests !!!
+
 end program

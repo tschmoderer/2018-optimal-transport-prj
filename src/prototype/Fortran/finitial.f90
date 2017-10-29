@@ -1,4 +1,5 @@
 subroutine finitial(x,N,f0)
+    implicit none
     integer, intent(in) :: N;
     real, dimension(N+1), intent(in) :: x;
     real, dimension(N+1), intent(out) :: f0;
