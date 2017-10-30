@@ -5,18 +5,18 @@ subroutine interpolation_adjoint(mbar,fbar,m,f,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
     
-    real, dimension(N+2,Q+1), intent(out) :: mbar;
-    real, dimension(N+1,Q+2), intent(out) :: fbar;
-    real, dimension(N+1,Q+1), intent(in) :: m,f;
-    real, dimension(N+1,N+2) :: Interpm;
-    real, dimension(Q+2,Q+1) :: Interpf;
-    real, dimension(N+2,N+1) :: InterpAdjM;
-    real, dimension(Q+1,Q+2) :: InterpAdjF;
+    double precision, dimension(N+2,Q+1), intent(out) :: mbar;
+    double precision, dimension(N+1,Q+2), intent(out) :: fbar;
+    double precision, dimension(N+1,Q+1), intent(in) :: m,f;
+    double precision, dimension(N+1,N+2) :: Interpm;
+    double precision, dimension(Q+2,Q+1) :: Interpf;
+    double precision, dimension(N+2,N+1) :: InterpAdjM;
+    double precision, dimension(Q+1,Q+2) :: InterpAdjF;
 
     integer :: i,j;
     !! test
-    real, dimension(N+1,N+1) :: test1;
-    real, dimension(Q+1,Q+1) :: test2;
+    double precision, dimension(N+1,N+1) :: test1;
+    double precision, dimension(Q+1,Q+1) :: test2;
 
     Interpm = 0;
     Interpf = 0;

@@ -42,11 +42,11 @@ problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2,4,uh=0) +
 
 Poisson;
 
-// plot(uh,wait=1,fill=true,value=true);
+//plot(uh,wait=1,fill=true,value=true);
 
 ofstream output("files/Y");
 for(int j=0; j<uh[].n;j++) {
-    output << uh[][j]<<endl;
+    output << uh[][j] << endl;
 }
 
 savemesh(Th,"files/maillage.msh");

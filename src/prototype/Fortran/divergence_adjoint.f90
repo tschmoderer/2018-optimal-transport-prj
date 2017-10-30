@@ -4,9 +4,9 @@
 subroutine divergence_adjoint(mbar,fbar,d,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
-    real, dimension(N+2,Q+1), intent(out) :: mbar;
-    real, dimension(N+1,Q+2), intent(out) :: fbar;
-    real, dimension(N+1,Q+1), intent(in) :: d; 
+    double precision, dimension(N+2,Q+1), intent(out) :: mbar;
+    double precision, dimension(N+1,Q+2), intent(out) :: fbar;
+    double precision, dimension(N+1,Q+1), intent(in) :: d; 
 
     mbar(1,:) = -d(1,:);
     mbar(N+2,:) = d(N+1,:);

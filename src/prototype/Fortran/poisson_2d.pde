@@ -60,9 +60,9 @@ problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh
 
 Poisson;
 
-// plot(uh,wait=1,fill=true,value=true);
+plot(uh,wait=1,fill=true,value=true);
 
 ofstream output("files/solution");
 for(int j=0; j<uh[].n;j++) {
-    output << uh[][j]<<endl;
+    output << uh[][j] << endl;
 }

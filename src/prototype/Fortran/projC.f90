@@ -5,25 +5,27 @@
 subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
-    real, dimension(N+2,Q+1), intent(in) :: mbar;
-    real, dimension(N+1,Q+2), intent(in) :: fbar;
-    real, dimension(N+2,Q+1), intent(out) :: projCmbar;
-    real, dimension(N+1,Q+2), intent(out) :: projCfbar;
+    double precision, dimension(N+2,Q+1), intent(in) :: mbar;
+    double precision, dimension(N+1,Q+2), intent(in) :: fbar;
+    double precision, dimension(N+2,Q+1), intent(out) :: projCmbar;
+    double precision, dimension(N+1,Q+2), intent(out) :: projCfbar;
 
     !! Constantes dans la projection !!
-    real, dimension(N+1,Q+1) :: Cst;
-    real, dimension(N+2,Q+1) :: Cstmbar;
-    real, dimension(N+1,Q+2) :: Cstfbar;
+    double precision, dimension(N+1,Q+1) :: Cst;
+    double precision, dimension(N+2,Q+1) :: Cstmbar;
+    double precision, dimension(N+1,Q+2) :: Cstfbar;
 
     !! Second memebre de la projection !!
-    real, dimension(N+1,Q+1) :: d; ! le centre 
-    real, dimension(Q+1) :: mleft,mright;
-    real, dimension(N+1) :: fup,fdown;
+    double precision, dimension(N+1,Q+1) :: d; ! le centre 
+    double precision, dimension(Q+1) :: mleft,mright;
+    double precision, dimension(N+1) :: fup,fdown;
 
     !! Solution du pbm de poisson !!
-    real, dimension(N+1,Q+1) :: solution;
-    real, dimension(N+2,Q+1) :: solutionmbar;
-    real, dimension(N+1,Q+2) :: solutionfbar;
+    double precision, dimension(N+1,Q+1) :: solution;
+    double precision, dimension(N+2,Q+1) :: solutionmbar;
+    double precision, dimension(N+1,Q+2) :: solutionfbar;
+
+    integer :: i;
 
     !! Initialisation !! 
     Cst = 0; Cstmbar = 0; Cstfbar = 0;
@@ -32,7 +34,7 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
 
     open (unit=3,file="files/Y");
     read (3,*), Cst;
-    close (unit=3);
+    close (3);
 
     call divergence_adjoint(Cstmbar,Cstfbar,Cst,N,Q);
 
@@ -53,15 +55,13 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     
     call system('FreeFem++ poisson_2d.pde');
 
-    open(11,file="files/solution");
-    
-    read(11,*), solution;
- 
-    call divergence_adjoint(solutionmbar,solutionmbar,solution,N,Q);
+    open(unit=3,file="files/solution");
+    read(3,*), solution;
+    close (unit=3)
+    call divergence_adjoint(solutionmbar,solutionfbar,solution,N,Q);
   
-
-  !  projCmbar = mbar - solutionmbar + Cstmbar;
-  !  projCfbar = fbar - solutionfbar + Cstfbar;
+    projCmbar = mbar - solutionmbar + Cstmbar;
+    projCfbar = fbar - solutionfbar + Cstfbar;
     projCmbar = 0;
     projCfbar = 0;
 

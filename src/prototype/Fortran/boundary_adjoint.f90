@@ -4,10 +4,10 @@
 subroutine boundary_adjoint(mbar,fbar,mleft,mright,fup,fdown,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
-    real, dimension(N+2,Q+1), intent(out) :: mbar;
-    real, dimension(N+1,Q+2), intent(out) :: fbar;
-    real, dimension(Q+1), intent(in) :: mleft,mright;
-    real, dimension(N+1), intent(in) :: fup,fdown;
+    double precision, dimension(N+2,Q+1), intent(out) :: mbar;
+    double precision, dimension(N+1,Q+2), intent(out) :: fbar;
+    double precision, dimension(Q+1), intent(in) :: mleft,mright;
+    double precision, dimension(N+1), intent(in) :: fup,fdown;
 
     mbar = 0;
     fbar = 0;

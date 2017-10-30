@@ -4,25 +4,25 @@ subroutine check_adjoint(N,Q)
 
     !! Variables tests Boundary!!
     
-    real, dimension(N+2,Q+1) :: mbar,boundAdjMres;
-    real, dimension(N+1,Q+2) :: fbar,boundAdjFres;
-    real, dimension(Q+1) :: mleft,mright,boundResLeft,boundResRight;
-    real, dimension(N+1) :: fup,fdown,boundResUp,boundResDown;
+    double precision, dimension(N+2,Q+1) :: mbar,boundAdjMres;
+    double precision, dimension(N+1,Q+2) :: fbar,boundAdjFres;
+    double precision, dimension(Q+1) :: mleft,mright,boundResLeft,boundResRight;
+    double precision, dimension(N+1) :: fup,fdown,boundResUp,boundResDown;
 
     !! Variables pour l'interpolation !!
     
-    real, dimension(N+2,Q+1) :: mbarInterpAdj;
-    real, dimension(N+1,Q+2) :: fbarInterAdj;
-    real, dimension(N+1,Q+1) :: m,f,mInterp,fInterp;
+    double precision, dimension(N+2,Q+1) :: mbarInterpAdj;
+    double precision, dimension(N+1,Q+2) :: fbarInterAdj;
+    double precision, dimension(N+1,Q+1) :: m,f,mInterp,fInterp;
 
     !! Variables pour la divergence !! 
 
-    real, dimension(N+2,Q+1) :: divAdjMres;
-    real, dimension(N+1,Q+2) :: divAdjFres;
-    real, dimension(N+1,Q+1) :: d,dRes;
+    double precision, dimension(N+2,Q+1) :: divAdjMres;
+    double precision, dimension(N+1,Q+2) :: divAdjFres;
+    double precision, dimension(N+1,Q+1) :: d,dRes;
 
     !! Variables pour tous le monde !!
-    real :: s1,s2;
+    double precision :: s1,s2;
 
 
     !! Initialisation Boundary !!

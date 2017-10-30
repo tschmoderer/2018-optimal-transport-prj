@@ -8,8 +8,8 @@ integer :: i,j,k;
 
 !! L'espace temps !!
 integer, parameter :: d = 1; ! Dimension du sytème
-integer, parameter :: N = 80; ! Nb de points dans la direction x
-integer, parameter :: Q = 30; ! Nb de points dans la direction t
+integer, parameter :: N = 10; ! Nb de points dans la direction x
+integer, parameter :: Q = 10; ! Nb de points dans la direction t
 
 !   1
 !   |
@@ -23,43 +23,43 @@ integer, parameter :: Q = 30; ! Nb de points dans la direction t
 
 
 !! Paramètres de la méthode !!
-real :: alpha = 1.0; ! Doit etre dans ]0,2[
-real :: beta = 1.0; ! Doit etre dans [0,1]
-real :: gamma = 0.5; ! Doit etre positif
+double precision :: alpha = 1.0; ! Doit etre dans ]0,2[
+double precision :: beta = 1.0; ! Doit etre dans [0,1]
+double precision :: gamma = 0.5; ! Doit etre positif
 
 !! Grille centrée !!
-real, dimension(0:N) :: GcX;
-real, dimension(0:Q) :: GcT;
+double precision, dimension(0:N) :: GcX;
+double precision, dimension(0:Q) :: GcT;
 
 !! Grille décentrée !!
-real, dimension(-1:N) :: GsX;
-real, dimension(-1:Q) :: GsT;
+double precision, dimension(-1:N) :: GsX;
+double precision, dimension(-1:Q) :: GsT;
 
 !! Variables centrées !!
-real, dimension(N+1,Q+1) :: m,f; ! N+1 colonnes et Q+1 lignes
+double precision, dimension(N+1,Q+1) :: m,f; ! N+1 colonnes et Q+1 lignes
 
 !! Variables décentrées !!
-real, dimension(N+2,Q+1) :: mbar; ! N+2 colonnes et Q+1 lignes
-real, dimension(N+1,Q+2) :: fbar; ! N+1 colonnes et Q+2 lignes
+double precision, dimension(N+2,Q+1) :: mbar; ! N+2 colonnes et Q+1 lignes
+double precision, dimension(N+1,Q+2) :: fbar; ! N+1 colonnes et Q+2 lignes
 
 !! Les valeurs aux frontières !!
-real, dimension(N+1) :: f0; ! La densité initiale --> en bas
-real, dimension(N+1) :: f1; ! la densité finale --> en haut 
+double precision, dimension(N+1) :: f0; ! La densité initiale --> en bas
+double precision, dimension(N+1) :: f1; ! la densité finale --> en haut 
 
 !! Variables dans la projection sur C !! 
-real, dimension(N+2,Q+1) :: projCmbar;
-real, dimension(N+1,Q+2) :: projCfbar;
+double precision, dimension(N+2,Q+1) :: projCmbar;
+double precision, dimension(N+1,Q+2) :: projCfbar;
 
 !! variable prximité G2 !!
-real, dimension(N+1,Q+1) :: mt,ft;
-real, dimension(N+2,Q+1) :: mbart;
-real, dimension(N+1,Q+2) :: fbart;
+double precision, dimension(N+1,Q+1) :: mt,ft;
+double precision, dimension(N+2,Q+1) :: mbart;
+double precision, dimension(N+1,Q+2) :: fbart;
 
 !! Le cout de la solution !!
-real R;
+double precision R;
 
 !! Varaiable de la projection sur J !! 
-real, dimension(N+1,Q+1) :: Pm,Pf;
+double precision, dimension(N+1,Q+1) :: Pm,Pf;
 
 !!! Initialisation des variables !!!
 
@@ -94,9 +94,9 @@ write (2,*), N, Q;
 
 call system('FreeFem++ poisson_2d_constante.pde');
 
-close(unit=0);
-close(unit=1);
-close(unit=2);
+close(0);
+close(1);
+close(2);
 
 !!! Zone de tests !!!
 
@@ -107,10 +107,12 @@ call RANDOM_NUMBER(fbar);
 !! call check_adjoint(N,Q); !! test les opérateurs et les adjoints
 !! call cost(R,m,f,N,Q); print *, R; !! test la fonction cout
 !! call proxJ(Pm,Pf,m,f,gamma,N,Q); print *, Pm; !! test l'opérateur de proximité de la fonction cout
-projCmbar = 0; projCfbar = 0;
-call projC(projCmbar,projCfbar,mbar,fbar,N,Q); !! test projection sur C , inch allah ça marche
-!! call proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
-print *, "test"
+!! call projC(projCmbar,projCfbar,mbar,fbar,N,Q); !! test projection sur C , inch allah ça marche
+!! call proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q); !! projection sur la variable G2
+!! call proxG1(mbar,fbar,m,f,gamma,N,Q); !! Proximité de G1
 !!! Fin Zone de tests !!!
+
+
+call DR(alpha,gamma,N,Q);
 
 end program

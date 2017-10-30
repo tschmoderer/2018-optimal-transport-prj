@@ -5,11 +5,11 @@ subroutine interpolation(mbar,fbar,m,f,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
     integer :: i,j;
-    real, dimension(N+2,Q+1), intent(in) :: mbar;
-    real, dimension(N+1,Q+2), intent(in) :: fbar;
-    real, dimension(N+1,Q+1), intent(out) :: m,f;
-    real, dimension(N+1,N+2) :: Interpm;
-    real, dimension(Q+2,Q+1) :: Interpf;
+    double precision, dimension(N+2,Q+1), intent(in) :: mbar;
+    double precision, dimension(N+1,Q+2), intent(in) :: fbar;
+    double precision, dimension(N+1,Q+1), intent(out) :: m,f;
+    double precision, dimension(N+1,N+2) :: Interpm;
+    double precision, dimension(Q+2,Q+1) :: Interpf;
 
 	Interpm = 0;
 	Interpf = 0;

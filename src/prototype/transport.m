@@ -7,9 +7,9 @@ globals;
 
 d = 1; % dimension du système
 
-N = 50; % Nb de points de discrétisation dans le sens des x
+N = 10; % Nb de points de discrétisation dans le sens des x
 %P = 5; % Nb de points de discrétisation dans le sens des y
-Q = 50; % Nb de points de discrétisation dans le sens de t
+Q = 10; % Nb de points de discrétisation dans le sens de t
 
 %% Grille centrée %%
 Gc.x = [0:N]/N;
@@ -98,6 +98,8 @@ y = reshape(y,N+1,Q+1)';
 
 projCY = y;
 
-mex call_poisson_constante.c;
-call_poisson_constante;
+[mbart,fbart,mt,ft] = proxG2(mbar,fbar,m,f)
+
+%mex call_poisson_constante.c;
+%call_poisson_constante;
 %%% Fin zone de tests %%%
