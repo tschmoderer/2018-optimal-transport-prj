@@ -1,5 +1,6 @@
 !! Etant donnée des valeurs décentrées bar et fbar
 !! Calcul leur divergence d
+
 subroutine divergence(mbar,fbar,d,N,Q)
     implicit none
     integer, intent(in) :: N,Q;

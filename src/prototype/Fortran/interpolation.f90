@@ -23,6 +23,7 @@ subroutine interpolation(mbar,fbar,m,f,N,Q)
             end if
         end do 
     end do 
+
     ! construction matrice d'interpolation pour f ! 
     do i=1,Q+2
         do j=1,Q+1

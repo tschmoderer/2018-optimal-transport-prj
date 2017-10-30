@@ -41,29 +41,18 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     call divergence(mbar,fbar,d,N,Q);
     call boundary(mbar,fbar,mleft,mright,fup,fdown,N,Q);
 
-    open(unit=4,file='files/d'); 
-    open(unit=7,file="files/mL");
-    open(unit=8,file="files/mR");
-    open(unit=9,file="files/fU");
-    open(unit=10,file="files/fD");
+    open(unit=4,file='files/d'); write(4,*), d; close(4);
+    open(unit=7,file="files/mL"); write(7,*), mleft; close(7);
+    open(unit=8,file="files/mR"); write(8,*), mright; close(8);
+    open(unit=9,file="files/fU"); write(9,*), fup; close(9);
+    open(unit=10,file="files/fD"); write(10,*), fdown; close(10);
     
-    write(4,*), d;
-    write(7,*), mleft;
-    write(8,*), mright;
-    write(9,*), fup;
-    write(10,*), fdown;
-    
-    call system('FreeFem++ poisson_2d.pde');
+    call system('FreeFem++ -v 0 poisson_2d.pde');
 
-    open(unit=3,file="files/solution");
-    read(3,*), solution;
-    close (unit=3)
+    open(unit=3,file="files/solution"); read(3,*), solution; close (3)
+
     call divergence_adjoint(solutionmbar,solutionfbar,solution,N,Q);
   
     projCmbar = mbar - solutionmbar + Cstmbar;
     projCfbar = fbar - solutionfbar + Cstfbar;
-    projCmbar = 0;
-    projCfbar = 0;
-
-  
 end subroutine

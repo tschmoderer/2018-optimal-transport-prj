@@ -17,8 +17,8 @@ real[int] mleft(Qt+1);
 real[int] mright(Qt+1);
 real[int,int] secondMembre(Nx+1,Qt+1);
 
-ifstream file0("files/f0");
-ifstream file1("files/f1");
+ifstream file0("files/fD");
+ifstream file1("files/fU");
 ifstream file2("files/mL");
 ifstream file3("files/mR");
 ifstream file4("files/d");
@@ -31,9 +31,9 @@ for (int i=0;i<Qt+1;i++) {
     file2 >> mleft(i);
     file3 >> mright(i);
 }
-for (int i=0;i<Nx+1;i++) {
-    for (int j=0;j<Qt+1;j++) {
-        file4 >> secondMembre(i,j);
+for (int i=0;i<Qt+1;i++) {
+    for (int j=0;j<Nx+1;j++) {
+        file4 >> secondMembre(j,i);
     }
 }
 
@@ -60,7 +60,7 @@ problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh
 
 Poisson;
 
-plot(uh,wait=1,fill=true,value=true);
+//plot(uh,wait=1,fill=true,value=true);
 
 ofstream output("files/solution");
 for(int j=0; j<uh[].n;j++) {

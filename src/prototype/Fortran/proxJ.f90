@@ -21,20 +21,9 @@ subroutine proxJ(Pm,Pf,m,f,g,N,Q)
 
     Pf = x1;
     Pm = (x1*m)/(1.0*(x1+2*g));
-end subroutine
-
-subroutine polynome(P,x,m,f,g,N,Q)
-    integer, intent(in) :: N,Q;
-    double precision, dimension(N+1,Q+1), intent(in) :: x,m,f;
-    double precision, dimension(N+1,Q+1), intent(out) :: P;
-    double precision :: g; 
-    P = -g*m**2 + (x-f)*((x+2*g)**2);
-end subroutine
-
-subroutine polynome_derivative(dP,x,f,g,N,Q)
-    integer, intent(in) :: N,Q;
-    double precision, dimension(N+1,Q+1), intent(in) :: x,f;
-    double precision, dimension(N+1,Q+1), intent(out) :: dP;
-    double precision :: g;
-    dP = 2*x*(x-f) + (x+2*g)**2;
+ !   print *, "k = ",k;
+ !   print *, "prox j : "
+ !   do k=1,Q+1
+ !   print *, Pm(:,k);
+ !   end do
 end subroutine
