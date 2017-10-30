@@ -1,16 +1,14 @@
-// https://arxiv.org/pdf/1205.1293.pdf
-// manuel freefem p244
-
 /*
 Calcul de la constante dans la solution
 genere le maillage
 */
 
-int Nx,Qt;
-int [int] d(2);
+int Nx,Qt; // Taille de la grille 
 
 ifstream param("files/parameters");
 param >> Nx >> Qt;
+
+// les conditions aux fontières 
 
 real[int] finit(Nx+1);
 real[int] ffinal(Nx+1);
@@ -37,12 +35,10 @@ Vh uh, vh;
 //		  1
 //
 
-
 problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2,4,uh=0) + on(1,uh=f0) + on(3,uh=f1);
-
 Poisson;
 
-//plot(uh,wait=1,fill=true,value=true);
+// plot(uh,wait=1,fill=true,value=true);
 
 ofstream output("files/Y");
 for(int j=0; j<uh[].n;j++) {
