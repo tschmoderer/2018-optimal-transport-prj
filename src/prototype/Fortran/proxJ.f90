@@ -1,3 +1,6 @@
+!! Etant donné m,f 
+!! renvoi l'opérateur de proximité sur J
+
 subroutine proxJ(Pm,Pf,m,f,g,N,Q)
     implicit none
     integer, intent(in) :: N,Q;

@@ -17,7 +17,7 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
 
     !! Second memebre de la projection !!
     double precision, dimension(N+1,Q+1) :: d; ! le centre 
-    double precision, dimension(Q+1) :: mleft,mright;
+    double precision, dimension(Q+1) :: mleft,mright; ! les frontières 
     double precision, dimension(N+1) :: fup,fdown;
 
     !! Solution du pbm de poisson !!

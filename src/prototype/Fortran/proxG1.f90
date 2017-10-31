@@ -1,3 +1,7 @@
+!! opérateur de proximité G1
+!! in : mbar, fbar, m, f
+!! out : Umbar Ufbar, Vm,Vf
+
 subroutine proxG1(Umbar,Ufbar,Vm,Vf,mbar,fbar,m,f,g,N,Q)
     implicit none
     integer, intent(in) :: N,Q;

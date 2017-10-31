@@ -14,26 +14,22 @@ subroutine interpolation_adjoint(mbar,fbar,m,f,N,Q)
     double precision, dimension(Q+1,Q+2) :: InterpAdjF;
 
     integer :: i,j;
-    !! test
-    double precision, dimension(N+1,N+1) :: test1;
-    double precision, dimension(Q+1,Q+1) :: test2;
+    
+	Interpm = 0;
+	Interpf = 0;
 
-    Interpm = 0;
-    Interpf = 0;
-    InterpAdjM = 0;
-    InterpAdjF = 0;
-    ! construction matrice d'interpolation de m
-    do j=1,N+2
-        do i = 1,N+1
+	! Construction matrice d'interpolation pour m !
+    do i=1,N+1
+        do j = 1,N+2
             if (i .EQ. j) then 
                 Interpm(i,j) = 0.5;
-            else if (i .EQ. j-1) then
+            else if (j .EQ. i+1) then
                 Interpm(i,j) = 0.5;
             end if
         end do 
     end do 
-    InterpAdjM = transpose(Interpm); ! son adjoint
-    ! construction matrice d'interpolation de f
+
+    ! construction matrice d'interpolation pour f ! 
     do i=1,Q+2
         do j=1,Q+1
             if (i .EQ. j) then
@@ -43,7 +39,9 @@ subroutine interpolation_adjoint(mbar,fbar,m,f,N,Q)
             end if
         end do
     end do
-    InterpAdjF = transpose(Interpf); ! son adjointe
+ 
+    InterpAdjM = transpose(Interpm); ! adjoint de Im
+    InterpAdjF = transpose(Interpf); ! adjoint de If
 
     mbar = matmul(InterpAdjM,m);
     fbar = matmul(f,InterpAdjF);
