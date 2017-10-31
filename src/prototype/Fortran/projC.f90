@@ -54,5 +54,5 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     call divergence_adjoint(solutionmbar,solutionfbar,solution,N,Q);
   
     projCmbar = mbar - solutionmbar + Cstmbar;
-    projCfbar = fbar - solutionfbar + Cstfbar;
+    projCfbar = fbar - solutionfbar + Cstfbar;    
 end subroutine

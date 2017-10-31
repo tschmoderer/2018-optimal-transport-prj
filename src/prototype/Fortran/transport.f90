@@ -6,25 +6,25 @@ integer :: i,j,k;
 
 !!! Initialisation !!!
 !! L'espace temps !!
-integer, parameter :: N = 70; ! Nb de points dans la direction x
-integer, parameter :: Q = 50; ! Nb de points dans la direction t
+integer, parameter :: N = 60; ! Nb de points dans la direction x
+integer, parameter :: Q = 53; ! Nb de points dans la direction t
 
 !   1
 !   |
+!   | 
+!   |  Q+1
+!   t  
+!   |  pts
 !   |
-!   |
-!   t  Q
-!   |
-!   |
-!   |        N
+!   |     N+1 pts
 !   0 ------ x ------ 1
 
 !! Paramètres de la méthode !!
 double precision :: alpha = 1; ! Doit etre dans ]0,2[
 double precision :: beta = 1.0; ! Doit etre dans [0,1]
-double precision :: gamma = 0.5; ! Doit etre positif
+double precision :: gamma = 1; ! Doit etre positif
 
-!! Grille centrée !!
+!! Grille centrée selon la variable  x !!
 double precision, dimension(0:N) :: GcX;
 
 !! Variables centrées !!
@@ -60,7 +60,7 @@ open (unit=2,file="files/parameters"); write (2,*), N, Q; close(2);
 
 call system('FreeFem++ -v 0 poisson_2d_constante.pde');
 
-!! call check(alpha,beta,gamma,N,Q);
+!call check(alpha,beta,gamma,N,Q);
 print *, "Lancement de l'algorithme";
 call DR(alpha,beta,gamma,N,Q);
 print *, "Fin de l'algorithme";

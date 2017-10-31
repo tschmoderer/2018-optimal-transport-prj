@@ -2,6 +2,8 @@
 ressources/*
 src/prototype/exemple_mex/*
 src/prototype/C/*
+src/prototype/Fortran/results/*
+src/prototype/Fortran/transport
 
 
 ## Core latex/pdflatex auxiliary files:

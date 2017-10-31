@@ -94,15 +94,13 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
  !   print *, InterpAdjF(:,i), "NN";
 !    end do 
 
+    Am = Idm + matmul(InterpAdjM,Interpm);
     Af = Idf + matmul(Interpf,InterpAdjF);
-    !call DGETRI(Q+2,Af,Q+2,IPIVf,WORK,Q+2,INFO);
-  Am = Idm + matmul(InterpAdjM,Interpm);
- !  Af = Idf + matmul(InterpAdjF,Interpf);
 
     !! second membre !! 
 
-  Bm = mbar + matmul(InterpAdjM,m);
-  Bf = fbar + matmul(f,InterpAdjF);
+   Bm = mbar + matmul(InterpAdjM,m);
+   Bf = fbar + matmul(f,InterpAdjF);
 
    ! print *, "Af : ";
   !  do i=1,Q+2
