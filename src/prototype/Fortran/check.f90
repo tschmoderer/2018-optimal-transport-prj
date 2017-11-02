@@ -127,16 +127,16 @@ subroutine check(alpha,beta,gamma,N,Q)
     
     !! Check Projection on C 
     call projC(projCmbar,projCfbar,mbar,fbar,N,Q); 
-    print *, "Projection sur C mbar : ";
-    do i = 1,Q+1
-        print *, projCmbar(:,i), "ENDL";
-    end do 
-    print *, "Projection sur C fbar : ";
-    do i = 1,Q+2
-        print *, projCfbar(:,i), "ENDL";
-    end do
-    do while (1 .EQ. 1)
-    end do
+!    print *, "Projection sur C mbar : ";
+!    do i = 1,Q+1
+!        print *, projCmbar(:,i), "ENDL";
+!    end do 
+!    print *, "Projection sur C fbar : ";
+!    do i = 1,Q+2
+!        print *, projCfbar(:,i), "ENDL";
+!    end do
+!    do while (1 .EQ. 1)
+!    end do
 
     !! Check prox G2
     call proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q);

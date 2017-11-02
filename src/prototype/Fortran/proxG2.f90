@@ -6,28 +6,26 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     implicit none
     
     integer, intent(in) :: N,Q;
-    double precision, dimension(N+1,Q+1), intent(in) :: m,f;
-    double precision, dimension(N+2,Q+1), intent(in) :: mbar;
-    double precision, dimension(N+1,Q+2), intent(in) :: fbar;
-    double precision, dimension(N+1,Q+1), intent(out) :: mt,ft;
-    double precision, dimension(N+2,Q+1), intent(out) :: mbart;
-    double precision, dimension(N+1,Q+2), intent(out) :: fbart;
+    double precision, dimension(Q+1,N+1), intent(in) :: m,f;
+    double precision, dimension(Q+1,N+2), intent(in) :: mbar;
+    double precision, dimension(Q+2,N+1), intent(in) :: fbar;
+    double precision, dimension(Q+1,N+1), intent(out) :: mt,ft;
+    double precision, dimension(Q+1,N+2), intent(out) :: mbart;
+    double precision, dimension(Q+2,N+1), intent(out) :: fbart;
 
-    double precision, dimension(N+1,N+2) :: Interpm;
-    double precision, dimension(Q+2,Q+1) :: Interpf;
-    double precision, dimension(N+2,N+1) :: InterpAdjM;
-    double precision, dimension(Q+1,Q+2) :: InterpAdjF;
+    double precision, dimension(N+2,N+1) :: Interpm;
+    double precision, dimension(Q+1,Q+2) :: Interpf;
+    double precision, dimension(N+1,N+2) :: InterpAdjM;
+    double precision, dimension(Q+2,Q+1) :: InterpAdjF;
     double precision, dimension(N+2,N+2) :: Idm;
     double precision, dimension(N+2,N+2) :: Am;
     double precision, dimension(Q+2,Q+2) :: Idf;
     double precision, dimension(Q+2,Q+2) :: Af;
-    double precision, dimension(N+2,Q+1) :: Bm;
-    double precision, dimension(N+1,Q+2) :: Bf;
+    double precision, dimension(Q+1,N+2) :: Bm;
+    double precision, dimension(Q+2,N+1) :: Bf;
 
     integer :: i,j;
     integer :: INFO;
-   ! integer, parameter :: LWORK = Q+2;
-    double precision, dimension(Q+2) :: WORK;
     integer, dimension(N+2) :: IPIVm;
     integer, dimension(Q+2) :: IPIVf;
 
@@ -45,8 +43,8 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     Bf = 0;
 
     ! construction matrice d'interpolation de m
-    do j=1,N+2
-        do i = 1,N+1
+    do j=1,N+1
+        do i = 1,N+2
             if (i .EQ. j) then 
                 Interpm(i,j) = 0.5;
             else if (i .EQ. j-1) then
@@ -57,8 +55,8 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     InterpAdjM = transpose(Interpm); ! son adjoint
     
   !   construction matrice d'interpolation de f
-    do i=1,Q+2
-        do j=1,Q+1
+    do i=1,Q+1
+        do j=1,Q+2
             if (i .EQ. j) then
                 Interpf(i,j) = 0.5;
             else if (i .EQ. j+1) then 
@@ -94,13 +92,13 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
  !   print *, InterpAdjF(:,i), "NN";
 !    end do 
 
-    Am = Idm + matmul(InterpAdjM,Interpm);
-    Af = Idf + matmul(Interpf,InterpAdjF);
+    Am = Idm + matmul(Interpm,InterpAdjM);
+    Af = Idf + matmul(InterpAdjF,Interpf);
 
     !! second membre !! 
 
-   Bm = mbar + matmul(InterpAdjM,m);
-   Bf = fbar + matmul(f,InterpAdjF);
+   Bm = mbar + matmul(m,InterpAdjM);
+   Bf = fbar + matmul(InterpAdjF,f);
 
    ! print *, "Af : ";
   !  do i=1,Q+2
@@ -121,6 +119,6 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     !end do 
     mbart = Bm;
     fbart = Bf;
-    mt = matmul(Interpm,mbart);
-    ft = matmul(fbart,Interpf);
+    mt = matmul(mbart,Interpm);
+    ft = matmul(Interpf,fbart);
 end subroutine

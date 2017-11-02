@@ -22,27 +22,25 @@ for (int j=0;j<Nx+1;j++) {
 func f0=finit(Nx*x);
 func f1=ffinal(Nx*x);
 
-
-mesh Th=square(Nx,Qt);
-//plot(Th,wait=1);
+mesh Th=square(Nx,Qt); //plot(Th,wait=1);
 
 fespace Vh(Th,P1);
-
 Vh uh, vh;
 
 //		  3
-//      4|	|2
-//		  1
-//
+//     4|	|2
+//		  1  
+
 
 problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2,4,uh=0) + on(1,uh=f0) + on(3,uh=f1);
 Poisson;
 
-// plot(uh,wait=1,fill=true,value=true);
+plot(uh,wait=1,fill=true,value=true);
 
 ofstream output("files/Y");
-for(int j=0; j<uh[].n;j++) {
-    output << uh[][j] << endl;
+// Affichage à l'envers pour lecture fortran dans le bon sens
+for(int j=uh[].n-1; j>=0;j--) {
+    output << uh[][j] << endl; // a voir s'il faudrait pas tout ecrire sur une ligne 
 }
 
 savemesh(Th,"files/maillage.msh");

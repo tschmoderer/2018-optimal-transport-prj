@@ -4,8 +4,8 @@ implicit none
 !!! Initialisation !!!
 integer :: i;
 !! L'espace temps !!
-integer, parameter :: N = 30; ! Nb de points dans la direction x i.e Nb colonnes
-integer, parameter :: Q = 30; ! Nb de points dans la direction t i.e Nb lignes
+integer, parameter :: N = 29; ! Nb de points dans la direction x i.e Nb colonnes
+integer, parameter :: Q = 31; ! Nb de points dans la direction t i.e Nb lignes
 
 !   1
 !   |
@@ -52,10 +52,8 @@ open (unit=2,file="files/parameters"); write (2,*), N, Q; close(2);
 call system('FreeFem++ -v 0 poisson_2d_constante.pde');
 
 !! Lancement de l'algorithme de résolution !!
-call check(alpha,beta,gamma,N,Q);
-stop
-call check(alpha,beta,gamma,N,Q);
-stop;
+
+!call check(alpha,beta,gamma,N,Q); stop;
 print *, "Lancement de l'algorithme";
 call DR(alpha,beta,gamma,N,Q);
 print *, "Fin de l'algorithme";
