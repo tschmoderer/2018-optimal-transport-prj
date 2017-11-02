@@ -1,10 +1,8 @@
 # Ajout personnel
-ressources/*
-src/prototype/exemple_mex/*
-src/prototype/C/*
+Ressources/*
+src/prototype/Fortran/files/*
 src/prototype/Fortran/results/*
 src/prototype/Fortran/transport
-
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
