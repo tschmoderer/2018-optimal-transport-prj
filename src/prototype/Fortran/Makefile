@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS  = -g -o
+FFLAGS  = -g -Wall -fcheck=all -ffpe-trap=invalid,zero
 LLFLAGS  = -llapack
 EXEC = transport
 
@@ -12,8 +12,8 @@ OBJS = $(SRCS:.f90=.o)
 %.o : %.f90
 	$(FC) $(FFLAGS) −c $<
 
-all : *.f90	
-	$(FC) $(FFLAGS) $(EXEC) *.f90 $(LLFLAGS)
+all : *.f90
+	$(FC) $(FFLAGS) -o $(EXEC) *.f90 $(LLFLAGS)
 
 clean : 
 	rm *.out *.o $(EXEC) 		

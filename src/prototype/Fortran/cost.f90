@@ -3,15 +3,15 @@
 subroutine cost(R,m,f,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
-    double precision, dimension(N+1,Q+1), intent(in) :: m,f; 
+    double precision, dimension(Q+1,N+1), intent(in) :: m,f; 
     double precision, intent(out) :: R;
 
     integer :: i,j; 
-    real :: x = 0.0;
+    double precision :: x = 0.0;
 
     R = 0;
-    do i = 1,N+1
-        do j = 1,Q+1
+    do i = 1,Q+1
+        do j = 1,N+1
             if (f(i,j) .GT. 0) then 
                 R = R + m(i,j)**2/(1.0*f(i,j));
             else if ((f(i,j) .EQ. 0 ) .AND. (m(i,j) .EQ. 0)) then 

@@ -1,13 +1,11 @@
 program transport
 implicit none
 
-!! Les basiques -  indices de boucles!!
-integer :: i,j,k;
-
 !!! Initialisation !!!
+integer :: i;
 !! L'espace temps !!
-integer, parameter :: N = 60; ! Nb de points dans la direction x
-integer, parameter :: Q = 53; ! Nb de points dans la direction t
+integer, parameter :: N = 30; ! Nb de points dans la direction x i.e Nb colonnes
+integer, parameter :: Q = 30; ! Nb de points dans la direction t i.e Nb lignes
 
 !   1
 !   |
@@ -20,32 +18,25 @@ integer, parameter :: Q = 53; ! Nb de points dans la direction t
 !   0 ------ x ------ 1
 
 !! Paramètres de la méthode !!
-double precision :: alpha = 1; ! Doit etre dans ]0,2[
+double precision :: alpha = 1.983; ! Doit etre dans ]0,2[
 double precision :: beta = 1.0; ! Doit etre dans [0,1]
-double precision :: gamma = 1; ! Doit etre positif
+double precision :: gamma = 1.0; ! Doit etre positif
 
 !! Grille centrée selon la variable  x !!
-double precision, dimension(0:N) :: GcX;
-
-!! Variables centrées !!
-double precision, dimension(N+1,Q+1) :: m,f; ! N+1 colonnes et Q+1 lignes
-
-!! Variables décentrées !!
-double precision, dimension(N+2,Q+1) :: mbar; ! N+2 colonnes et Q+1 lignes
-double precision, dimension(N+1,Q+2) :: fbar; ! N+1 colonnes et Q+2 lignes
+double precision, dimension(0:N) :: GcX = (/(i/(1.0*N),i=0,N)/);
 
 !! Les valeurs aux frontières !!
 double precision, dimension(N+1) :: f0; ! La densité initiale --> en bas
 double precision, dimension(N+1) :: f1; ! la densité finale --> en haut 
 
+!! Variables centrées !!
+double precision, dimension(Q+1,N+1) :: m,f; ! Q+1 lignes, N+1 colonnes
+
+!! Variables décentrées !! 
+double precision, dimension(Q+1,N+2) :: mbar; ! Q+1 lignes, N+2 colonnes
+double precision, dimension(Q+2,N+1) :: fbar; ! Q+2 lignes, N+1 colonnes
+
 !!! Initialisation des variables !!!
-
-!! Grille centrée !!
-do i=0,N
-    GcX(i) = i/(1.0*N);
-end do
-
-
 !! Les fontières !!
 call finitial(GcX,N,f0);
 call ffinal(GcX,N,f1);
@@ -60,7 +51,11 @@ open (unit=2,file="files/parameters"); write (2,*), N, Q; close(2);
 
 call system('FreeFem++ -v 0 poisson_2d_constante.pde');
 
-!call check(alpha,beta,gamma,N,Q);
+!! Lancement de l'algorithme de résolution !!
+call check(alpha,beta,gamma,N,Q);
+stop
+call check(alpha,beta,gamma,N,Q);
+stop;
 print *, "Lancement de l'algorithme";
 call DR(alpha,beta,gamma,N,Q);
 print *, "Fin de l'algorithme";

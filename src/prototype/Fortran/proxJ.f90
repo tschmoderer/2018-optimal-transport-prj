@@ -5,16 +5,16 @@ subroutine proxJ(Pm,Pf,m,f,g,N,Q)
     implicit none
     integer, intent(in) :: N,Q;
     double precision, intent(in) :: g;
-    double precision, dimension(N+1,Q+1), intent(in) :: m,f; 
-    double precision, dimension(N+1,Q+1), intent(out) :: Pm,Pf; 
-    double precision, dimension(N+1,Q+1) :: x0,x1; 
-    double precision, dimension(N+1,Q+1) :: P,dP;
+    double precision, dimension(Q+1,N+1), intent(in) :: m,f; 
+    double precision, dimension(Q+1,N+1), intent(out) :: Pm,Pf; 
+    double precision, dimension(Q+1,N+1) :: x0,x1,P,dP; 
+  
     integer :: k;
     
     x0 = 1000;
     x1 = 0;
     k = 0;
-    do while ((sum(abs(x0-x1)) .GT. 1e-5 ) .AND. (k .LT. 50))
+    do while ((sum(abs(x0-x1)) .GT. 1e-15 ) .AND. (k .LT. 50))
         x0 = x1;
         call polynome(P,x0,m,f,g,N,Q);
         call polynome_derivative(dP,x0,f,g,N,Q)
@@ -23,7 +23,7 @@ subroutine proxJ(Pm,Pf,m,f,g,N,Q)
     end do
 
     Pf = x1;
-    Pm = (x1*m)/(1.0*(x1+2*g));
+    Pm = (x1*m)/(1.0*(x1+2.0*g));
  !   print *, "k = ",k;
  !   print *, "prox j : "
  !   do k=1,Q+1

@@ -4,22 +4,22 @@ subroutine check_adjoint(N,Q)
 
     !! Variables tests Boundary!!
     
-    double precision, dimension(N+2,Q+1) :: mbar,boundAdjMres;
-    double precision, dimension(N+1,Q+2) :: fbar,boundAdjFres;
+    double precision, dimension(Q+1,N+2) :: mbar,boundAdjMres;
+    double precision, dimension(Q+2,N+1) :: fbar,boundAdjFres;
     double precision, dimension(Q+1) :: mleft,mright,boundResLeft,boundResRight;
     double precision, dimension(N+1) :: fup,fdown,boundResUp,boundResDown;
 
     !! Variables pour l'interpolation !!
     
-    double precision, dimension(N+2,Q+1) :: mbarInterpAdj;
-    double precision, dimension(N+1,Q+2) :: fbarInterAdj;
-    double precision, dimension(N+1,Q+1) :: m,f,mInterp,fInterp;
+    double precision, dimension(Q+1,N+2) :: mbarInterpAdj;
+    double precision, dimension(Q+2,N+1) :: fbarInterAdj;
+    double precision, dimension(Q+1,N+1) :: m,f,mInterp,fInterp;
 
     !! Variables pour la divergence !! 
 
-    double precision, dimension(N+2,Q+1) :: divAdjMres;
-    double precision, dimension(N+1,Q+2) :: divAdjFres;
-    double precision, dimension(N+1,Q+1) :: d,dRes;
+    double precision, dimension(Q+1,N+2) :: divAdjMres;
+    double precision, dimension(Q+2,N+1) :: divAdjFres;
+    double precision, dimension(Q+1,N+1) :: d,dRes;
 
     !! Variables pour tous le monde !!
     double precision :: s1,s2;
@@ -46,7 +46,23 @@ subroutine check_adjoint(N,Q)
 
     print *, abs(s1-s2)/s1;
 
-    !! Initialisation Interpolation !!
+    !! Initialisation divergence !!
+    divAdjMres = 0;
+    divAdjFres = 0;
+    d = 0;    
+    call RANDOM_NUMBER(dRes);
+
+    print *, "Check divergence adjoint";
+
+    call divergence(mbar,fbar,d,N,Q);
+    call divergence_adjoint(divAdjMres,divAdjFres,dRes,N,Q);
+
+    s1 = sum(dRes*d);
+    s2 = sum(divAdjMres*mbar) + sum(divAdjFres*fbar);
+
+    print *, abs(s1-s2)/(1.0*s1);
+    
+ !! Initialisation Interpolation !!
 
     mbarInterpAdj = 0;
     fbarInterAdj = 0;
@@ -64,22 +80,5 @@ subroutine check_adjoint(N,Q)
     s2 = sum(mbarInterpAdj*mbar) + sum(fbarInterAdj*fbar);
 
     print *, abs(s1-s2)/(1.0*s1);
-
-    !! Initialisation divergence !!
-    divAdjMres = 0;
-    divAdjFres = 0;
-    d = 0;    
-    call RANDOM_NUMBER(dRes);
-
-    print *, "Check divergence adjoint";
-
-    call divergence(mbar,fbar,d,N,Q);
-    call divergence_adjoint(divAdjMres,divAdjFres,dRes,N,Q);
-
-    s1 = sum(dRes*d);
-    s2 = sum(divAdjMres*mbar) + sum(divAdjFres*fbar);
-
-    print *, abs(s1-s2)/(1.0*s1);
-    
 
 end subroutine
