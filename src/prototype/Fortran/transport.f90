@@ -56,6 +56,7 @@ call system('FreeFem++ -v 0 poisson_2d_constante.pde');
 !call check(alpha,beta,gamma,N,Q); stop;
 print *, "Lancement de l'algorithme";
 call DR(alpha,beta,gamma,N,Q);
+! call PD(alpha,beta,gamma,N,Q)
 print *, "Fin de l'algorithme";
 
 end program

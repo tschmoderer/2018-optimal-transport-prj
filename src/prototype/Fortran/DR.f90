@@ -9,13 +9,18 @@ subroutine DR(alpha,beta,gamma,N,Q)
     double precision, dimension(Q+2,N+1) :: zfbar,wfbar0,wfbar1,wfbartmp;
 
     double precision, dimension(0:N) :: GcX;
-    integer :: i,j;
-!    character(10) :: charI;
+    double precision, dimension(0:Q) :: GcT; 
+    integer :: i,j,k;
+    character(10) :: charI;
+    character(200) :: cmd;
 !    double precision :: R;
 
     !! initialisation
     do i=0,N
      GcX(i) = i/(1.0*N);
+    end do
+    do i =0,Q 
+        GcT(i) = i/(1.0*Q);
     end do
 
     wm0 = 0; wm1 = 0;
@@ -36,9 +41,20 @@ subroutine DR(alpha,beta,gamma,N,Q)
 
         !! z = ProxG2(w) !!
         call proxG2(zmbar,zfbar,zm,zf,wmbar0,wfbar0,wm0,wf0,N,Q);
-    !    write(charI,'(I5.5)'), i
-    !    open(7,file='results/f_'//trim(charI)//'.dat'); write(7,*) zf; close(7);
-        
+        write(charI,'(I5.5)'), i
+        open(7,file='results/f_'//trim(charI)//'.dat'); 
+        write(7,*) "# ", "X ", "T ", "Z";
+        do k = 1,Q+1 
+            do j = 1,N+1 
+                write(7,*) GcX(j-1), GcT(k-1), zf(k,j); 
+            end do 
+        end do
+        close(7);
+        write(cmd,*) 'set contour; set dgrid3d ', N, ',', Q, ';', 'splot "results/f_'//trim(charI), &
+            '.dat" with lines; set title "Iteration Nb '//trim(charI),' "';
+        open(8,file="plot.gnu"); write(8,*) cmd; close(8);
+        call system("gnuplot plot.gnu");
+
         print *, "-3 : |wm1 - wm0| = ", sum(wm1-wm0);
         print *, "-2 : |wf1 - wf0| = ", sum(wf1-wf0);
         print *, "-1 : |wmbar1 - wmbar0| = ", sum(wmbar1-wmbar0);
