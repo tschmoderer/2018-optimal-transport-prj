@@ -1,6 +1,8 @@
 /*
-Calcul de la constante dans la solution
-genere le maillage
+Procédure de calcul de l'équation de Poisson dans le carré [0,1]x[0,1]
+Timothée Schmoderer
+INSA Rouen Normandie
+Cc 2017
 */
 
 int Nx,Qt; // Taille de la grille 
@@ -10,8 +12,8 @@ param >> Nx >> Qt;
 
 // les conditions aux fontières 
 
-real[int] finit(Nx+1);
-real[int] ffinal(Nx+1);
+real[int] finit(Nx+1); // condition initial --> ira en bas
+real[int] ffinal(Nx+1); // condition terminal --> ira en haut 
 ifstream file0("files/f0");
 ifstream file1("files/f1");
 for (int j=0;j<Nx+1;j++) {
@@ -19,10 +21,11 @@ for (int j=0;j<Nx+1;j++) {
 	file1 >> ffinal(j);
 }
 
-func f0=finit(Nx*x);
-func f1=ffinal(Nx*x);
+func f0=finit(floor(Nx*x));
+func f1=ffinal(floor(Nx*x));
 
-mesh Th=square(Nx,Qt); //plot(Th,wait=1);
+mesh Th=square(Nx,Qt); 
+// plot(Th,wait=1);
 
 fespace Vh(Th,P1);
 Vh uh, vh;
@@ -32,15 +35,15 @@ Vh uh, vh;
 //		  1  
 
 
-problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2,4,uh=0) + on(1,uh=f0) + on(3,uh=f1);
+problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(1,uh=f0) + on(2,4,uh=0) + on(3,uh=f1);
 Poisson;
 
-plot(uh,wait=1,fill=true,value=true);
+// plot(uh,wait=1,nbiso=30,fill=true,value=true);
 
 ofstream output("files/Y");
-// Affichage à l'envers pour lecture fortran dans le bon sens
-for(int j=uh[].n-1; j>=0;j--) {
-    output << uh[][j] << endl; // a voir s'il faudrait pas tout ecrire sur une ligne 
+
+for (int j=0;j<uh[].n;j++) {
+	output << uh[][j] << endl;
 }
 
 savemesh(Th,"files/maillage.msh");

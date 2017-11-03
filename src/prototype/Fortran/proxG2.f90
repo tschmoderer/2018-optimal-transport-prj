@@ -17,12 +17,12 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     double precision, dimension(Q+1,Q+2) :: Interpf;
     double precision, dimension(N+1,N+2) :: InterpAdjM;
     double precision, dimension(Q+2,Q+1) :: InterpAdjF;
-    double precision, dimension(N+2,N+2) :: Idm;
-    double precision, dimension(N+2,N+2) :: Am;
     double precision, dimension(Q+2,Q+2) :: Idf;
     double precision, dimension(Q+2,Q+2) :: Af;
-    double precision, dimension(Q+1,N+2) :: Bm;
     double precision, dimension(Q+2,N+1) :: Bf;
+    double precision, dimension(N+2,N+2) :: Idm;
+    double precision, dimension(N+2,N+2) :: Am;
+    double precision, dimension(N+2,Q+1) :: Bm;
 
     integer :: i,j;
     integer :: INFO;
@@ -42,29 +42,30 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
     Bm = 0;
     Bf = 0;
 
-    ! construction matrice d'interpolation de m
-    do j=1,N+1
-        do i = 1,N+2
+	! Construction matrice d'interpolation pour m !
+    do i=1,N+2
+        do j = 1,N+1
             if (i .EQ. j) then 
                 Interpm(i,j) = 0.5;
-            else if (i .EQ. j-1) then
+            else if (j .EQ. i-1) then
                 Interpm(i,j) = 0.5;
             end if
         end do 
     end do 
-    InterpAdjM = transpose(Interpm); ! son adjoint
-    
-  !   construction matrice d'interpolation de f
+
+    ! construction matrice d'interpolation pour f ! 
     do i=1,Q+1
         do j=1,Q+2
             if (i .EQ. j) then
                 Interpf(i,j) = 0.5;
-            else if (i .EQ. j+1) then 
+            else if (j .EQ. i+1) then 
                 Interpf(i,j) = 0.5;
             end if
         end do
     end do
-    InterpAdjF = transpose(Interpf); ! son adjointe
+ 
+    InterpAdjM = transpose(Interpm); ! adjoint de Im
+    InterpAdjF = transpose(Interpf); ! adjoint de If
 
     do i=1,N+2
         do j=1,N+2
@@ -82,42 +83,19 @@ subroutine proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q)
        end do
     end do 
 
-!    print *, "Interpf : ";
- !   do i=1,Q+1
-  !  print *, Interpf(:,i), "NN";
-   ! end do 
-
-   ! print *, "InterpfAdj : ";
-  !  do i =1,Q+2
- !   print *, InterpAdjF(:,i), "NN";
-!    end do 
-
-    Am = Idm + matmul(Interpm,InterpAdjM);
+    Am = transpose(Idm + matmul(Interpm,InterpAdjM));
     Af = Idf + matmul(InterpAdjF,Interpf);
 
     !! second membre !! 
 
-   Bm = mbar + matmul(m,InterpAdjM);
+   Bm = transpose(mbar + matmul(m,InterpAdjM));
    Bf = fbar + matmul(InterpAdjF,f);
 
-   ! print *, "Af : ";
-  !  do i=1,Q+2
- !   print *, Af(:,i), "NN";
-!    end do 
-
-!    print *, "Bf : ";
- !   do i =1,Q+2
-  !  print *, Bf(:,i), "NN";
-   ! end do 
-  
    call SGESV(N+2,Q+1,Am,N+2,IPIVm,Bm,N+2,INFO);
    call SGESV(Q+2,N+1,Af,Q+2,IPIVf,Bf,Q+2,INFO);
 
- !print *, "la solution Bf : ";
-  !  do i =1,Q+2
-   ! print *, Bf(:,i), "NN";
-    !end do 
-    mbart = Bm;
+
+    mbart = transpose(Bm);
     fbart = Bf;
     mt = matmul(mbart,Interpm);
     ft = matmul(Interpf,fbart);

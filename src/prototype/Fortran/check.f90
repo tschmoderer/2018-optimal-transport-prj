@@ -39,19 +39,19 @@ subroutine check(alpha,beta,gamma,N,Q)
     call RANDOM_NUMBER(mbar);
     call RANDOM_NUMBER(fbar);
 
-    open(0,file="../m"); write(0,*) m; close(0);
-    open(0,file="../f"); write(0,*) f; close(0);
-    open(0,file="../mbar"); write(0,*) mbar; close(0);
-    open(0,file="../fbar"); write(0,*) fbar; close(0);
+!    open(0,file="../m"); write(0,*) m; close(0);
+!    open(0,file="../f"); write(0,*) f; close(0);
+!    open(0,file="../mbar"); write(0,*) mbar; close(0);
+!    open(0,file="../fbar"); write(0,*) fbar; close(0);
 
-    print *, "mbar : "
-    do i = 1,Q+1
-        print *, mbar(:,i), "ENDL";
-    end do
-    print *, "fbar : "
-    do i = 1,Q+2
-        print *, fbar(:,i), "ENDL";
-    end do
+!    print *, "mbar : "
+!    do i = 1,Q+1
+!        print *, mbar(:,i), "ENDL";
+!    end do
+!    print *, "fbar : "
+!    do i = 1,Q+2
+!        print *, fbar(:,i), "ENDL";
+!    end do
 
     !! Check cost !!
     call cost(R,m,f,N,Q);
@@ -139,6 +139,7 @@ subroutine check(alpha,beta,gamma,N,Q)
 !    end do
 
     !! Check prox G2
+!    mbar = 0; fbar = 0; m = 0; f= 0;
     call proxG2(mbart,fbart,mt,ft,mbar,fbar,m,f,N,Q);
 !    print *, "Proximité G2 : mbart :"
 !    do i = 1,Q+1
