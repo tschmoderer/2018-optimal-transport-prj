@@ -31,16 +31,21 @@ s2 = sum([sum(mbarX.*mbarY) sum((fbarX.*fbarY)')]);
 e2 = abs(s1 - s2)/s1
 
 % check Interpolation adjoint
+globals;
+mbar = rand(Q+1,N+2); fbar = rand(Q+2,N+1);
+m = rand(Q+1,N+1); f = rand(Q+1,N+1); 
+%
+%Imbar = mbar*Interpm; 
+%Ifbar = Interpf*fbar; 
+%
+%Iadjm = m*Interpm_adj; 
+%Iadjf = Interpf_adj*f;
 
-mbarX = rand(Q+1,N+2);
-fbarX = rand(Q+2,N+1);
-IYm = rand(Q+1,N+1);
-IYf = rand(Q+1,N+1);
+[Imbar Ifbar] = interpolation(mbar,fbar);
+[Iadjm Iadjf] = interpolation_adjoint(m,f); 
 
-[IXm IXf] = interpolation(mbarX,fbarX);
-[mbarY fbarY] = interpolation_adjoint(IYm,IYf);
 
-s1 = sum([sum(IXm.*IYm) sum((IXf.*IYf)')]);
-s2 = sum([sum(mbarX.*mbarY) sum((fbarX.*fbarY)')]);
+s1 = sum(sum(Imbar.*m)) + sum(sum(Ifbar.*f));
+s2 = sum(sum(Iadjm.*mbar)) + sum(sum(Iadjf.*fbar));
 
 e3 = abs(s1 - s2)/s1

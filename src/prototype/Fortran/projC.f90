@@ -26,7 +26,6 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     double precision, dimension(Q+2,N+1) :: solutionfbar;
     
     !test 
-    double precision, dimension(0:N) :: GcX;
     integer :: i,j;
 
     !! Initialisation !! 
@@ -61,7 +60,6 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
     end do 
     close(4);
 
-
     call system('FreeFem++ -v 0 poisson_2d.pde');
 
     open(unit=3,file="files/solution"); 
@@ -76,12 +74,17 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
   	 
     projCmbar = mbar - solutionmbar + Cstmbar;
     projCfbar = fbar - solutionfbar + Cstfbar;    
-    
+
+    projCmbar(:,1) = mbar(:,1) - solution(:,1) + Cst(:,1); 
+    projCmbar(:,N+2) = mbar(:,N+2) - solution(:,N+1) + Cst(:,N+1);
+    projCfbar(1,:) = fbar(1,:) - solution(1,:) + Cst(1,:);
+    projCfbar(Q+2,:) = fbar(Q+2,:) - solution(Q+1,:) + Cst(Q+1,:);
+
     !! test 
-  	print *, "Constante fbar: "
+  	print *, "Constasolution fbarnte : "
   	do i = 1,Q+1
   		do j = 1,N+1
-  			!print *, Cst(i,j), " ";
+  			!print *, solutionfbar(i,j), " ";
   		end do 
   			print *, "ENDL";
   	end do
@@ -94,6 +97,13 @@ subroutine projC(projCmbar,projCfbar,mbar,fbar,N,Q)
   		end do 
   			print *, "ENDL";
   	end do
+      call divergence(projCmbar,projCfbar,d,N,Q);
+      call boundary(projCmbar,projCfbar,mleft,mright,fup,fdown,N,Q);
+      print *, "divergence : ", sum(d);
+      print *, "mleft : ", sum(mleft);
+      print *, "mright : ", sum(mright);
+      print *, "fup : ", sum(fup);
+      print *, "fdown : ", sum(fdown);
  ! stop  
   !! test
 end subroutine

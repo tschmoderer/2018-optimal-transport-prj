@@ -95,8 +95,8 @@ p = 20;
 %%
 % Shortcut to generate Gaussian function.
 
-[Y,X] = meshgrid(linspace(0,1,n), linspace(0,1,n));
-gaussian = @(a,b,sigma)exp( -((X-a).^2+(Y-b).^2)/(2*sigma^2) );
+X = linspace(0,1,n);
+gaussian = @(a,sigma)exp( -((X-a).^2)/(2*sigma^2) );
 normalize = @(u)u/sum(u(:));
 
 %%
@@ -104,8 +104,8 @@ normalize = @(u)u/sum(u(:));
 
 sigma = .1;
 rho = .05; % minimum density value
-f0 = normalize( rho + gaussian(.2,.3,sigma) );
-f1 = normalize( rho + gaussian(.6,.7,sigma*.7) + .6*gaussian(.7,.4,sigma*.7) );
+f0 = normalize( rho + gaussian(.2,sigma) );
+f1 = normalize( rho + gaussian(.7,sigma*.7) + .6*gaussian(.4,sigma*.7) );
 
 %%
 % Display \(f_0,f_1\).
@@ -127,8 +127,8 @@ if strcmp(bound, 'per')
     dx = @(u)u([2:end 1],:,:)-u;
     dy = @(u)u(:,[2:end 1],:)-u;
 else
-    dx = @(u)u([2:end end],:,:)-u;
-    dy = @(u)u(:,[2:end end],:)-u;
+    dx = @(u)u([2:end end],:)-u;
+  %  dy = @(u)u(:,[2:end end],:)-u;
 end
 
 %%
@@ -138,33 +138,33 @@ if strcmp(bound, 'per')
     dxS = @(u)-u+u([end 1:end-1],:,:);
     dyS = @(u)-u+u(:,[end 1:end-1],:);
 else
-    dxS = @(u)[-u(1,:,:); u(1:end-2,:,:)-u(2:end-1,:,:); u(end-1,:,:)];
-    dyS = @(u)[-u(:,1,:), u(:,1:end-2,:)-u(:,2:end-1,:), u(:,end-1,:)];    
+    dxS = @(u)[-u(1,:); u(1:end-2,:)-u(2:end-1,:); u(end-1,:)];
+ %   dyS = @(u)[-u(:,1,:), u(:,1:end-2,:)-u(:,2:end-1,:), u(:,end-1,:)];    
 end
 
 %%
 % Check that |dxS| and |dyS| really implement \(d/dx^*\) and \(d/dy^*\).
 
-fprintf('Should be 0: %.2e\n', certify_adjoint(dx,dxS,[n n p]));
-fprintf('Should be 0: %.2e\n', certify_adjoint(dy,dyS,[n n p]));
+fprintf('Should be 0: %.2e\n', certify_adjoint(dx,dxS,[n p]));
+%fprintf('Should be 0: %.2e\n', certify_adjoint(dy,dyS,[n p]));
 
 %%
 % Define spacial gradient and divergence, satisfying \(\text{div}=-\nabla^*\).
 
-grad = @(f)cat(4, dx(f), dy(f));
-div  = @(u)-dxS(u(:,:,:,1)) - dyS(u(:,:,:,2));
+grad = @(f)dx(f);
+div  = @(u)-dxS(u(:,:,1)) ;
 
 %%
 % Check that |div| really implements div.
 
-fprintf('Should be 0: %.2e\n', certify_adjoint(grad,@(v)-div(v),[n n p]));
+fprintf('Should be 0: %.2e\n', certify_adjoint(grad,@(v)-div(v),[n p]));
 
 %%
 % We use first order finite differences for the time derivatives. 
 % Note that zero is padded at the end to keep the same dimensionality.
 
-dt  = @(f)cat(3, f(:,:,2:end)-f(:,:,1:end-1), zeros(size(f,1),size(f,2)) );
-dtS = @(u)cat(3, -u(:,:,1), u(:,:,1:end-2)-u(:,:,2:end-1), u(:,:,end-1));
+dt  = @(f)cat(2, f(:,2:end)-f(:,1:end-1), zeros(size(f,1),size(f,2)) );
+dtS = @(u)cat(2, -u(:,1), u(:,1:end-2)-u(:,2:end-1), u(:,end-1));
 
 %%
 % In the following, we group the dicrete variables as \(w=(m,f) \in \RR^{N
@@ -365,10 +365,10 @@ niter = 200;
 %%
 % Initialization using linear interpolation of the densities.
 
-t = repmat( reshape(linspace(0,1,p), [1 1 p]), [n n 1]);
-f = (1-t) .* repmat(f0, [1 1 p]) + t .* repmat(f1, [1 1 p]);
-m = zeros(n,n,p,2);
-w0 = cat(4, m,f);
+t = repmat(linspace(0,1,p), [n 1]); % le temps 
+f = (1-t) .* repmat(f0', [1 p]) + t .* repmat(f1', [1 p]);
+m = zeros(n,p);
+w0 = cat(m,f);
 
 %%
 % Display the initialization.

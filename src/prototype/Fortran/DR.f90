@@ -13,7 +13,7 @@ subroutine DR(alpha,beta,gamma,N,Q)
     integer :: i,j,k;
     character(10) :: charI;
     character(200) :: cmd;
-!    double precision :: R;
+    double precision :: R;
 
     !! initialisation
     do i=0,N
@@ -30,7 +30,7 @@ subroutine DR(alpha,beta,gamma,N,Q)
 
 
     !! boucle principale
-    do i = 0,5
+    do i = 0,50
         !! Svg des valeurs au début de la boucle 
         wmtmp = wm0; wftmp = wf0;
         wmbartmp = wmbar0; wfbartmp = wfbar0;
@@ -86,7 +86,7 @@ subroutine DR(alpha,beta,gamma,N,Q)
         wm1 = (1-0.5*alpha)*wmtmp + 0.5*alpha*wm0;
         wf1 = (1-0.5*alpha)*wftmp + 0.5*alpha*wf0;
 
-        wm0 = wm1;wf0 = wf1;
+        wm0 = wm1; wf0 = wf1;
         wmbar0 = wmbar1; wfbar0 = wfbar1;        
     end do
 

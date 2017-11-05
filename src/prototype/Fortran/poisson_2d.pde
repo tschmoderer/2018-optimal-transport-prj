@@ -25,7 +25,7 @@ for (int j=0;j<Nx+1;j++) {
 	file0 >> fdown(j);
 	file1 >> fup(j);
 }
-for (int i=Qt;i>=0;i--) {
+for (int i=0;i<Qt+1;i++) {
     file2 >> mleft(i);
     file3 >> mright(i);
 }

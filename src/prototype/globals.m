@@ -1,6 +1,4 @@
 % variables globales 
-global d; % dimension du système
-
 global N; % Nb de points de discrétisation dans le sens des x
 %P = 5; % Nb de points de discrétisation dans le sens des y
 global Q; % Nb de points de discrétisation dans le sens de t
@@ -11,13 +9,13 @@ global Gc;
 %% Grille décentrée %%
 global Gs;
 
-%% Variables centrées %%
-global m;
-global f;
-
-%% Variables décentrées %%
-global mbar;
-global fbar;
+%%% Variables centrées %%
+%global m;
+%global f;
+%
+%%% Variables décentrées %%
+%global mbar;
+%global fbar;
 
 %% Frontières %%
 global b0;
@@ -35,4 +33,6 @@ global beta; % Doit etre dans [0,1]
 global gamma; % Doit etre positif
 
 %% Constantes dans la projection sur C %%
-global projCY; % diviser en plusieurs morceaux
+global Cst;
+global Cstmbar;
+global Cstfbar

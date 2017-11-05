@@ -1,9 +1,23 @@
-function [m f] = projC(mbar,fbar)
+function [Umbar, Ufbar] = projC(mbar,fbar)
 globals;
 
-y = dlmread('files/Y.txt'); % size NxQ
-y = reshape(y,Q+1,N+1);
+d = divergence(mbar,fbar);
+b = boundary(mbar,fbar); 
 
-[mybar fybar] = divergence_adjoint(y);
-[my fy] = boundary_adjoint(y(:,1),y(:,end),y(1,:),y(end,:),N,Q);
+solu = poisson(d,b.m(:,1),b.m(:,2),b.f(1,:),b.f(2,:),N,Q,1e-3);
+
+[solmbar, solfbar] = divergence_adjoint(solu);
+
+Umbar = mbar - solmbar + Cstmbar;
+Ufbar = fbar - solfbar + Cstfbar;
+
+Ufbar(1,:) = fbar(1,:) - solu(1,:) + Cst(1,:); 
+Ufbar(end,:) = fbar(end,:) - solu(end,:) + Cst(end,:); 
+Umbar(:,1) = mbar(:,1) - solu(:,1) + Cst(:,1);
+Umbar(:,end) = mbar(:,end) - solu(:,end) + Cst(:,end);
+
+%  [X Y] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+2));
+%  surf(X,Y,Ufbar);
+%  title('Ufbar du pbm de poisson');
+%  pause
 end

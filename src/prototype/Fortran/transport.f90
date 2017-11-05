@@ -52,7 +52,8 @@ open (unit=2,file="files/parameters"); write (2,*), N, Q; close(2);
 call system('FreeFem++ -v 0 poisson_2d_constante.pde');
 
 !! Lancement de l'algorithme de résolution !!
-!call check_adjoint(N,Q);
+call check_adjoint(N,Q);
+pause
 !call check(alpha,beta,gamma,N,Q); stop;
 !stop
 print *, "Lancement de l'algorithme";

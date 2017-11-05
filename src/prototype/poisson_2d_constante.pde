@@ -41,7 +41,6 @@ Poisson;
 plot(uh,wait=1,nbiso=30,fill=true,value=true);
 
 ofstream output("files/Y");
-
 for (int j=0;j<uh[].n;j++) {
 	output << uh[][j] << endl;
 }

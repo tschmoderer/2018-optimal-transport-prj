@@ -1,59 +1,65 @@
-// https://arxiv.org/pdf/1205.1293.pdf
-// manuel freefem p244
-
-/*
-Calcul de la constante dans la solution
-genere le maillage
+/* Porcédure pour calculer les solutions de l'équation de Laplace 
+Timothée Schmoderer
+INSA Rouen Normandie
+Cc 2017
 */
-load "lapack"
 
 int Nx,Qt;
-int [int] d(2);
-real mu = 0.1;
-real s = 0.005;
 
-ifstream param("files/parameters.txt");
+ifstream param("files/parameters");
 param >> Nx >> Qt;
 
-//func f0=exp(-0.5*((x-0.1)/s)^2)/(s*sqrt(2*pi));
-//func f1=exp(-0.5*((x-0.9)/s)^2)/(s*sqrt(2*pi));
+real[int] fdown(Nx+1);
+real[int] fup(Nx+1);
+real[int] mleft(Qt+1);
+real[int] mright(Qt+1);
+real[int,int] secondMembre(Qt+1,Nx+1); // N+1 colonnes Q+1 lignes
 
-real[int] finit(Nx+1);
-real[int] ffinal(Nx+1);
-ifstream file0("files/f0.txt");
-ifstream file1("files/f1.txt");
+ifstream file0("files/fD");
+ifstream file1("files/fU");
+ifstream file2("files/mL");
+ifstream file3("files/mR");
+ifstream file4("files/d");
+
 for (int j=0;j<Nx+1;j++) {
-	file0 >> finit(j);
-	file1 >> ffinal(j);
+	file0 >> fdown(j);
+	file1 >> fup(j);
+}
+for (int i=0;i<Qt+1;i++) {
+    file2 >> mleft(i);
+    file3 >> mright(i);
 }
 
-func f0=finit(Nx*x);
-func f1=ffinal(Nx*x);
+for (int i=0;i<Qt+1;i++) {
+    for (int j=0;j<Nx+1;j++) {
+        file4 >> secondMembre(i,j);
+    }
+}
 
+func fD=fdown(floor(Nx*x));
+func fU=fup(floor(Nx*x));
+func mL=mleft(floor(Qt*y));
+func mR=mright(floor(Qt*y));
+func f=secondMembre(floor(Qt*y),floor(Nx*x));
 
-mesh Th=square(Nx,Qt);
-plot(Th,wait=1);
+mesh Th=readmesh("files/maillage.msh"); //plot(Th,wait=1);
 
 fespace Vh(Th,P1);
-
 Vh uh, vh;
 
 //		  3
-//      4|	|2
+//     4|	|2
 //		  1
-//
 
-
-problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) + on(2,4,uh=0) + on(1,uh=f0) + on(3,uh=f1);
-
+problem Poisson(uh,vh) = int2d(Th)(dx(uh)*dx(vh)+dy(uh)*dy(vh)) - int2d(Th)(f*vh) + on(4,uh=mL) + on(2,uh=mR) + on(1,uh=fD) + on(3,uh=fU);
 Poisson;
 
-plot(uh,wait=1,fill=true,value=true);
+plot(uh,fill=true,nbiso=50,wait=false,value=true);
 
-ofstream output("files/Y.txt");
-for(int j=0; j<uh[].n;j++) {
-    output << uh[][j]<<endl;
+ofstream output("files/solution");
+
+for (int j=0;j<uh[].n;j++) {
+	output << uh[][j] << endl;
 }
 
-savemesh(Th,"files/maillage.msh");
 
