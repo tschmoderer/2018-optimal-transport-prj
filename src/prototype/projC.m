@@ -16,9 +16,8 @@ Ufbar(end,:) = fbar(end,:) - solu(end,:) + Cst(end,:);
 Umbar(:,1) = mbar(:,1) - solu(:,1) + Cst(:,1);
 Umbar(:,end) = mbar(:,end) - solu(:,end) + Cst(:,end);
 
-  [X Y] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+2));
-  Y = flipud(Y);
-  surf(X,Y,Ufbar);
-  title('Ufbar du pbm de poisson');
-  pause
+%  [X Y] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+2));
+%  surf(X,Y,Ufbar);
+%  title('Ufbar du pbm de poisson');
+%  pause
 end
