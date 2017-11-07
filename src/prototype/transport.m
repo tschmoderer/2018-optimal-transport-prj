@@ -1,6 +1,6 @@
 clc
 close all
-clear
+clear all
 
 %%% Initialisation %%%
 globals;
@@ -31,7 +31,7 @@ b0.f = [gauss(0.6,sig,N,min) ; gauss(0.4,sig,N,min)];
 
 %% Matrice d'interpolation %%
 Interpm = [diag(ones(1,N+1));zeros(1,N+1)] + [zeros(1,N+1);diag(ones(1,N+1))];
-Interpm = Interpm/2; % m = mbar*I
+Interpm = Interpm/2; % m = mbar*Im
 Interpf = [diag(ones(1,Q+1)) zeros(Q+1,1)] + [zeros(Q+1,1) diag(ones(1,Q+1))];
 Interpf = Interpf/2;
 
@@ -43,13 +43,12 @@ alpha = 1.983; % Doit etre dans ]0,2[
 beta = 1; % Doit etre dans [0,1]
 gamma = 1/240; % Doit etre positif
 
-
-[XX, YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); %YY = flipud(YY);
+[XX, YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1));
 [XXX, YYY] = meshgrid(linspace(0,1,N+2),linspace(0,1,Q+1));
 [XXXX, YYYY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+2));
 
 %system("FreeFem++ -v 0 poisson_2d_constante.pde");
-Cst = poisson(zeros(Q+1,N+1),0,0,b0.f(2,:),b0.f(1,:),N,Q,1e-3);
+Cst = poisson(zeros(Q+1,N+1),0,0,b0.f(1,:),b0.f(2,:),N,Q,1e-3);
 [Cstmbar, Cstfbar] = divergence_adjoint(Cst);
 
 % Initialisation 
@@ -60,9 +59,9 @@ Wmbar0 = zeros(Q+1,N+2); Wfbar0 = zeros(Q+2,N+1); Wmbar1 = zeros(Q+1,N+2); Wfbar
 
 
 t = repmat(linspace(1,0,Q+1)',1,N+1);
-Wf0 = (1-t).*repmat(b0.f(2,:),Q+1,1) + t.*repmat(b0.f(1,:),Q+1,1);
+%Wf0 = (1-t).*repmat(b0.f(2,:),Q+1,1) + t.*repmat(b0.f(1,:),Q+1,1);
 surf(XX,YY,Wf0);
-title('Initial WF');
+title('Initial Wf');
 pause
 
 % Itérations
