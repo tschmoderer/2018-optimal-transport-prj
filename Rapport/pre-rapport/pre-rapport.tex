@@ -1,0 +1,251 @@
+\documentclass[a4paper,12pt]{article}
+
+\input{/home/tim/Documents/Ecole/modele_documents.tex}
+
+\setlength{\parindent}{0pt}
+\newcommand\titre{OT}
+\newcommand\auteur{Timothée \textsc{Schmoderer}}
+\newcommand\dateDoc{2017/2018}
+\newcommand\chapitre{Chapitre 2}
+\newcommand\cours{PFE}
+\usepackage{enumitem}
+\everymath{\displaystyle}
+
+\title{\titre }
+\author{\auteur}
+\date{\dateDoc}
+
+\usepackage{fancyhdr,lastpage}
+\pagestyle{fancy}
+
+\lhead{\cours}
+\chead{}
+\rhead{\currentname}
+\lfoot{\titre}
+\cfoot{}
+\rfoot{Page \thepage\ /\ \pageref*{LastPage}}  
+
+
+\lstset{
+language=Matlab,
+}
+
+\hypersetup {
+ pdftitle={\titre},    % title
+    pdfauthor={\auteur},     % author
+    pdfsubject={\cours},   % subject of the document
+    pdfkeywords={}, % list of keywords
+}
+
+
+\renewcommand{\lstlistingname}{Code}% Listing -> Code
+\renewcommand{\lstlistlistingname}{Liste des \lstlistingname s}% List of Listings -> List of codes
+
+
+
+\begin{document}
+\thispagestyle{empty}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Pbm de transport optimal}
+Soient deux densités $f_0$ et $f_1$ de même masse, suffisamment régulière, sur un domaine $[0,1]^d$.\\
+Un transport de $f_0$ sur $f_1$ est une application $T$ telle que :
+$$
+f_0(x)=f_1(T(x))|det(\partial T(x))|
+$$
+Le transport optimal est celui qui minimise le coût $\int c(x,T(x)dx$ parmi tous les transports de $f_0$ sur $f_1$. Dans notre problème : $C(x,y) =\|x-y\|^2$. 
+
+\section{Formulation de Benamou et Brenier}
+On montre que la géodésique entre $f_0$ et $f_1$ est : 
+$$
+f(x,t)=f_0((1-t)Id+tT(x))|det((1-t)Id+t\partial T(x))|
+$$
+et que ce chemin minimise le problème suivant : 
+$$
+\min_{(f,v)\in C_v} \int_{[0,1]^d}\int_0^1 f(x,t)\|v(x,t)\|^2dtdx
+$$
+
+Où : $C_v= \{(f,v)|\partial_t f+div_x(v)=0;v(0,.)=0,v(1,.)=0,f(.,0)=f_0,f(.,1)=f_1\}$
+
+On pose $m = fv$ pour obtenir le problème de minimisation 
+$$
+\min_{(f,m)\in C}J(m,f)=\int_{[0,1]^d}\int_0^1 \theta (m,f)dtdx
+$$
+avec $\theta (m,f) = \frac{\|m\|^2}{f} si f>0 \quad 0 si (m,f)=(0,0)\quad \infty sinon$
+
+Rq : on a ramené le pbm de transport optimal à celui de trouver la géodésique entre les deux densités. 
+\section{Méthodes numériques}
+On présente le cas 1D qui nous a accaparé. \\
+Carré espace temps : $[0,1]^2$ que l'on discrétise : 
+$$
+G_c = \{(x_i=\frac{i}{N},t_j=\frac{j}{P})|0\leq i\leq N,\ 0\leq j\leq P\}
+$$
+On notre $E_c =(\RR^2)^{G_c}$ l'espace des variables centrées et $ V=(m_{ij},f_{ij}) \quad 0\leq i\leq N,\ 0\leq j\leq P$ les variables discrétisées. \\
+
+Dans le but de capturer l'équation de continuité, on introduit une grille décentrée : 
+$$
+G_s^x = \{(x_i=\frac{i+1/2}{N},t_j=\frac{j}{P})|-1\leq i\leq N,\ 0\leq j\leq P\}
+$$
+et 
+$$
+G_s^t = \{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{P})|0\leq i\leq N,\ -1\leq j\leq P\}
+$$
+
+On note $E_s=\RR^{G_s^x}\times\RR^{G_s^t}$ l'espace des variables décentrées, et $U=(\bar{m_{ij}}\quad 1\leq i\leq N,\ 0\leq j\leq P,\bar{f_{ij}},\quad 0\leq i\leq N,\ -1\leq j\leq P$
+
+
+\section{Opérateurs}
+On introduit plusieurs opérateurs pour lier les variables décentrées et les variables centrées.
+\subsection{Interpolation}
+$$
+I:E_s \rightarrow E_c
+$$
+tq 
+$$
+m_{ij} = = (\bar{m}_{i+1/2,j}+\bar{m}_{i-1/2,j})/2.
+$$
+et
+$$
+f_{ij} = = (\bar{f}_{i,j+1/2}+\bar{f}_{i,j-1/2})/2.
+$$
+Cet opérateur s'interprète matriciellement : 
+$$
+m = \bar{m}I_m
+$$
+et 
+$$
+f = I_f\bar{f}
+$$
+
+\subsection{Divergence}
+l'opérateur qui approxime la divergence
+$$
+div : E_s\rightarrow \RR^{G_c}
+$$
+et 
+$$
+div(\bar{m},\bar{f})_{ij} = (\bar{m}_{i+1/2,j}-\bar{m}_{i-1/2,j}) + (\bar{f}_{i,j+1/2}-\bar{f}_{i,j-1/2})
+$$
+
+\subsection{Frontières}
+Un opérateur pour extraire les frontières : 
+
+$$
+b(\bar{m},\bar{f}) = ((\bar{m}_{-1/2,j},\bar{m}_{N+1/2,j});(\bar{f}_{i,-1/2},\bar{f}_{i,P+1/2}))
+$$
+et on impose les conditions aux frontières suivantes : 
+$$
+b(\bar{m},\bar{f}) = b_0=(0,0,f_0,f_1);
+$$
+
+\subsection{Problème discrétisé}
+
+On a le problème suivant 
+
+$$
+\min_{U=(\bar{m},\bar{f})\in E_s} \theta(I(\bar{m},\bar{f})) + \iota_C(U)
+$$
+avec l'ensemble des contraintes :
+$$
+C=\{(\bar{m},\bar{f})\in E_s|\ div(\bar{m},\bar{f}) = 0\ b(\bar{m},\bar{f}) = b_0 \}
+$$
+
+\section{Résolution par algorithme de séparation de proximité}
+Ces algorithmes sont des généralisation des algos de gradient conjugués. \\
+
+\textbf{Remarque : } On a $J(m,f)=\int_{[0,1]^d}\int_0^1 \frac{\|m\|^2}{f} dtdx$ donc si $f\rightarrow\infty$ on a $J\rightarrow 0$ donc ce n'est pas coercif ce qui rend l'existence de minimiseurs non triviale. Et si $f\rightarrow 0$, on a $j\rightarrow \infty$ donc les méthodes de gradient conjugués ne peuvent pas s'appliquer, le gradient n'est pas lipschitz. \\
+
+On veut résoudre le pbm suivant : 
+$$
+\min_{z=(U,V)\in E_s\times E_c} G_1(z)+G_2(z)
+$$
+où, $G_1(z) = J(U)+\iota_C(U)$ et $G_2(z)=\iota_{C_s}(z)$ et $C_s=\{z=(U,V)\in E_s\times E_c\ | \ V=I(U) \}$
+
+
+\remarque{$G_1$ est la fonctionnelle originelle et $G_2$ vient de notre introduction des variables décalées. }\\
+
+On va alors calculer les opérateurs de proximités de $G_1$ et $G_2$.On dit que $G_1$ est \textbf{simple} dans la mesure ou : 
+
+$$
+Prox_{\gamma G_1} (U,V) = (Prox_{\gamma C} (U),Prox_{\gamma J} (V))
+$$
+
+\subsection{Opérateur de proximité de $G_2$}
+
+$$
+Prox_{\gamma C_s} (U,V) = arg\min_{z'\in C_s} \frac{1}{2}\|z-z'\|^2= Proj_{C_s}(U,V)
+$$
+Suivant l'article de Papadakis, Peyré et Oudet on a :
+
+$$
+Prox_{\gamma C_s} (U,V)  = (\tilde{U},I(\tilde{U}))
+$$
+et 
+
+$$
+\tilde{U} = (Id +I^{\star}I)^{-1}(U+I^{\star}(V))
+$$
+Ou $I^{\star}$ est l'adjointe de $I$. ce qui nous donne en terme de matrice : 
+$$
+\tilde{\bar{m}} = (\bar{m}+mI_m^{\star})(Id +I_mI_m^{\star})^{-1}
+$$
+et 
+$$
+\tilde{\bar{f}} = (Id +I_f^{\star}I_f)^{-1}(\bar{f}+I_f^{\star}f)
+$$
+enfin : $\tilde{m}=\tilde{\bar{m}}I_m$ et $\tilde{f}=I_f\tilde{\bar{f}}$
+
+Comme l'opérateur d'interpolation s'interprète matriciellement, son adjoint est donné par la transposée. 
+
+\subsection{Opérateur de proximité de $J$}
+
+$Prox_{\gamma J}(V)=(Prox_{\gamma J}(V_k))_{k\in G_c}$ et 
+
+$$
+Prox_{\gamma J}(m_k,f_k) = (\frac{f^{\star}_km_k}{f^{\star}_k+2\gamma},f^{\star}_k)\ si\ f^{\star}>0 \qquad (0,0)\ sinon
+$$ 
+et $f^{\star}_k$ est la plus grande racine réelle du polynôme de degré 3 donné par : 
+$$
+P(x) = (X-f_k)(X+2\gamma)^2-\gamma \|m_k\|^2
+$$
+La racine est calculée rapidement avec l’algorithme de Newton. 
+
+\subsection{Opérateur de proximité de $\iota_C$}
+
+$$
+Prox_{\gamma C} = Proj_C
+$$
+on réécrit l'ensemble des contraintes sous la forme : 
+
+$$
+C=\{U\in E_s\ | \ AU=y\} \qquad A=(div,b)^T \qquad y = (0,b0)^T
+$$
+
+et on obtient $Proj_C(U)=(Id +A^{\star}\Delta^{-1}A)U + A^{\star} \Delta^{-1}y$ avec $\Delta^{-1}=(A^{\star}A)^{-1}$ et son problème requiert la résolution d'un problème de poisson. 
+
+\section{Algorithme de Douglas Rachford}
+On procède à l'itération suivante : $(z^l,w^l)\in (E_s\times E_c)\times (E_s\times E_c)$ avec un $w^0$ donné : 
+$$
+z^{l+1}=Prox_{\gamma G_2} (w^l)
+$$
+et 
+$$
+w^{l+1}=(1-\frac{\alpha}{2})w^l + \frac{\alpha}{2}RProx_{\gamma G_2}\circ RProx_{\gamma G_1} (w^l)
+$$
+
+Où on a posé : $RProx_{\gamma G} = 2Prox_{\gamma G}-Id$.\\
+On montre alors que pour $\alpha\in ]0,2[$ et $\gamma>0$ la méthode converge $z^l\rightarrow z^{\star}$ ce qui permet de retrouver la géodésique, car : 
+$$
+z^l=(U^l,V^l)\rightarrow (U^{\star},V^{\star}) \qquad V^{\star}=(m^{\star},f^{\star})
+$$
+
+\newpage
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures
+\addcontentsline{toc}{section}{\lstlistlistingname}
+\lstlistoflistings
+
+
+\end{document}
