@@ -12,8 +12,8 @@ function U = boundary_adj(b)
 %     end
 %     
 %     B = blkdiag(Bm,Bf);
-    Badj = B';
+%    Badj = B';
     
-    U = Badj*b;
+    U = B'*b;
 end
 

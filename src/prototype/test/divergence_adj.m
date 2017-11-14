@@ -26,8 +26,8 @@ function U = divergence_adj(d)
 %     end
 %     
 %     D = [Dm Df];
-    Dadj = D';
+%   Dadj = D';
     
-    U = Dadj*d;
+    U = D'*d;
 end
 
