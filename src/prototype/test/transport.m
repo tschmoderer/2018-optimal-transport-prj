@@ -85,7 +85,7 @@ delta = A*A';
 
 sigma = 0.05; mini = 0.0001;
 f0 = gauss(0.1,sigma,N,mini); 
-f1 = gauss(0.9,sigma,N,mini); 
+f1 = 0.5*(gauss(0.9,sigma,N,mini) + gauss(0.7,sigma,N,mini)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
