@@ -1,38 +1,17 @@
-% variables globales 
-global N; % Nb de points de discrétisation dans le sens des x
-%P = 5; % Nb de points de discrétisation dans le sens des y
-global Q; % Nb de points de discrétisation dans le sens de t
+% define les variables globales 
 
-% %% Grille centrée %%
-% global Gc;
-% 
-% %% Grille décentrée %%
-% global Gs;
+%% tailles du maillage %%
 
-%%% Variables centrées %%
-%global m;
-%global f;
-%
-%%% Variables décentrées %%
-%global mbar;
-%global fbar;
+global N; % Nb de points de discrétisation en x
+global Q; % Nb de points de discrétisation en t
 
-%% Frontières %%
-global b0;
+%% les matrices qui vont nous intéresser  %% 
 
-%% Matrice d'interpolation %%
-global Interpm;
-global Interpm_adj;
+global B; % matrice de l'opérateur b
+global D; % matrice de l'opérateur div
+global Interp; % matrice d'intepolation
+global pG2; % matrice de proximité de G2
 
-global Interpf;
-global Interpf_adj;
+global P; % matrice de projection sur C
+global Cst; % constante dans la projection sur C
 
-%% Paramètres %%
-global alpha; % Doit etre dans ]0,2[
-global beta; % Doit etre dans [0,1]
-global gamma; % Doit etre positif
-
-%% Constantes dans la projection sur C %%
-global Cst;
-global Cstmbar;
-global Cstfbar;

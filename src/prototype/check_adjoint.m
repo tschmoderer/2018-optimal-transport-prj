@@ -1,44 +1,113 @@
-% check Boundary adjoint 
+clc
+clear all
+close all
 
-mX = rand(Q+1,N+2);
-fX = rand(Q+2,N+1);
-
-mY = rand(Q+1,2);
-fY = rand(2,N+1);
-
-b = boundary(mX,fX);
-
-s1 = sum([sum(b.m.*mY) sum((b.f.*fY)')]);
-
-[mA fA] = boundary_adjoint(mY(:,1),mY(:,2),fY(1,:),fY(2,:),N,Q);
-
-s2 = sum([sum(mX.*mA) sum((fX.*fA)')]);
-
-e1 = abs(s1 - s2)/s1
-
-% check Divergence adjoint
-
-mbarX = rand(Q+1,N+2);
-fbarX = rand(Q+2,N+1);
-
-dY = rand(Q+1,N+1);
-
-dX = divergence(mbarX,fbarX);
-[mbarY fbarY] = divergence_adjoint(dY);
-s1 = sum(sum(dX.*dY));
-s2 = sum([sum(mbarX.*mbarY) sum((fbarX.*fbarY)')]);
-
-e2 = abs(s1 - s2)/s1
-
-% check Interpolation adjoint
 globals;
-mbar = rand(Q+1,N+2); fbar = rand(Q+2,N+1);
-m = rand(Q+1,N+1); f = rand(Q+1,N+1); 
 
-[Imbar Ifbar] = interpolation(mbar,fbar);
-[Iadjm Iadjf] = interpolation_adjoint(m,f); 
+N = 2;
+Q = 2;
 
-s1 = sum(sum(Imbar.*m)) + sum(sum(Ifbar.*f));
-s2 = sum(sum(Iadjm.*mbar)) + sum(sum(Iadjf.*fbar));
+% Matrice de l'opérateur b %
+Bm = zeros(2*(Q+1),(N+2)*(Q+1));
+Bm(1:Q+1,1:Q+1) = eye(Q+1);
+Bm(Q+2:end,end-Q:end) = eye(Q+1);
 
-e3 = abs(s1 - s2)/s1
+Bf = [];
+for i = 1:N+1
+    Bf = blkdiag(Bf,[1 zeros(1,Q+1);zeros(1,Q+1) 1]);
+end
+
+B = blkdiag(Bm,Bf);
+
+% Matrice de la divergence %
+Dm = zeros((N+1)*(Q+1),(N+2)*(Q+1));
+for i = 1:(N+1)*(Q+1)
+    for j = 1:(N+2)*(Q+1)
+        if i == j 
+            Dm(i,j) = -1;
+        elseif j == i+Q+1
+            Dm(i,j) = 1;
+        end
+    end
+end
+dia = zeros(Q+1,Q+2);
+for i = 1:Q+1
+    for j = 1:Q+2
+        if i == j 
+            dia(i,j) = -1;
+        elseif j == i+1
+            dia(i,j) = 1;
+        end
+    end
+end
+Df = [];
+for i = 1:N+1
+    Df = blkdiag(Df,dia);
+end
+
+D = [N*Dm Q*Df];
+
+% matrices projection sur C %
+A = [D ; B]; 
+delta = A*A'; 
+sigma = 0.05; mini = 0.0001;
+f0 = gauss(0.2,sigma,N,mini); 
+f1 = gauss(0.8,sigma,N,mini); 
+
+y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; f0' ; f1'];
+Cst = A'*(delta\y);
+
+P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*inv(delta)*A;
+
+% check interpolation
+
+m = rand(Q+1,N+1);
+f = rand(Q+1,N+1);
+mbar = rand(Q+1,N+2);
+fbar = rand(Q+2,N+1);
+
+V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
+U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+
+Vinterp = interpolation(U,N,Q);
+Uinterpadj = interpolation_adj(V,N,Q);
+
+e1 = (sum(U.*Uinterpadj) - sum(Vinterp.*V))/sum(Vinterp.*V)
+
+% check divergence
+
+d = rand(Q+1,N+1);
+mbar = rand(Q+1,N+2);
+fbar = rand(Q+2,N+1);
+
+U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+d = reshape(d,(N+1)*(Q+1),1);
+
+divU = divergence(U);
+divadjU = divergence_adj(d);
+
+e2 = (sum(divU.*d) - sum(divadjU.*U))/sum(divadjU.*U)
+
+% check boundary
+
+b = rand(2*(N+Q+2),1);
+mbar = rand(Q+1,N+2);
+fbar = rand(Q+2,N+1);
+
+U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+boundU = boundary(U);
+boundUadj = boundary_adj(b);
+
+e3 = (sum(U.*boundUadj) - sum(U.*boundUadj))/sum(U.*boundUadj)
+
+
+
+% check opérateurs 
+N = 2; Q = 2;
+
+mbar = [1 9 10 2;2 3 4 8; 4 10 10 6];
+fbar = [7 7 10;5 9 6;3 7 3;2 5 7];
+
+U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+
+D*U

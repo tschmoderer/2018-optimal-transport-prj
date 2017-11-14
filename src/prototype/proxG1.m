@@ -1,4 +1,5 @@
-function [Umbar,Ufbar,Vm,Vf] = proxG1(mbar,fbar,m,f,gamma)
-	[Umbar, Ufbar] = projC(mbar,fbar);
-	[Vm, Vf] = proxJ(m,f,gamma);
+function [pU,pV] = proxG1(U,V,gamma)
+    pV = proxJ(V,gamma);
+    pU = projC(U);
 end
+

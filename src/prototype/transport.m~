@@ -84,8 +84,8 @@ A = [D ; B];
 delta = A*A'; 
 
 sigma = 0.05; mini = 0.0001;
-f0 = gauss(0.1,sigma,N,mini); 
-f1 = gauss(0.9,sigma,N,mini); 
+f0 = gauss(0.,sigma,N,mini); 
+f1 = gauss(0.1,sigma,N,mini); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
@@ -115,7 +115,7 @@ zU0 = zeros(size(U)); zV0 = zeros(size(V));
 [XX,YY] = meshgrid([0:N],[0:Q]); YY = flipud(YY);
 
 % Itérations
-niter = 500;
+niter = 1000;
 cout = zeros(1,niter);
 div = zeros(1,niter);
 for l = 1:niter
@@ -134,8 +134,8 @@ for l = 1:niter
     title(['itération : ',num2str(l)]);
     pause(0.04)
     
-    cout(i) = cost(Z);
-    div(i) = sum(D*ZU);
+    cout(i) = cost(zV0);
+    div(i) = sum(D*zU0);
 end
 
 figure;

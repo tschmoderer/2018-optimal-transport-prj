@@ -1,4 +1,4 @@
-function b = boundary(U)
+function U = boundary_adj(b)
     globals;
 %     Bm = zeros(2*(Q+1),(N+2)*(Q+1));
 %     Bm(1:Q+1,1:Q+1) = eye(Q+1);
@@ -12,6 +12,8 @@ function b = boundary(U)
 %     end
 %     
 %     B = blkdiag(Bm,Bf);
-    b = B*U;
+%    Badj = B';
+    
+    U = B'*b;
 end
 

@@ -1,107 +1,150 @@
 clc
-close all
 clear all
+close all
 
-%%% Initialisation %%%
-globals;
+globals; 
 
-N = 32; % Nb de points de discrétisation dans le sens des x
-Q = 32; % Nb de points de discrétisation dans le sens de t
+%% Initialisation %%
 
-%% Grille centrée %%
-Gc.x = [0:N]/N;
-Gc.t = [0:Q]/Q;
+N = 101;
+Q = 97;
 
-%% Grille décentrée %%
-Gs.x = ([-1:N]+0.5)/N;
-Gs.t = ([-1:Q]+0.5)/Q;
+% Matrice de l'opérateur b %
+Bm = zeros(2*(Q+1),(N+2)*(Q+1));
+Bm(1:Q+1,1:Q+1) = eye(Q+1);
+Bm(Q+2:end,end-Q:end) = eye(Q+1);
 
-%% Variables centrées %%
+Bf = [];
+for i = 1:N+1
+    Bf = blkdiag(Bf,[1 zeros(1,Q+1);zeros(1,Q+1) 1]);
+end
+
+B = blkdiag(Bm,Bf);
+% matrice d'interpolation %
+
+Im = zeros((N+1)*(Q+1),(N+2)*(Q+1));
+for i = 1:(N+1)*(Q+1)
+    for j = 1:(N+2)*(Q+1)
+        if i == j 
+            Im(i,j) = 1;
+        elseif j == i+Q+1
+            Im(i,j) = 1;
+        end
+    end
+end
+dia = zeros(Q+1,Q+2);
+for i = 1:Q+1
+    for j = 1:Q+2
+        if i == j 
+            dia(i,j) = 1;
+        elseif j == i+1
+            dia(i,j) = 1;
+        end
+    end
+end
+If = [];
+for i = 1:N+1
+    If = blkdiag(If,dia);
+end
+
+Interp = 0.5*blkdiag(Im,If);
+
+% matrice de projection sur G2
+pG2 = inv(eye((N+1)*(Q+2)+(N+2)*(Q+1)) + Interp'*Interp);
+
+% Matrice de la divergence %
+Dm = zeros((N+1)*(Q+1),(N+2)*(Q+1));
+for i = 1:(N+1)*(Q+1)
+    for j = 1:(N+2)*(Q+1)
+        if i == j 
+            Dm(i,j) = -1;
+        elseif j == i+Q+1
+            Dm(i,j) = 1;
+        end
+    end
+end
+dia = zeros(Q+1,Q+2);
+for i = 1:Q+1
+    for j = 1:Q+2
+        if i == j 
+            dia(i,j) = -1;
+        elseif j == i+1
+            dia(i,j) = 1;
+        end
+    end
+end
+Df = [];
+for i = 1:N+1
+    Df = blkdiag(Df,dia);
+end
+
+D = [N*Dm Q*Df];
+
+% matrices projection sur C %
+A = [D ; B]; 
+delta = A*A'; 
+
+sigma = 0.05; mini = 0.0001;
+f0 = gauss(0.2,sigma,N,mini); 
+f1 = gauss(0.8,sigma,N,mini); 
+
+y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
+Cst = A'*(delta\y);
+
+P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
+
+
+%% Fin Initialisation %%
+
 m = zeros(Q+1,N+1);
 f = zeros(Q+1,N+1);
-
-%% Variables décentrées %%
 mbar = zeros(Q+1,N+2);
 fbar = zeros(Q+2,N+1);
 
-%% Frontières %%
-b0.m = [zeros(Q+1,1) , zeros(Q+1,1)];
-sig = 0.5; min = 1e1;
-b0.f = [gauss(0.6,sig,N,min) ; gauss(0.4,sig,N,min)];
+V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
+U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-%% Matrice d'interpolation %%
-Interpm = [diag(ones(1,N+1));zeros(1,N+1)] + [zeros(1,N+1);diag(ones(1,N+1))];
-Interpm = Interpm/2; % m = mbar*Im
-Interpf = [diag(ones(1,Q+1)) zeros(Q+1,1)] + [zeros(Q+1,1) diag(ones(1,Q+1))];
-Interpf = Interpf/2;
+alpha = 1; gamma = 0.5;
 
-Interpm_adj = Interpm';
-Interpf_adj = Interpf';
+wU0 = zeros(size(U)); wV0 = zeros(size(V));
+zU0 = zeros(size(U)); zV0 = zeros(size(V));
 
-%% Paramètres %%
-alpha = 1.983; % Doit etre dans ]0,2[
-beta = 1; % Doit etre dans [0,1]
-gamma = 1/240; % Doit etre positif
+% test
+%wU0 = ones(size(U)); wV0 = ones(size(V));
+%zU0 = ones(size(U)); zV0 = ones(size(V));
+%wU0 = wU0/sum(wU0(:)); wV0 = wV0/sum(wV0(:)); %zU0 = zU0/sum(zU0(:)); zV0 = zV0/sum(zV0(:)); 
+% fin test
 
-[XX, YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1));
-[XXX, YYY] = meshgrid(linspace(0,1,N+2),linspace(0,1,Q+1));
-[XXXX, YYYY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+2));
-
-
-%system("FreeFem++ -v 0 poisson_2d_constante.pde");
-Cst = poisson(zeros(Q+1,N+1),0,0,b0.f(1,:),b0.f(2,:),N,Q,1e-3);
-[Cstmbar, Cstfbar] = divergence_adjoint(Cst);
-
-% Initialisation 
-Zm = zeros(Q+1,N+1); Zf = zeros(Q+1,N+1);
-Wm0 = zeros(Q+1,N+1); Wf0 = zeros(Q+1,N+1); Wm1 = zeros(Q+1,N+1); Wf1 = zeros(Q+1,N+1); Wm2 = zeros(Q+1,N+1); Wf2 = zeros(Q+1,N+1);
-Zmbar = zeros(Q+1,N+2); Zfbar = zeros(Q+2,N+1); 
-Wmbar0 = zeros(Q+1,N+2); Wfbar0 = zeros(Q+2,N+1); Wmbar1 = zeros(Q+1,N+2); Wfbar1 = zeros(Q+2,N+1); Wmbar2 = zeros(Q+1,N+2); Wfbar2 = zeros(Q+2,N+1); 
-
-
-t = repmat(linspace(1,0,Q+1)',1,N+1);
-%Wf0 = (1-t).*repmat(b0.f(2,:),Q+1,1) + t.*repmat(b0.f(1,:),Q+1,1);
-surf(XX,YY,Wf0);
-title('Initial Wf');
-pause
+[XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); YY = flipud(YY);
 
 % Itérations
-niter = 50;
+niter = 300;
 cout = zeros(1,niter);
 div = zeros(1,niter);
-for i = 1:niter
-	[Zmbar,Zfbar,Zm,Zf] = proxG2(Wmbar0,Wfbar0,Wm0,Wf0);
-
-	[Wmbar1,Wfbar1,Wm1,Wf1] = proxG1(Wmbar0,Wfbar0,Wm0,Wf0,gamma);
+for l = 1:niter
+    [wU1 , wV1] = proxG1(2*zU0-wU0,2*zV0-wV0,gamma);
+    wU1 = wU0 + alpha*(wU1- zU0); wV1 = wV0 + alpha*(wV1- zV0);
     
-	Wmbar1 = 2*Wmbar1 - Wmbar0; Wfbar1 = 2*Wfbar1 - Wfbar0;
-	Wm1 = 2*Wm1 - Wm0; Wf1 = 2*Wf1 - Wf0;	
- 
-	[Wmbar2,Wfbar2,Wm2,Wf2] = proxG2(Wmbar1,Wfbar1,Wm1,Wf1);
-
-    Wmbar2 = 2*Wmbar2 - Wmbar1; Wfbar2 = 2*Wfbar2 - Wfbar1; 
-	Wm2 = 2*Wm2 - Wm1; Wf2 = 2*Wf2 - Wf1;
-	
-	Wmbar0 = (1-0.5*alpha)*Wmbar0 + 0.5*alpha*Wmbar2;
-	Wfbar0 = (1-0.5*alpha)*Wfbar0 + 0.5*alpha*Wfbar2;
-	Wm0 = (1-0.5*alpha)*Wm0 + 0.5*alpha*Wm2;
-	Wf0 = (1-0.5*alpha)*Wf0 + 0.5*alpha*Wf2;
-
+    [zU0,zV0] = proxG2(wU1,wV1);
+    wU0 = wU1;
+    wV0 = wV1;
     
-	surf(XX,YY,Zf)
-	xlabel('x')
-	ylabel('t')
-    title(['iteration : ',num2str(i)])
-	drawnow
-  %  pause
+    f = reshape(zV0((N+1)*(Q+1)+1:end),Q+1,N+1);
+    surf(XX,YY,f)
+    xlabel('x');
+    ylabel('t');
+    zlabel('f');
+    title(['itération : ',num2str(l)]);
+    pause(0.04)
     
-    cout(i) = cost(Zm,Zf);
-    div(i) = sum(sum(divergence(Zmbar,Zfbar)));
+    cout(l) = cost(zV0);
+    div(l) = sum(D*zU0);
 end
 
- subplot(2,1,1)
- plot([1:niter],cout);
- title('cout')
- subplot(2,1,2)
- plot([1:niter],div)
- title('div')
+figure;
+subplot(2,1,1)
+plot([1:niter],cout);
+title('cout')
+subplot(2,1,2)
+plot([1:niter],div)
+title('div')
