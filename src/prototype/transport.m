@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 101;
-Q = 97;
+N = 31;
+Q = 29;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -104,7 +104,7 @@ fbar = zeros(Q+2,N+1);
 V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
 U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-alpha = 1; gamma = 0.5;
+alpha = 1.998; gamma = 0.5;
 
 wU0 = zeros(size(U)); wV0 = zeros(size(V));
 zU0 = zeros(size(U)); zV0 = zeros(size(V));
@@ -121,6 +121,7 @@ zU0 = zeros(size(U)); zV0 = zeros(size(V));
 niter = 300;
 cout = zeros(1,niter);
 div = zeros(1,niter);
+tic;
 for l = 1:niter
     [wU1 , wV1] = proxG1(2*zU0-wU0,2*zV0-wV0,gamma);
     wU1 = wU0 + alpha*(wU1- zU0); wV1 = wV0 + alpha*(wV1- zV0);
@@ -129,18 +130,21 @@ for l = 1:niter
     wU0 = wU1;
     wV0 = wV1;
     
-    f = reshape(zV0((N+1)*(Q+1)+1:end),Q+1,N+1);
-    surf(XX,YY,f)
-    xlabel('x');
-    ylabel('t');
-    zlabel('f');
-    title(['itération : ',num2str(l)]);
-    pause(0.04)
+    if mod(l,10) == 0
+        f = reshape(zV0((N+1)*(Q+1)+1:end),Q+1,N+1);
+        surf(XX,YY,f)
+        xlabel('x');
+        ylabel('t');
+        zlabel('f');
+        title(['itération : ',num2str(l)]);
+        drawnow
+      %  pause(0.04)
+    end
     
     cout(l) = cost(zV0);
     div(l) = sum(D*zU0);
 end
-
+toc
 figure;
 subplot(2,1,1)
 plot([1:niter],cout);
