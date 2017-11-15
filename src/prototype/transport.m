@@ -20,8 +20,8 @@ for i = 1:N+1
 end
 
 B = blkdiag(Bm,Bf);
-% matrice d'interpolation %
 
+% matrice d'interpolation %
 Im = zeros((N+1)*(Q+1),(N+2)*(Q+1));
 for i = 1:(N+1)*(Q+1)
     for j = 1:(N+2)*(Q+1)
@@ -49,7 +49,7 @@ end
 
 Interp = 0.5*blkdiag(Im,If);
 
-% matrice de projection sur G2
+% matrice de projection sur G2 %
 pG2 = inv(eye((N+1)*(Q+2)+(N+2)*(Q+1)) + Interp'*Interp);
 
 % Matrice de la divergence %
@@ -93,6 +93,7 @@ Cst = A'*(delta\y);
 
 P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
 
+P = sparse(P);
 
 %% Fin Initialisation %%
 
@@ -104,21 +105,22 @@ fbar = zeros(Q+2,N+1);
 V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
 U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-alpha = 1.998; gamma = 0.5;
+alpha = 0.5; gamma = 0.40;
 
 wU0 = zeros(size(U)); wV0 = zeros(size(V));
 zU0 = zeros(size(U)); zV0 = zeros(size(V));
 
-% test
-%wU0 = ones(size(U)); wV0 = ones(size(V));
-%zU0 = ones(size(U)); zV0 = ones(size(V));
-%wU0 = wU0/sum(wU0(:)); wV0 = wV0/sum(wV0(:)); %zU0 = zU0/sum(zU0(:)); zV0 = zV0/sum(zV0(:)); 
-% fin test
+% test autre initialisation % 
+fbar = zeros(Q+2,N+1);
+t = repmat(linspace(1,0,Q+2)',1,N+1);
+fbar = (1-t) .* repmat(f0,Q+2,1) + t .* repmat(f1,Q+2,1);
+wU0 = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+% fin test % 
 
 [XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); YY = flipud(YY);
 
 % Itérations
-niter = 300;
+niter = 1000;
 cout = zeros(1,niter);
 div = zeros(1,niter);
 tic;
@@ -145,6 +147,7 @@ for l = 1:niter
     div(l) = sum(D*zU0);
 end
 toc
+
 figure;
 subplot(2,1,1)
 plot([1:niter],cout);

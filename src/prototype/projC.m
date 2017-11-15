@@ -42,8 +42,6 @@ function pC = projC(U)
 %     D = [Dm Df];
 %   Dadj = D';
     
- 
-    
     pC = P*U + Cst;
 end
 
