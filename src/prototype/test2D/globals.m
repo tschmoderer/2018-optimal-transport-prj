@@ -3,6 +3,7 @@
 %% tailles du maillage %%
 
 global N; % Nb de points de discrétisation en x
+global P; % Nb de points de discrétisation en y
 global Q; % Nb de points de discrétisation en t
 
 %% les matrices qui vont nous intéresser  %% 

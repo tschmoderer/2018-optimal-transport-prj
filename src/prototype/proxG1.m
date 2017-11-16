@@ -1,5 +1,5 @@
-function [pU,pV] = proxG1(U,V,gamma)
-    pV = proxJ(V,gamma);
+function [pU,pV] = proxG1(U,V)
+    pV = proxJ(V);
     pU = projC(U);
 end
 

@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 31;
-Q = 29;
+N = 29;
+Q = 31;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -84,16 +84,16 @@ D = [N*Dm Q*Df];
 A = [D ; B]; 
 delta = A*A'; 
 
-sigma = 0.05; mini = 0.0001;
-f0 = gauss(0.2,sigma,N,mini); 
-f1 = gauss(0.8,sigma,N,mini); 
+normalise = @(f) f/sum(f(:));
+
+sigma = 0.001; mini = 0.000001;
+f0 = normalise(mini + gauss(0.2,sigma,N)); 
+f1 = normalise(mini + gauss(0.6,sigma,N) + gauss(0.8,sigma,N)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
 
 P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
-
-P = sparse(P);
 
 %% Fin Initialisation %%
 
@@ -105,7 +105,7 @@ fbar = zeros(Q+2,N+1);
 V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
 U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-alpha = 0.5; gamma = 0.40;
+alpha = 1.998; g = 0.0125; g = 1;
 
 wU0 = zeros(size(U)); wV0 = zeros(size(V));
 zU0 = zeros(size(U)); zV0 = zeros(size(V));
@@ -115,17 +115,22 @@ fbar = zeros(Q+2,N+1);
 t = repmat(linspace(1,0,Q+2)',1,N+1);
 fbar = (1-t) .* repmat(f0,Q+2,1) + t .* repmat(f1,Q+2,1);
 wU0 = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+m = zeros(Q+1,N+1);
+f = mini*ones(Q+1,N+1);
+wV0 = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
+minimumF0 = min(f0);
 % fin test % 
 
 [XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); YY = flipud(YY);
 
 % Itérations
-niter = 1000;
+niter = 3000;
 cout = zeros(1,niter);
 div = zeros(1,niter);
+minF = zeros(1,niter);
 tic;
 for l = 1:niter
-    [wU1 , wV1] = proxG1(2*zU0-wU0,2*zV0-wV0,gamma);
+    [wU1 , wV1] = proxG1(2*zU0-wU0,2*zV0-wV0);
     wU1 = wU0 + alpha*(wU1- zU0); wV1 = wV0 + alpha*(wV1- zV0);
     
     [zU0,zV0] = proxG2(wU1,wV1);
@@ -140,18 +145,22 @@ for l = 1:niter
         zlabel('f');
         title(['itération : ',num2str(l)]);
         drawnow
-      %  pause(0.04)
+       % pause
     end
     
     cout(l) = cost(zV0);
-    div(l) = sum(D*zU0);
+    div(l)  = sum(D*zU0);
+    minF(l) = min(zV0((N+1)*(Q+1)+1:end));
 end
 toc
 
 figure;
-subplot(2,1,1)
+subplot(3,1,1)
 plot([1:niter],cout);
 title('cout')
-subplot(2,1,2)
+subplot(3,1,2)
 plot([1:niter],div)
 title('div')
+subplot(3,1,3)
+plot([1:niter],minF);
+title('min de f');

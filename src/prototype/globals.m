@@ -15,3 +15,11 @@ global pG2; % matrice de proximité de G2
 global P; % matrice de projection sur C
 global Cst; % constante dans la projection sur C
 
+global g;
+
+
+
+
+% test 
+global minimumF0;
+
