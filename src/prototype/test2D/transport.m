@@ -6,9 +6,9 @@ globals;
 
 % %% Initialisation %%
 % 
-% N = 32;
-% P = 32;
-% Q = 32;
+N = 1;
+P = 1;
+Q = 1;
 % 
 % % Matrice de l'opérateur b %
 % Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -67,33 +67,35 @@ globals;
 % % matrice de projection sur G2
 % pG2 = inv(eye((N+1)*(Q+2)+(N+2)*(Q+1)) + Interp'*Interp);
 % 
-% % Matrice de la divergence %
-% Dm = zeros((N+1)*(Q+1),(N+2)*(Q+1));
-% for i = 1:(N+1)*(Q+1)
-%     for j = 1:(N+2)*(Q+1)
-%         if i == j 
-%             Dm(i,j) = -1;
-%         elseif j == i+Q+1
-%             Dm(i,j) = 1;
-%         end
-%     end
-% end
-% dia = zeros(Q+1,Q+2);
-% for i = 1:Q+1
-%     for j = 1:Q+2
-%         if i == j 
-%             dia(i,j) = -1;
-%         elseif j == i+1
-%             dia(i,j) = 1;
-%         end
-%     end
-% end
-% Df = [];
-% for i = 1:N+1
-%     Df = blkdiag(Df,dia);
-% end
-% 
-% D = [N*Dm Q*Df];
+% Matrice de la divergence %
+Dm1 = zeros((N+1)*(P+1)*(Q+1),(N+2)*(P+2)*(Q+1));
+for i = 1:(N+1)*(P+1)*(Q+1)
+    for j = 1:(N+2)*(P+2)*(Q+1)
+        if i == j 
+            Dm1(i,j) = -1;
+        elseif j == i+Q+1
+            Dm1(i,j) = 1;
+        end
+    end
+end
+
+
+dia = zeros(Q+1,Q+2);
+for i = 1:Q+1
+    for j = 1:Q+2
+        if i == j 
+            dia(i,j) = -1;
+        elseif j == i+1
+            dia(i,j) = 1;
+        end
+    end
+end
+Df = [];
+for i = 1:N+1
+    Df = blkdiag(Df,dia);
+end
+
+D = [N*Dm1 P*Dm2 Q*Df];
 
 % matrices projection sur C %
 % A = [D ; B]; 
@@ -108,32 +110,40 @@ globals;
 % 
 % P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
 
+% 
+% %% test %%
+% 
+% N = 1; P = 7; Q = 9;
+% 
+% m = zeros(N+1,P+1,Q+1,2); % c'est un champ de vecteurs sur le cube espace temps
+% f = zeros(N+1,P+1,Q+1); % c'est un champ dans le cube
+% 
+% mbarX = zeros(N+2,P+1,Q+1,2); mbarY = zeros(N+1,P+2,Q+1,2);
+% fbar  = zeros(N+1,P+1,Q+2);
+% 
+% % test interpolation 
+% Im = 0.25*(mbarX(1:end-1,:,:,:) + mbarX(2:end,:,:,:) + mbarY(:,1:end-1,:,:) + mbarY(:,2:end,:,:));
+% If = 0.5*(fbar(:,:,1:end-1) + fbar(:,:,2:end));
+% 
+% % test divergence
+% d = N*(mbarX(2:end,:,:,1) - mbarX(1:end-1,:,:,1)) + P*(mbarY(:,2:end,:,2) - mbarY(:,1:end-1,:,2)) + Q*(fbar(:,:,2:end) - fbar(:,:,1:end-1));
+% 
+% % test boundary 
+% bX1 = mbarX(1,:,:,:); bX2 = mbarX(end,:,:,:);
+% bY1 = mbarY(:,1,:,:); bY2 = mbarY(:,end,:,:);
+% bt1 = fbar(:,:,1); bt2 = fbar(:,:,end);
+% 
+% %% fin tests %%
 
-%% test %%
+m = zeros(N+1,P+1,Q+1,2);
+f = zeros(N+1,P+1,Q+1);
 
-N = 1; P = 7; Q = 9;
+V = [reshape(m,[],1); reshape(f,[],1)];
 
-m = zeros(N+1,P+1,Q+1,2); % c'est un champ de vecteurs sur le cube espace temps
-f = zeros(N+1,P+1,Q+1); % c'est un champ dans le cube
+mbar = zeros(N+2,P+2,Q+1,2);
+fbar = zeros(N+1,P+1,Q+2);
 
-mbarX = zeros(N+2,P+1,Q+1,2); mbarY = zeros(N+1,P+2,Q+1,2);
-fbar  = zeros(N+1,P+1,Q+2);
-
-% test interpolation 
-Im = 0.25*(mbarX(1:end-1,:,:,:) + mbarX(2:end,:,:,:) + mbarY(:,1:end-1,:,:) + mbarY(:,2:end,:,:));
-If = 0.5*(fbar(:,:,1:end-1) + fbar(:,:,2:end));
-
-% test divergence
-d = N*(mbarX(2:end,:,:,1) - mbarX(1:end-1,:,:,1)) + P*(mbarY(:,2:end,:,2) - mbarY(:,1:end-1,:,2)) + Q*(fbar(:,:,2:end) - fbar(:,:,1:end-1));
-
-% test boundary 
-bX1 = mbarX(1,:,:,:); bX2 = mbarX(end,:,:,:);
-bY1 = mbarY(:,1,:,:); bY2 = mbarY(:,end,:,:);
-bt1 = fbar(:,:,1); bt2 = fbar(:,:,end);
-
-%% fin tests %%
-
-
+U = [reshape(mbar,[],1); reshape(fbar,[],1)];
 
 
 
