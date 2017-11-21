@@ -88,7 +88,7 @@ normalise = @(f) f/sum(f(:));
 
 sigma = 0.001; mini = 0.000001;
 f0 = normalise(mini + gauss(0.2,sigma,N)); 
-f1 = normalise(mini + gauss(0.6,sigma,N) + gauss(0.8,sigma,N)); 
+f1 = normalise(mini + gauss(0.6,sigma,N) + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
@@ -137,7 +137,7 @@ for l = 1:niter
     wU0 = wU1;
     wV0 = wV1;
     
-    if mod(l,10) == 0
+    if mod(l,20) == 0
         f = reshape(zV0((N+1)*(Q+1)+1:end),Q+1,N+1);
         surf(XX,YY,f)
         xlabel('x');
