@@ -4,6 +4,8 @@ src/prototype/Fortran/files/*
 src/prototype/Fortran/results/*
 src/prototype/Fortran/transport
 
+*.o
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
