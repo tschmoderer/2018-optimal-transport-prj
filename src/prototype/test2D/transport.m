@@ -5,109 +5,28 @@ close all
 globals; 
 
 % %% Initialisation %%
-% 
+
 N = 1;
 P = 1;
 Q = 1;
-% 
-% % Matrice de l'opérateur b %
-% Bm = zeros(2*(Q+1),(N+2)*(Q+1));
-% Bm(1:Q+1,1:Q+1) = eye(Q+1);
-% Bm(Q+2:end,end-Q:end) = eye(Q+1);
-% 
-% Bf = [];
-% for i = 1:N+1
-%     Bf = blkdiag(Bf,[1 zeros(1,Q+1);zeros(1,Q+1) 1]);
-% end
-% 
-% B = blkdiag(Bm,Bf);
-% % matrice d'interpolation %
-% 
-% Im = zeros((N+1)*(Q+1),(N+2)*(Q+1));
-% for i = 1:(N+1)*(Q+1)
-%     for j = 1:(N+2)*(Q+1)
-%         if i == j 
-%             Im(i,j) = 1;
-%         elseif j == i+Q+1
-%             Im(i,j) = 1;
-%         end
-%     end
-% end
-% dia = zeros(Q+1,Q+2);
-% for i = 1:Q+1
-%     for j = 1:Q+2
-%         if i == j 
-%             dia(i,j) = 1;
-%         elseif j == i+1
-%             dia(i,j) = 1;
-%         end
-%     end
-% end
-% If = [];
-% for i = 1:N+1
-%     = zeros(Q+1,Q+2);
-% for i = 1:Q+1
-%     for j = 1:Q+2
-%         if i == j 
-%             dia(i,j) = -1;
-%         elseif j == i+1
-%             dia(i,j) = 1;
-%         end
-%     end
-% end
-% Df = [];
-% for i = 1:N+1
-%     Df = blkdiag(Df,dia);
-% end
-% 
-% D = [N*Dm Q*Df]; If = blkdiag(If,dia);
-% end
-% 
-% Interp = 0.5*blkdiag(Im,If);
-% % matrice de projection sur G2
-% pG2 = inv(eye((N+1)*(Q+2)+(N+2)*(Q+1)) + Interp'*Interp);
-% 
-% Matrice de la divergence %
-Dm1 = zeros((N+1)*(P+1)*(Q+1),(N+2)*(P+2)*(Q+1));
-for i = 1:(N+1)*(P+1)*(Q+1)
-    for j = 1:(N+2)*(P+2)*(Q+1)
-        if i == j 
-            Dm1(i,j) = -1;
-        elseif j == i+Q+1
-            Dm1(i,j) = 1;
-        end
-    end
-end
 
-
-dia = zeros(Q+1,Q+2);
-for i = 1:Q+1
-    for j = 1:Q+2
-        if i == j 
-            dia(i,j) = -1;
-        elseif j == i+1
-            dia(i,j) = 1;
-        end
-    end
-end
-Df = [];
-for i = 1:N+1
-    Df = blkdiag(Df,dia);
-end
-
-D = [N*Dm1 P*Dm2 Q*Df];
+divergence;
+boundary;
+interpolation;
 
 % matrices projection sur C %
-% A = [D ; B]; 
-% delta = A*A'; 
-% 
-% sigma = 0.05; mini = 0.0001;
-% f0 = gauss(0.1,sigma,N,mini); 
-% f1 = 0.5*(gauss(0.9,sigma,N,mini) + gauss(0.7,sigma,N,mini)); 
-% 
+ A = [D ; B]; 
+ delta = A*A'; 
+ 
+ normalise = @(f) f/sum(f(:));
+ 
+ sigma = 0.05; mini = 0.0001;
+ f0 = normalise(gauss(0.1,0.1,sigma,sigma,N,P,mini));
+ f1 = normalise(gauss(0.1,0.1,sigma,sigma,N,P,mini));
+
 % y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 % Cst = A'*(delta\y);
-% 
+ 
 % P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
 
 % 

@@ -40,7 +40,7 @@ InterpF = fbar(:,:,2:end) + fbar(:,:,1:end-1);
 Interp = 0;
 
 % a revoir
-e2 = sum(sum(sum(reshape(I*U,[P+1,N+1,Q+1,2]) - Interp)))
+%e2 = sum(sum(sum(reshape(I*U,[P+1,N+1,Q+1,2]) - Interp)))
 
 
 %% test boundary %%
@@ -62,5 +62,41 @@ fbar (:,:,1) = [1 2 ; 3 4];
 fbar (:,:,2) = [5 6 ; 7 8];
 fbar (:,:,3) = [9 10 ; 11 12];
 
-U = [reshape(mbar(:,:,:,1),[],1) ; reshape(mbar(:,:,:,2),[],1) ; reshape(fbar,[],1)];oundary % 
+U = [reshape(mbar(:,:,:,1),[],1) ; reshape(mbar(:,:,:,2),[],1) ; reshape(fbar,[],1)];
+
+
+% test cout 
+m = rand(P+1,N+1,Q+1,2);
+f = rand(P+1,N+1,Q+1);
+
+V = [reshape(m(:,:,:,1),[],1) ; reshape(m(:,:,:,2),[],1) ; reshape(f,[],1)];
+
+R = (V(1:(N+1)*(P+1)*(Q+1)).^2 + V((N+1)*(P+1)*(Q+1)+1:2*(N+1)*(P+1)*(Q+1)).^2);
+R = R./V(2*(N+1)*(P+1)*(Q+1)+1:end);
+R = sum(R);
+
+%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

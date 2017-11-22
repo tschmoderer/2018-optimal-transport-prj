@@ -1,9 +1,16 @@
 function pJ = proxJ(V,g)
     globals;
-    mt = reshape(V(1:(N+1)*(Q+1)),Q+1,N+1);
-    ft = reshape(V((N+1)*(Q+1)+1:end),Q+1,N+1);
     
-    Poly = @(x)(-g*mt.^2+(x-ft).*(x+2*g).^2);
+    mt1 = V(1:(N+1)*(P+1)*(Q+1));
+    mt2 = V((N+1)*(P+1)*(Q+1)+1:2*(N+1)*(P+1)*(Q+1));
+    ft = V(2*(N+1)*(P+1)*(Q+1):end);
+    
+    
+    mt1 = reshape(mt1,[P+1,N+1,Q+1]);
+    mt2 = reshape(mt2,[P+1,N+1,Q+1]);
+    ft = reshape(ft,[P+1,N+1,Q+1]);
+      
+    Poly = @(x)(-g*(mt1.^2 + mt2.^2) + (x-ft).*(x+2*g).^2);
 	dP = @(x)(2*(x+2*g).*(x-ft)+(x+2*g).^2);
  
 	x0 = 1000;
