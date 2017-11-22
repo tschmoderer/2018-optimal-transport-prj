@@ -53,4 +53,4 @@ for i = 1:Q+1;
     Im1 = blkdiag(Im1,blk2Im1*blk1Im1);
 end
 
-I = blkdiag(0.25*Im1,0.25*Im1,0.5*If);
+Interp = blkdiag(0.25*Im1,0.25*Im1,0.5*If);

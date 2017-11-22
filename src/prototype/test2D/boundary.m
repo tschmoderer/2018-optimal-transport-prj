@@ -2,7 +2,6 @@
 % fichier temporaire pour libérer l'espace de travail
 % le vecteur U est donné par [mbar1 mbar2 fbar]
 
-
 globals;
 % Opérateur pour f
 Bf = blkdiag([diag(ones(1,(N+1)*(Q+1))) zeros((N+1)*(Q+1),(N+1)*(P+1)*Q)],diag(ones(1,(N+1)*(Q+1))));

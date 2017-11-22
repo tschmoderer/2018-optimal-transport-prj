@@ -10,9 +10,9 @@ global Q; % Nb de points de discrétisation en t
 
 global B; % matrice de l'opérateur b
 global D; % matrice de l'opérateur div
-global I; % matrice d'intepolation
+global Interp; % matrice d'intepolation
 global pG2; % matrice de proximité de G2
 
-global P; % matrice de projection sur C
+global PC; % matrice de projection sur C
 global Cst; % constante dans la projection sur C
 

@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 29;
-Q = 31;
+N = 5;
+Q = 5;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));

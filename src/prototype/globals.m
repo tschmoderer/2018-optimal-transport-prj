@@ -17,9 +17,3 @@ global Cst; % constante dans la projection sur C
 
 global g;
 
-
-
-
-% test 
-global minimumF0;
-
