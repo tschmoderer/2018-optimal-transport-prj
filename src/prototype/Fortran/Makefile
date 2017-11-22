@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS  = -g -Wall -fcheck=all -ffpe-trap=invalid,zero
+FFLAGS  = -g
 LLFLAGS  = -llapack
 EXEC = transport
 
