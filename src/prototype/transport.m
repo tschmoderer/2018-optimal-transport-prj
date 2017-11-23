@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 5;
-Q = 5;
+N = 32;
+Q = 29;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -32,6 +32,7 @@ for i = 1:(N+1)*(Q+1)
         end
     end
 end
+
 dia = zeros(Q+1,Q+2);
 for i = 1:Q+1
     for j = 1:Q+2
@@ -105,21 +106,21 @@ fbar = zeros(Q+2,N+1);
 V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
 U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-alpha = 1.998; g = 0.0125; g = 1;
+alpha = 1.998; g = 0.0125;
 
 wU0 = zeros(size(U)); wV0 = zeros(size(V));
 zU0 = zeros(size(U)); zV0 = zeros(size(V));
 
-% test autre initialisation % 
-fbar = zeros(Q+2,N+1);
-t = repmat(linspace(1,0,Q+2)',1,N+1);
-fbar = (1-t) .* repmat(f0,Q+2,1) + t .* repmat(f1,Q+2,1);
-wU0 = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
-m = zeros(Q+1,N+1);
-f = mini*ones(Q+1,N+1);
-wV0 = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
-minimumF0 = min(f0);
-% fin test % 
+% % test autre initialisation % 
+% fbar = zeros(Q+2,N+1);
+% t = repmat(linspace(1,0,Q+2)',1,N+1);
+% fbar = (1-t) .* repmat(f0,Q+2,1) + t .* repmat(f1,Q+2,1);
+% wU0 = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
+% m = zeros(Q+1,N+1);
+% f = mini*ones(Q+1,N+1);
+% wV0 = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
+% minimumF0 = min(f0);
+% % fin test % 
 
 [XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); YY = flipud(YY);
 

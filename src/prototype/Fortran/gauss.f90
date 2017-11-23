@@ -1,8 +1,9 @@
-function gauss(mu,sigma,N)
+!function gauss(mu,sigma,N)
+subroutine gauss(mu,sigma,N,G)
     implicit none
     integer, intent(in) :: N;
     double precision, intent(in) :: mu, sigma;
-    double precision, dimension(N+1):: gauss; 
+    double precision, dimension(N+1), intent(out) :: G; 
     double precision, dimension(N+1) :: x; 
     integer :: i;
 
@@ -12,6 +13,6 @@ function gauss(mu,sigma,N)
     x = (x-mu)/(1.0*sigma);
     x = -0.5*x*x;
 
-    gauss = exp(x);
-    return
-end function 
+    G = exp(x);
+end subroutine
+!end function 
