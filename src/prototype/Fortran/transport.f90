@@ -3,8 +3,6 @@ implicit none
 
 include 'global.inc'
 
-! 
-
 !!! Initialisation !!!
 integer :: i,j;
 double precision :: mu = 0.1 , sigma = 0.005 , minimum = 0.000001;
@@ -17,9 +15,8 @@ double precision, dimension((N+1)*(Q+2)+(N+2)*(Q+1),(N+1)*(Q+2)+(N+2)*(Q+1)) :: 
 double precision, dimension(2*Q+2*N+4+(N+1)*(Q+1),2*(Q+1)*(N+1)+Q+N+2) :: A, Atmp;
 double precision, dimension(2*Q+2*N+4+(N+1)*(Q+1),2*Q+2*N+4+(N+1)*(Q+1)) :: delta;
 double precision, dimension((N+1)*(Q+1)+2*(Q+1)+2*(N+1)) :: y;
+double precision, dimension(2*(N+1)*(Q+1)+N+Q+2,2*(N+1)*(Q+1)+N+Q+2) :: IdPC;
 double precision, dimension(2*(N+1)) :: tmpPC;
-
-double precision, dimension((N+1)*(Q+2)+(N+2)*(Q+1),(N+1)*(Q+2)+(N+2)*(Q+1)) :: inv;
 
 ! Variables DR ! 
 double precision, dimension((N+2)*(Q+1)+(N+1)*(Q+2)) :: wU0,wU1,zU;
@@ -56,8 +53,6 @@ call boundary(B);
 call interpolation(Interp);
 call divergence(D);
 
-call check(INFO);
-
 ! projection sur C ! 
 A(1:(N+1)*(Q+1),1:2*(Q+1)*(N+1)+Q+N+2) = D;
 A((N+1)*(Q+1)+1:2*Q+2*N+4+(N+1)*(Q+1),1:2*(Q+1)*(N+1)+Q+N+2) = B;
@@ -80,6 +75,11 @@ Cst = matmul(transpose(A),y);
 Atmp = A;
 call SGESV(2*Q+2*N+4+(N+1)*(Q+1),2*(Q+1)*(N+1)+Q+N+2,delta,2*Q+2*N+4+(N+1)*(Q+1),IPIVA,A,2*Q+2*N+4+(N+1)*(Q+1),INFO);
 
+IdPC = 0;
+do i = 1,(N+1)*(Q+2)+(N+2)*(Q+1)
+	IdPC(i,i) = 1;
+end do
+P = IdPC - matmul(transpose(A),A);
 
 ! projection sur G2 !
 tmpPG2 = 0;
@@ -91,9 +91,27 @@ call DGETRF((N+1)*(Q+2)+(N+2)*(Q+1),(N+1)*(Q+2)+(N+2)*(Q+1),tmptmpPG2,(N+1)*(Q+2
 call DGETRI((N+1)*(Q+2)+(N+2)*(Q+1),tmptmpPG2,(N+1)*(Q+2)+(N+2)*(Q+1),IPIV,work,(N+1)*(Q+2)+(N+2)*(Q+1),INFO);
 pG2 = tmptmpPG2;
 
+!! CHECK !!
+!print *, 'f0 : ', f0;
+!print *, 'f1 : ', f1;
 
+!print *, 'B : ', B;
+!print *, 'Interp : ', Interp;
+!print *, 'D : ', D;
 
+!print *, 'y : ', y;
+!print *, 'A : ', A;
+!print *, 'delta : ', delta;
+!print *, 'Cst : ', Cst;
+!print *, 'P : ', P;
 
+!print *, 'PG2 : ', pG2;
+call check(INFO);
+
+do while (1 .EQ. 1)
+end do
+
+!! END CHECK !!
 
 ! Début ! 
 g = 0.0125; 

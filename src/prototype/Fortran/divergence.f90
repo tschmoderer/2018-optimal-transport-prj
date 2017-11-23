@@ -35,5 +35,5 @@ subroutine divergence(D)
 	end do
 		
 	D(1:(N+1)*(Q+1),1:(N+2)*(Q+1)) = N*Dm;
-	D(1:(N+1)*(Q+1),(N+2)*(Q+1)+1:2*(N+1)*(Q+1)+N+Q+2) = Df;	
+	D(1:(N+1)*(Q+1),(N+2)*(Q+1)+1:2*(N+1)*(Q+1)+N+Q+2) = Q*Df;	
 end subroutine

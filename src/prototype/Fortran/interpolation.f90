@@ -29,9 +29,9 @@ subroutine interpolation(Interp)
     do i = 1,Q+1
 		do j = 1,Q+2
 			if (i .EQ. j) then
-				tmp(i,j) = 1;
+				tmp(i,j) = 0.5;
 			else if (j .EQ. i+1) then
-				tmp(i,j) = 1;
+				tmp(i,j) = 0.5;
 			end if
 		end do
 	end do

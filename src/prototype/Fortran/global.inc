@@ -10,3 +10,6 @@ double precision, dimension(2*(N+1)*(Q+1)+N+Q+2) :: Cst;
 double precision, dimension(2*(N+1)*(Q+1)+N+Q+2,2*(N+1)*(Q+1)+N+Q+2) :: pG2;
 
 double precision :: g;
+
+
+common pG2;

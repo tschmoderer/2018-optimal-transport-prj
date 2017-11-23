@@ -5,7 +5,8 @@ subroutine check(INFO)
 	integer :: i,j,k;
 	integer :: INFO;
 	
+	i = 0;
+	print *, 'dans check : PG2 : ', pG2;
 	
-	stop;
 	
 end subroutine
