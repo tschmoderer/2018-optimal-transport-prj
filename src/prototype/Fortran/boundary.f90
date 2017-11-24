@@ -13,7 +13,7 @@ subroutine boundary(B)
     implicit none
     include 'global.inc'
 
-    integer :: i,j;
+    integer :: i;
     double precision, dimension(2*(Q+1),(N+2)*(Q+1)) :: Bm;
     double precision, dimension(2*(N+1),(Q+2)*(N+1)) :: Bf;  
     double precision, dimension(2,Q+2) :: tmp;

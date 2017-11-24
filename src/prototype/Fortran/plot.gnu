@@ -1,1 +1,1 @@
-  set contour; set dgrid3d            1 ,           1 ;splot "results/f_01000.dat" with lines; set title "Iteration Nb 01000 "                                                                           
+  set contour; set dgrid3d            5 ,           5 ;splot "results/f_00005.dat" with lines; set title "Iteration Nb 00005 "                                                                           

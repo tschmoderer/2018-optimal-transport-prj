@@ -10,7 +10,7 @@ subroutine proxJ(V,pV)
 	
 	double precision, dimension((Q+1)*(N+1)) :: mt,ft,Pf,Pm;
 	double precision, dimension((Q+1)*(N+1)) :: x0,x1,poly,dpoly,ddpoly;
-	integer :: i,j,k;
+	integer :: i,k;
     
     mt = V(1:(N+1)*(Q+1));
     ft = V((N+1)*(Q+1)+1:2*(N+1)*(Q+1));

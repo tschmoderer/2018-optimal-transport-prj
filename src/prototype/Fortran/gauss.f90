@@ -13,6 +13,6 @@ subroutine gauss(mu,sigma,N,G)
     x = (x-mu)/(1.0*sigma);
     x = -0.5*x*x;
 
-    G = exp(x);
+    G = dexp(x);
 end subroutine
 !end function 

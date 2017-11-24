@@ -3,20 +3,20 @@ implicit none
 
 include 'global.inc'
 
-!!! Initialisation !!!
-integer :: i,j;
+integer :: i,j,k;
 double precision :: mu = 0.1 , sigma = 0.005 , minimum = 0.000001;
-integer, parameter :: niter = 1000;
-double precision :: alpha;
-!double precision, dimension(N+1) :: gauss;
+
 double precision, dimension(N+1) :: f0, f1;
-double precision, dimension((N+1)*(Q+2)+(N+2)*(Q+1),(N+1)*(Q+2)+(N+2)*(Q+1)) :: tmpPG2,tmptmpPG2;
+
 ! projection sur C !
 double precision, dimension(2*Q+2*N+4+(N+1)*(Q+1),2*(Q+1)*(N+1)+Q+N+2) :: A, Atmp;
 double precision, dimension(2*Q+2*N+4+(N+1)*(Q+1),2*Q+2*N+4+(N+1)*(Q+1)) :: delta;
 double precision, dimension((N+1)*(Q+1)+2*(Q+1)+2*(N+1)) :: y;
 double precision, dimension(2*(N+1)*(Q+1)+N+Q+2,2*(N+1)*(Q+1)+N+Q+2) :: IdPC;
 double precision, dimension(2*(N+1)) :: tmpPC;
+
+! Proximal of G2 !
+double precision, dimension((N+1)*(Q+2)+(N+2)*(Q+1),(N+1)*(Q+2)+(N+2)*(Q+1)) :: tmpPG2,tmptmpPG2;
 
 ! Variables DR ! 
 double precision, dimension((N+2)*(Q+1)+(N+1)*(Q+2)) :: wU0,wU1,zU;
@@ -25,23 +25,25 @@ double precision, dimension(2*(N+1)*(Q+1)) :: wV0,wV1,zV;
 ! variables export files 
 character(10) :: charI;
 character(200) :: cmd;
-integer :: k;
 double precision, dimension(Q+1,N+1) :: tmpZV;
 
-! variables construction des inverses 
+! variables construction des inverses !
 integer INFO;
 integer, dimension((N+1)*(Q+1)+2*(Q+1)+2*(N+1)) :: IPIVy;
 integer, dimension(2*(Q+1)*(N+1)+Q+N+2) :: IPIVA;
 integer, dimension((N+1)*(Q+2)+(N+2)*(Q+1)) :: IPIV;
 double precision, dimension((N+1)*(Q+2)+(N+2)*(Q+1)) :: work;
+
 external SGESV
 external DGETRF
 external DGETRI
 
 !!! Construction des matrices opérateurs !!!
 
+print *, 'Begin Initialisation :'
+
 call gauss(mu,sigma,N,f0);
-call gauss(mu,sigma,N,f1);
+call gauss(mu+0.8,sigma,N,f1);
 
 f0 = f0 + minimum;
 f1 = f1 + minimum;
@@ -49,10 +51,13 @@ f1 = f1 + minimum;
 f0 = f0/sum(f0(:));
 f1 = f1/sum(f1(:));
 
+print *, 'Construction of matrix operators'
+
 call boundary(B);
 call interpolation(Interp);
 call divergence(D);
 
+print *, 'Construction of the projection on C'
 ! projection sur C ! 
 A(1:(N+1)*(Q+1),1:2*(Q+1)*(N+1)+Q+N+2) = D;
 A((N+1)*(Q+1)+1:2*Q+2*N+4+(N+1)*(Q+1),1:2*(Q+1)*(N+1)+Q+N+2) = B;
@@ -69,7 +74,13 @@ do i = 1,2*(N+1)
 end do
 y((N+1)*(Q+1)+2*(Q+1)+1:(N+1)*(Q+1)+2*(Q+1)+2*(N+1)) = tmpPC;
 
-call SGESV(2*Q+2*N+4+(N+1)*(Q+1),(N+1)*(Q+1)+2*(Q+1)+2*(N+1),delta,2*Q+2*N+4+(N+1)*(Q+1),IPIVy,y,2*Q+2*N+4+(N+1)*(Q+1),INFO);
+do i = 1,2*Q+2*N+4+(N+1)*(Q+1)
+	print *, delta(i,:), 'ENDL';
+end do
+
+!call SGESV(2*Q+2*N+4+(N+1)*(Q+1),(N+1)*(Q+1)+2*(Q+1)+2*(N+1),delta,2*Q+2*N+4+(N+1)*(Q+1),IPIVy,y,2*Q+2*N+4+(N+1)*(Q+1),INFO);
+call SGESV(2*Q+2*N+4+(N+1)*(Q+1),1,delta,2*Q+2*N+4+(N+1)*(Q+1),IPIVy,y,(N+1)*(Q+1)+2*(Q+1)+2*(N+1),INFO);
+
 Cst = matmul(transpose(A),y);
 
 Atmp = A;
@@ -79,7 +90,9 @@ IdPC = 0;
 do i = 1,(N+1)*(Q+2)+(N+2)*(Q+1)
 	IdPC(i,i) = 1;
 end do
-P = IdPC - matmul(transpose(A),A);
+P = IdPC - matmul(transpose(Atmp),A);
+
+print *, 'Construction of the projection on G2'
 
 ! projection sur G2 !
 tmpPG2 = 0;
@@ -92,30 +105,18 @@ call DGETRI((N+1)*(Q+2)+(N+2)*(Q+1),tmptmpPG2,(N+1)*(Q+2)+(N+2)*(Q+1),IPIV,work,
 pG2 = tmptmpPG2;
 
 !! CHECK !!
-!print *, 'f0 : ', f0;
-!print *, 'f1 : ', f1;
 
-!print *, 'B : ', B;
-!print *, 'Interp : ', Interp;
-!print *, 'D : ', D;
-
-!print *, 'y : ', y;
-!print *, 'A : ', A;
-!print *, 'delta : ', delta;
-!print *, 'Cst : ', Cst;
-!print *, 'P : ', P;
-
-!print *, 'PG2 : ', pG2;
-call check(INFO);
-
-do while (1 .EQ. 1)
+print *, 'tmpC :';
+do i = 1,2*(N+1)*(Q+1)+N+Q+2
+!print *, Cst(i) , 'ENDL';
 end do
+!call check(INFO);
 
+stop 0
 !! END CHECK !!
 
 ! Début ! 
-g = 0.0125; 
-alpha = 1.998;
+print *, 'Begin DR algorithm'
 wU0 = 0; wV0 = 0;
 wU1 = 0; wV1 = 0;
 zU = 0; zV = 0;
@@ -143,7 +144,7 @@ do i = 1,niter
 	write(cmd,*) 'set contour; set dgrid3d ', N, ',', Q, ';', 'splot "results/f_'//trim(charI), &
 		'.dat" with lines; set title "Iteration Nb '//trim(charI),' "';
 	open(8,file="plot.gnu"); write(8,*) cmd; close(8);
-	!call system("gnuplot plot.gnu");
+	call system("gnuplot -p plot.gnu");
 
 end do
 

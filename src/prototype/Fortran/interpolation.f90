@@ -1,7 +1,7 @@
 !! Etant donné des variables décentrées mbar,fbar !!
 !! interpol les valeurs sur la grille centrée m,f !!
 
-subroutine interpolation(Interp)
+subroutine interpolation(opInterp)
     implicit none
     include 'global.inc'
   
@@ -9,6 +9,7 @@ subroutine interpolation(Interp)
 
     double precision, dimension((N+1)*(Q+1),(N+2)*(Q+1)) :: Interpm;
     double precision, dimension((N+1)*(Q+1),(N+1)*(Q+2)) :: Interpf;
+    double precision, dimension(2*(N+1)*(Q+1),2*(N+1)*(Q+1)+N+Q+2) :: opInterp;
     double precision, dimension(Q+1,Q+2) :: tmp;
 
 	Interpm = 0;
@@ -41,7 +42,7 @@ subroutine interpolation(Interp)
 		Interpf((i-1)*(Q+1)+1:i*(Q+1),(i-1)*(Q+2)+1:i*(Q+2)) = tmp;
     end do
     
-    Interp(1:(N+1)*(Q+1),1:(N+2)*(Q+1)) = Interpm;
-    Interp((N+1)*(Q+1)+1:2*(N+1)*(Q+1),(N+2)*(Q+1)+1:2*(N+1)*(Q+1)+N+Q+2) = Interpf;
+    opInterp(1:(N+1)*(Q+1),1:(N+2)*(Q+1)) = Interpm;
+    opInterp((N+1)*(Q+1)+1:2*(N+1)*(Q+1),(N+2)*(Q+1)+1:2*(N+1)*(Q+1)+N+Q+2) = Interpf;
 
 end subroutine
