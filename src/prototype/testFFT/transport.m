@@ -81,7 +81,7 @@ end
 
 D = [N*Dm Q*Df];
 
-% matrices projection sur C %
+% matrices projection sur C %Cst
 A = [D ; B]; 
 delta = A*A'; 
 
@@ -129,6 +129,7 @@ niter = 3000;
 cout = zeros(1,niter);
 div = zeros(1,niter);
 minF = zeros(1,niter);
+
 tic;
 for l = 1:niter
     [wU1 , wV1] = proxG1(2*zU0-wU0,2*zV0-wV0);

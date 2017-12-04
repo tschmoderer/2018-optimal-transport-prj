@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 1;
-Q = 1;
+N = 31;
+Q = 29;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -88,13 +88,18 @@ delta = A*A';
 normalise = @(f) f/sum(f(:));
 
 sigma = 0.005; mini = 0.000001;
-f0 = normalise(mini + gauss(0.1,sigma,N)); 
-f1 = normalise(mini + gauss(0.9,sigma,N));% + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
+f0 = normalise(mini + gauss(0.8,sigma,N)); 
+f1 = normalise(mini + gauss(0.5,sigma,N));% + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
 
 P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
+
+% tt = delta\y;
+% surf(reshape(tt(1:(N+1)*(Q+1)),Q+1,N+1))
+% title('Cst');
+% stop
 
 %% Fin Initialisation %%
 
