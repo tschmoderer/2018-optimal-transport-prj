@@ -2,8 +2,8 @@ clc
 clear all
 close all
 
-N = 29;
-Q = 31; 
+N = 31;
+Q = 29; 
 
 % Matrice de l'opérateur b
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -16,38 +16,6 @@ for i = 1:N+1
 end
 
 B = blkdiag(Bm,Bf);
-
-% matrice d'interpolation %
-Im = zeros((N+1)*(Q+1),(N+2)*(Q+1));
-for i = 1:(N+1)*(Q+1)
-    for j = 1:(N+2)*(Q+1)
-        if i == j 
-            Im(i,j) = 1;
-        elseif j == i+Q+1
-            Im(i,j) = 1;
-        end
-    end
-end
-
-dia = zeros(Q+1,Q+2);
-for i = 1:Q+1
-    for j = 1:Q+2
-        if i == j 
-            dia(i,j) = 1;
-        elseif j == i+1
-            dia(i,j) = 1;
-        end
-    end
-end
-If = [];
-for i = 1:N+1
-    If = blkdiag(If,dia);
-end
-
-Interp = 0.5*blkdiag(Im,If);
-
-% matrice de projection sur G2 %
-pG2 = inv(eye((N+1)*(Q+2)+(N+2)*(Q+1)) + Interp'*Interp);
 
 % Matrice de la divergence %
 Dm = zeros((N+1)*(Q+1),(N+2)*(Q+1));
@@ -75,8 +43,8 @@ for i = 1:N+1
     Df = blkdiag(Df,dia);
 end
 
-D = [N*Dm Q*Df];
-
+%D = [N*Dm Q*Df];%!!
+D = [Dm Df];
 % matrices projection sur C %
 A = [D ; B]; 
 delta = A*A'; 
@@ -104,18 +72,61 @@ C22 = A'*C2;
 
 errCm = sum(sum(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2) - Cmbar))
 eerCf = sum(sum(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1) - Cfbar))
-
+% 
 figure;
-subplot(1,2,1), 
-surf(C1);
+subplot(2,2,1), 
+surf(Cmbar);
 %contour3(C1,50);
-title('C1');
-
-subplot(1,2,2), 
-surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1));
+title('Cmbar');
+subplot(2,2,2), 
+surf(Cfbar);
+%contour3(C1,50);
+title('Cfbar');
+subplot(2,2,3), 
+surf(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2));
 %contour3(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1),50);
-title('C2');
+title('C2 - mbar');
+subplot(2,2,4), 
+surf(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1));
+%contour3(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1),50);
+title('C2 - fbar');
 
+figure; 
+subplot(121)
+surf(C1);
+title('C1 - poisson');
+subplot(122);
+surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))
+title('C2 - delta\y');
+%close all 
+
+% N = 10; P = 10;
+% w = ([0:10]'*ones(1,P+1))'
+% M = zeros(P+1);
+
+
+
+% %% test div.div*
+% N = 10; Q = 10; 
+% 
+% w = rand(Q+1,N+1); % en theorie les inconnue
+% 
+% Lw = zeros(Q+1,N+1);
+% 
+% Lw(2:end-1,2:end-1) = (-w(2:end-1,1:end-2)+2*w(2:end-1,2:end-1)-w(2:end-1,3:end)) + (-w(1:end-2,2:end-1)+2*w(2:end-1,2:end-1)-w(3:end,2:end-1));
+% 
+% Lw(2:end-1,1) = 2*w(2:end-1,1) - w(2:end-1,2) - w(1:end-2,1) + 2*w(2:end-1,1) - w(3:end,1); % bord gauche
+% Lw(2:end-1,end) = 2*w(2:end-1,end) - w(2:end-1,end-1) - w(1:end-2,end) + 2*w(2:end-1,end) - w(3:end,end); % bord droit
+% 
+% Lw;
+
+
+
+
+
+
+
+%% test subroutine
 
 % m = rand(Q+1,N+1); 
 % f = rand(Q+1,N+1);

@@ -6,8 +6,8 @@ globals;
 
 %% Initialisation %%
 
-N = 31;
-Q = 29;
+N = 35;
+Q = 45;
 
 % Matrice de l'opérateur b %
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -87,19 +87,14 @@ delta = A*A';
 
 normalise = @(f) f/sum(f(:));
 
-sigma = 0.005; mini = 0.000001;
+sigma = 0.01; mini = 0.000001;
 f0 = normalise(mini + gauss(0.8,sigma,N)); 
-f1 = normalise(mini + gauss(0.5,sigma,N));% + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
+f1 = normalise(mini + gauss(0.2,sigma,N));% + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
 
 P = eye((N+1)*(Q+2)+(N+2)*(Q+1)) - A'*(delta\A);
-
-% tt = delta\y;
-% surf(reshape(tt(1:(N+1)*(Q+1)),Q+1,N+1))
-% title('Cst');
-% stop
 
 %% Fin Initialisation %%
 
@@ -111,7 +106,7 @@ fbar = zeros(Q+2,N+1);
 V = [reshape(m,(N+1)*(Q+1),1);reshape(f,(N+1)*(Q+1),1)];
 U = [reshape(mbar,(N+2)*(Q+1),1);reshape(fbar,(N+1)*(Q+2),1)];
 
-alpha = 1.998; g = 0.0125;
+alpha = 1; g = 1;
 
 wU0 = zeros(size(U)); wV0 = zeros(size(V));
 zU0 = zeros(size(U)); zV0 = zeros(size(V));
@@ -130,7 +125,7 @@ zU0 = zeros(size(U)); zV0 = zeros(size(V));
 [XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); YY = flipud(YY);
 
 % Itérations
-niter = 3000;
+niter = 1000;
 cout = zeros(1,niter);
 div = zeros(1,niter);
 minF = zeros(1,niter);

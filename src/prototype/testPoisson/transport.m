@@ -4,8 +4,8 @@ close all
 
 %% Initialisation %%
 
-N = 20;
-Q = 20;
+N = 29;
+Q = 31;
 
 
 alpha = 1.998; g = 0.0125;
