@@ -2,6 +2,28 @@ clc
 clear all
 close all
 
+
+
+
+%% test poisson -- OK
+
+% N = 10; Q = 10; 
+% X = [0:N]/N; Y = [0:Q]/Q;
+% [XX,YY] = meshgrid(X,Y);
+% 
+% 
+% S = poisson(-4*ones(Q+1,N+1),Y.^2,1+Y.^2,1+X.^2,X.^2,N,Q,1e-15);
+% %S = poisson(-ones(Q+1,N+1),0,0,0,0,N,Q,1e-5);
+% % X = [0:N]/N; Y = [0:Q]/Q;
+% % S = poisson(-6*XX.*YY.*(1-YY)+2*XX.^3,0,Y.*(1-Y),0,0,N,Q,1e-5);
+% 
+% surf(S)
+% %sum(sum(S-YY.*(1-YY).*XX.^3))
+% sum(sum(XX.^2+YY.^2 - S))
+
+
+%%
+
 N = 31;
 Q = 29; 
 
@@ -43,8 +65,8 @@ for i = 1:N+1
     Df = blkdiag(Df,dia);
 end
 
-%D = [N*Dm Q*Df];%!!
-D = [Dm Df];
+D = [N*Dm Q*Df];%!!
+
 % matrices projection sur C %
 A = [D ; B]; 
 delta = A*A'; 
@@ -55,7 +77,11 @@ normalise = @(f) f/sum(f(:));
 f0 = normalise(gauss(0.4,0.05,N) + 0.01);
 f1 = normalise(gauss(0.6,0.05,N) + 0.01);
 
-C1 = poisson(zeros(Q+1,N+1),0,0,f1,f0,N,Q,1e-10);
+yy = zeros(Q+1,N+1);
+yy(1,:) = -Q*f1; 
+yy(end,:) = Q*f0;
+C1 = poisson(yy,0,0,0,0,N,Q,1e-10);
+C1 = poisson(zeros(Q+1,N+1),0,0,-Q*f1,Q*f0,N,Q,1e-10);
 Cmbar = zeros(Q+1,N+2); Cfbar = zeros(Q+2,N+1);
     
 Cmbar(:,1) = -C1(:,1); Cmbar(:,end) = C1(:,end);
@@ -64,7 +90,7 @@ Cmbar(:,2:end-1) = C1(:,1:end-1) - C1(:,2:end);
 Cfbar(1,:) = -C1(1,:); Cfbar(end,:) = C1(end,:); 
 Cfbar(2:end-1,:) = C1(1:end-1,:) - C1(2:end,:);
 
-Cmbar = Cmbar; Cfbar = Cfbar;
+Cmbar = N*Cmbar; Cfbar = Q*Cfbar;
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 C2 = delta\y;

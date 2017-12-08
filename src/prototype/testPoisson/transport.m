@@ -4,9 +4,8 @@ close all
 
 %% Initialisation %%
 
-N = 29;
-Q = 31;
-
+N = 20;
+Q = 19;
 
 alpha = 1.998; g = 0.0125;
 
@@ -17,9 +16,8 @@ wfbar0 = zeros(Q+2,N+1); wfbar1 = zeros(Q+2,N+1); zfbar = zeros(Q+2,N+1);
 wm0 = zeros(Q+1,N+1); wm1 = zeros(Q+1,N+1); zm = zeros(Q+1,N+1);
 wf0 = zeros(Q+1,N+1); wf1 = zeros(Q+1,N+1); zf = zeros(Q+1,N+1);
 
-
 % Itérations
-niter = 1000;
+niter = 5;
 cout = zeros(1,niter);
 div = zeros(1,niter);
 minF = zeros(1,niter);
@@ -39,14 +37,12 @@ for l = 1:niter
     wmbar0 = wmbar1; wfbar0 = wfbar1;
     wm0 = wm1; wf0 = wf1;
     
-    
     surf(XX,YY,zf)
     xlabel('x');
     ylabel('t');
     zlabel('f');
     title(['itération : ',num2str(l)]);
     drawnow
-
     
     cout(l) = cost(zm,zf);
    % div(l)  = sum(D*zU0);
@@ -54,13 +50,13 @@ for l = 1:niter
 end
 toc
 
-figure;
-subplot(3,1,1)
-plot([1:niter],cout);
-title('cout')
-subplot(3,1,2)
-plot([1:niter],div)
-title('div')
-subplot(3,1,3)
-plot([1:niter],minF);
-title('min de f');
+% figure;
+% subplot(3,1,1)
+% plot([1:niter],cout);
+% title('cout')
+% subplot(3,1,2)
+% plot([1:niter],div)
+% title('div')
+% subplot(3,1,3)
+% plot([1:niter],minF);
+% title('min de f');

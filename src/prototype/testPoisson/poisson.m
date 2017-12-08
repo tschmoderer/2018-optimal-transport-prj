@@ -18,16 +18,22 @@ function f = poisson(d,bL,bR,bU,bD,N,Q,tol)
 	u(1,:) = bU; u(end,:) = bD;
     u(:,1) = bL; u(:,end) = bR;
 
+%     % !! 
+%     u(1,:) = d(1,:) - bU; u(end,:) = d(end,:) - bD;
+%     u(:,1) = d(:,1) - bL; u(:,end) = d(:,end) - bR;  
+%     % !! 
+%     
 	ukp1 = u; 
 	err = 1;
     while (err > tol) 
-		for i = 2:Q
-			for j = 2:N
-				ukp1(i,j) = S*(d(i,j) + (u(i,j+1) + u(i,j-1))/dt^2 + (u(i+1,j) + u(i-1,j))/dx^2);
-			end
-		end
-			err = norm(ukp1-u,2);
-			u = ukp1;
+        ukp1(2:end-1,2:end-1) = S*(d(2:end-1,2:end-1)+ (u(2:end-1,3:end) + u(2:end-1,1:end-2))/dt^2 + (u(3:end,2:end-1) + u(1:end-2,2:end-1))/dx^2);
+% 		for i = 2:Q
+% 			for j = 2:N
+% 				ukp1(i,j) = S*(d(i,j) + (u(i,j+1) + u(i,j-1))/dt^2 + (u(i+1,j) + u(i-1,j))/dx^2);
+% 			end
+% 		end
+		err = norm(ukp1-u,inf);
+		u = ukp1;
     end
 
 	f = u;
