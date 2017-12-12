@@ -88,8 +88,8 @@ delta = A*A';
 normalise = @(f) f/sum(f(:));
 
 sigma = 0.01; mini = 0.000001;
-f0 = normalise(mini + gauss(0.8,sigma,N)); 
-f1 = normalise(mini + gauss(0.2,sigma,N));% + gauss(0.8,sigma,N) + gauss(0.4,sigma,N)); 
+f0 = normalise(mini + gauss(0.5,sigma,N)); 
+f1 = normalise(mini + gauss(0.2,sigma,N)+ gauss(0.8,sigma,N) + gauss(0.25,sigma,N)); 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 Cst = A'*(delta\y);
