@@ -30,8 +30,8 @@ close all
 % % return
 
 
-N = 51;
-Q = 49; 
+N = 11;
+Q = 9; 
 
 % Matrice de l'opérateur b
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -80,22 +80,22 @@ delta = A*A';
 
 normalise = @(f) f/sum(f(:));
 
-f0 = normalise(gauss(0.4,0.05,N) + 0.01);
-f1 = normalise(gauss(0.6,0.05,N) + 0.01);
+f0 = normalise(gauss(0.4,0.005,N) + 0.01);
+f1 = normalise(gauss(0.6,0.005,N) + 0.01);
 
 yy = zeros(Q+1,N+1);
 yy(1,:) = Q*f1; 
 yy(end,:) = -Q*f0;
 %C1 = poisson(yy,0,0,0,0,N,Q,1e-10);
-C1 = poisson(zeros(Q+1,N+1),0,0,-Q*f1,Q*f0,N,Q,1e-10);
+%C1 = poisson(zeros(Q+1,N+1),0,0,-Q*f1,Q*f0,N,Q,1e-10);
 C1 = poisson2d_Neumann(yy);
 Cmbar = zeros(Q+1,N+2); Cfbar = zeros(Q+2,N+1);
     
 Cmbar(:,1) = -C1(:,1); Cmbar(:,end) = C1(:,end);  Cmbar(:,1) = 0; Cmbar(:,end) = 0;
-Cmbar(:,2:end-1) = C1(:,1:end-1) - C1(:,2:end);
+Cmbar(:,2:end-1) = (C1(:,1:end-1) - C1(:,2:end));
 
 Cfbar(1,:) = -C1(1,:); Cfbar(end,:) = C1(end,:); Cfbar(1,:) = f1/Q; Cfbar(end,:) = f0/Q;
-Cfbar(2:end-1,:) = C1(1:end-1,:) - C1(2:end,:);
+Cfbar(2:end-1,:) = (C1(1:end-1,:) - C1(2:end,:));
 
 Cmbar = N*Cmbar; Cfbar = Q*Cfbar;
 
@@ -103,11 +103,11 @@ y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 C2 = delta\y;
 C22 = A'*C2;
 
-errCm = sum(sum(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2) - Cmbar));
-eerCf = sum(sum(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1) - Cfbar));
+errCs = sum(sum(abs(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1) - C1)))
+errCm = sum(sum(abs(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2) - Cmbar)))
+eerCf = sum(sum(abs(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1) - Cfbar)))
 
 
-%%
 figure;
 
 subplot(2,2,1), 
@@ -134,8 +134,9 @@ subplot(122);
 surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))
 title('C2 - delta\y');
 
+sum(sum(abs(C1-reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))))
 
-
+return
 % f = zeros(Q+1,N+1); f(1,:) = -Q*f1; f(end,:) = Q*f0; 
 % surf(poisson2d_Neumann(f))
 

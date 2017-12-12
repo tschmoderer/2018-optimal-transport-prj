@@ -7,14 +7,15 @@ function [mbart,fbart,mt,ft] = proxG2(mbar,fbar,m,f,N,Q)
 
     Interpm_adj = Interpm';
     Interpf_adj = Interpf';
-    Am = (eye(N+2) + Interpm*Interpm_adj)';
+    
+    Am = eye(N+2) + Interpm*Interpm_adj; % sym def positive
     Af = eye(Q+2) + Interpf_adj*Interpf;
     
-    Bm = (mbar+m*Interpm_adj)';
+    Bm = mbar + m*Interpm_adj;
     Bf = fbar + Interpf_adj*f;
 
     fbart = Af\Bf;
-    mbart = (Am\Bm)';
+    mbart = Bm/Am;
 
     mt = mbart*Interpm;
     ft = Interpf*fbart;
