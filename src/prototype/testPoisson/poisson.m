@@ -16,7 +16,7 @@ function f = poisson(d,bL,bR,bU,bD,N,Q,tol)
 
 	u = zeros(Q+1,N+1);
 	u(1,:) = bU; u(end,:) = bD; %!!%
-    u(:,1) = bL; u(:,end) = bR;
+    %u(:,1) = bL; u(:,end) = bR;
 
 %     % !! 
 %     u(1,:) = d(1,:) - bU; u(end,:) = d(end,:) - bD;

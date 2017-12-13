@@ -2,11 +2,22 @@ clc
 clear all
 close all
 
+globals;
+
 %% Initialisation %%
 
-N = 10;
-Q = 10;
+N = 20;
+Q = 30;
 
+epsilon = 0.0001;
+
+g = 1.0;
+
+normalise = @(f) f/sum(f(:));
+
+f0 = normalise(epsilon + gauss(0.4,0.05,N));
+f1 = normalise(epsilon + gauss(0.6,0.05,N));
+    
 alpha = 1.0; g = 0.0125;
 
 [XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); %YY = flipud(YY);
@@ -25,7 +36,7 @@ minF = zeros(1,niter);
 tic;
 for l = 1:niter
     % etape 1
-    [wmbar1,wfbar1,wm1,wf1] = proxG1(2*zmbar-wmbar0,2*zfbar-wfbar0,2*zm-wm0,2*zf-wf0,N,Q);    
+    [wmbar1,wfbar1,wm1,wf1] = proxG1(2*zmbar-wmbar0,2*zfbar-wfbar0,2*zm-wm0,2*zf-wf0);    
     
     wmbar1 = wmbar0 + alpha*(wmbar1 - zmbar); wfbar1 = wfbar0 + alpha*(wfbar1 - zfbar);
     wm1 = wm0 + alpha*(wm1 - zm); wf1 = wf0 + alpha*(wf1 - zf);
@@ -50,13 +61,13 @@ for l = 1:niter
 end
 toc
 
-% figure;
-% subplot(3,1,1)
-% plot([1:niter],cout);
-% title('cout')
-% subplot(3,1,2)
-% plot([1:niter],div)
-% title('div')
-% subplot(3,1,3)
-% plot([1:niter],minF);
-% title('min de f');
+figure;
+subplot(3,1,1)
+plot([1:niter],cout);
+title('cout')
+subplot(3,1,2)
+plot([1:niter],div)
+title('div')
+subplot(3,1,3)
+plot([1:niter],minF);
+title('min de f');

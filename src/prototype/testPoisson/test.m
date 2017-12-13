@@ -2,36 +2,8 @@ clc
 clear all
 close all
 
-%% test poisson -- OK
-% 
-% % N = 80; Q = 50; 
-% % X = [0:N]/N; Y = [0:Q]/Q;
-% % [XX,YY] = meshgrid(X,Y); %YY = flipud(YY);
-% % 
-% % bL = Y'.^2; bR = 1+Y'.^2;
-% % bU = 1+X.^2; bD = X.^2;
-% % d = -4*ones(Q+1,N+1);
-% % %bL = 0; bR = 0; bU = 0; bD = 1;
-% % S = poisson(d,bL,bR,bU,bD,N,Q,1e-15);
-% % %S = poisson(-ones(Q+1,N+1),0,0,0,0,N,Q,1e-5);
-% % % X = [0:N]/N; Y = [0:Q]/Q;
-% % %S = poisson(-6*XX.*YY.*(1-YY)+2*XX.^3,0,Y.*(1-Y),0,0,N,Q,1e-5);
-% % 
-% % surf(XX,YY,S)
-% % %sum(sum(S-YY.*(1-YY).*XX.^3))
-% % sum(sum(abs(XX.^2+YY.^2 - S)))
-% % 
-% % errL = sum(abs(S(:,1) - bL));
-% % errR = sum(abs(S(:,end) - bR));
-% % errU = sum(abs(S(1,:) - bU));
-% % errD = sum(abs(S(end,:) - bD));
-% % [errL errR errU errD]
-% % 
-% % return
-
-
-N = 11;
-Q = 9; 
+N = 30;
+Q = 29; 
 
 % Matrice de l'opérateur b
 Bm = zeros(2*(Q+1),(N+2)*(Q+1));
@@ -71,33 +43,35 @@ for i = 1:N+1
     Df = blkdiag(Df,dia);
 end
 
-D = [N*Dm Q*Df];%!!
+D = [N*Dm Q*Df];
 
 % matrices projection sur C %
 A = [D ; B]; 
 delta = A*A'; 
-
 
 normalise = @(f) f/sum(f(:));
 
 f0 = normalise(gauss(0.4,0.005,N) + 0.01);
 f1 = normalise(gauss(0.6,0.005,N) + 0.01);
 
-yy = zeros(Q+1,N+1);
-yy(1,:) = Q*f1; 
-yy(end,:) = -Q*f0;
-%C1 = poisson(yy,0,0,0,0,N,Q,1e-10);
-%C1 = poisson(zeros(Q+1,N+1),0,0,-Q*f1,Q*f0,N,Q,1e-10);
-C1 = poisson2d_Neumann(yy);
+%!!%
+ymbar = zeros(Q+1,N+2); 
+yfbar = zeros(Q+2,N+1); yfbar(1,:) = f1; yfbar(end,:) = f0;
+yy = N*(ymbar(:,2:end)-ymbar(:,1:end-1)) + Q*(yfbar(2:end,:) - yfbar(1:end-1,:));
+
+C1 = poisson2d_Neumann(-yy);
+% C1 = poisson_neumann(zeros(Q+1,N+1),zeros(Q+1,1),zeros(Q+1,1),f1,f0,N,Q,1e-5);
+% C1 = poisson_neumann(yy,zeros(Q+1,1),zeros(Q+1,1),0,0,N,Q,1e-5);
+
 Cmbar = zeros(Q+1,N+2); Cfbar = zeros(Q+2,N+1);
     
 Cmbar(:,1) = -C1(:,1); Cmbar(:,end) = C1(:,end);  Cmbar(:,1) = 0; Cmbar(:,end) = 0;
 Cmbar(:,2:end-1) = (C1(:,1:end-1) - C1(:,2:end));
 
-Cfbar(1,:) = -C1(1,:); Cfbar(end,:) = C1(end,:); Cfbar(1,:) = f1/Q; Cfbar(end,:) = f0/Q;
+Cfbar(1,:) = -C1(1,:); Cfbar(end,:) = C1(end,:); Cfbar(1,:) = Cfbar(1,:) + f1/Q; Cfbar(end,:) = Cfbar(end,:) + f0/Q;
 Cfbar(2:end-1,:) = (C1(1:end-1,:) - C1(2:end,:));
 
-Cmbar = N*Cmbar; Cfbar = Q*Cfbar;
+Cmbar = N*Cmbar; Cfbar = Q*Cfbar; 
 
 y = [zeros((N+1)*(Q+1),1) ; zeros(2*(Q+1),1) ; reshape([f1;f0],2*(N+1),1)];
 C2 = delta\y;
@@ -105,40 +79,74 @@ C22 = A'*C2;
 
 errCs = sum(sum(abs(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1) - C1)))
 errCm = sum(sum(abs(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2) - Cmbar)))
-eerCf = sum(sum(abs(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1) - Cfbar)))
+errCf = sum(sum(abs(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1) - Cfbar)))
 
 
-figure;
+% !!%% 
+% PBM 
 
-subplot(2,2,1), 
-surf(Cmbar);
-title('Cmbar');
+mustBeCloseToZeros = sum(sum(abs(N*(Cmbar(:,2:end)-Cmbar(:,1:end-1)) + Q*(Cfbar(2:end,:) - Cfbar(1:end-1,:)))))
 
-subplot(2,2,2), 
-surf(Cfbar);
-title('Cfbar');
 
-subplot(2,2,3), 
-surf(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2));
-title('C2 - mbar');
+A = @(mbar,fbar) N*(Cmbar(:,2:end)-Cmbar(:,1:end-1)) + Q*(Cfbar(2:end,:) - Cfbar(1:end-1,:));
+AS = 
 
-subplot(2,2,4), 
-surf(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1));
-title('C2 - fbar');
+% 
+% est non nulle
+% !!%
+
+% figure;
+% 
+% subplot(2,2,1), 
+% surf(Cmbar);
+% title('Cmbar');
+% 
+% subplot(2,2,2), 
+% surf(Cfbar);
+% title('Cfbar');
+% 
+% subplot(2,2,3), 
+% surf(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2));
+% title('C2 - mbar');
+% 
+% subplot(2,2,4), 
+% surf(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1));
+% title('C2 - fbar');
 
 figure; 
-subplot(121)
-surf(C1);
-title('C1 - poisson');
-subplot(122);
-surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))
-title('C2 - delta\y');
+subplot(121),
+surf(Cmbar);
+hold on 
+surf(reshape(C22(1:(N+2)*(Q+1)),Q+1,N+2),'EdgeColor','none');
+title('Cmbar vs delta mbar (fade)');
+hold off
 
-sum(sum(abs(C1-reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))))
+subplot(122),
+surf(Cfbar);
+hold on 
+surf(reshape(C22((N+2)*(Q+1)+1:end),Q+2,N+1),'EdgeColor','none');
+title('Cfbar vs delta fbar (fade)');
+hold off
+
+% figure; 
+% subplot(121)
+% surf(C1);
+% title('C1 - poisson');
+% subplot(122);
+% surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1))
+% title('C2 - delta y');
+
+figure; 
+surf(C1);
+hold on; 
+surf(reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1),'EdgeColor','none')
+title('C1 vs Delta (fade)');
+
+%DeltaSurC1 = reshape(C2(1:(N+1)*(Q+1)),Q+1,N+1)./C1
+
 
 return
-% f = zeros(Q+1,N+1); f(1,:) = -Q*f1; f(end,:) = Q*f0; 
-% surf(poisson2d_Neumann(f))
+
 
 
 

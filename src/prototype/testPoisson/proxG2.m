@@ -1,4 +1,6 @@
-function [mbart,fbart,mt,ft] = proxG2(mbar,fbar,m,f,N,Q)
+% Validée
+function [mbart,fbart,mt,ft] = proxG2(mbar,fbar,m,f)
+    globals;
     %% Matrice d'interpolation %%
     Interpm = [diag(ones(1,N+1));zeros(1,N+1)] + [zeros(1,N+1);diag(ones(1,N+1))];
     Interpm = Interpm/2; % m = mbar*Im
