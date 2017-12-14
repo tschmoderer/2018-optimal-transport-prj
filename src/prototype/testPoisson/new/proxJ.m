@@ -14,11 +14,10 @@ function Pw = proxJ(w,g)
         poly = (x0-ft).*((x0+g).^2)-0.5*g*mt.^2;
         dpoly = 2*(x0+g).*(x0-ft)+(x0+g).^2;
         ddpoly = 2*(3*x0+2*g-ft);
-        x1 = x0 - 2*poly.*dpoly./(2*dpoly.^2 - poly.*ddpoly);
-        %  x1 = x0 - poly./dpoly;
+    %    x1 = x0 - 2*poly.*dpoly./(2*dpoly.^2 - poly.*ddpoly + eps);
+        x1 = x0 - poly./dpoly;
         k = k+1;
     end
-    k
     Pf = x1;
     Pm = Pf.*mt./(Pf + g);
 
