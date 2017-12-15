@@ -38,7 +38,7 @@ function [pC, error] = projC(w)
     opts.niter_max = 150;
     flat = @(x) x(:);
     resh = @(x) reshape(x,Q+3,N+1);
-    cg = @(B,y) resh(perform_cg(@(r)flat(B(resh(r))),y(:),opts)); % ma fonction gradient conjugué
+%    cg = @(B,y) resh(perform_cg(@(r)flat(B(resh(r))),y(:),opts)); % ma fonction gradient conjugué
          
     pA = @(r) cg(@(s)A(AS(s)),r);
      
