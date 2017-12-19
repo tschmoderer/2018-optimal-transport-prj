@@ -32,17 +32,16 @@ function [pC, error] = projC(w)
 %     AAS = sum(sum(sum(rw.*ASrArw))) - sum(sum(sum(rArw.*Arw)))
 
     %% opérateurs de projetction
-     
     y = [zeros(Q+1,N+1);f0;f1]; % second membre
-    opts.epsilon = 1e-9;
-    opts.niter_max = 150;
+
     flat = @(x) x(:);
     resh = @(x) reshape(x,Q+3,N+1);
-%    cg = @(B,y) resh(perform_cg(@(r)flat(B(resh(r))),y(:),opts)); % ma fonction gradient conjugué
-         
-    pA = @(r) cg(@(s)A(AS(s)),r);
-     
+ 
+    do_cg =@(B,y) resh(cg(@(r)flat(B(resh(r))),y(:))); % solve B*x = y with CG
+    pA = @(r) do_cg(@(s)A(AS(s)),r); % solve (A*A')*x = r
+
     pC = w + AS(pA(y - A(w)));
+    
     err = @(w) norm(A(w)-y)/norm(y);
     error = err(pC);
     %% check div=0
