@@ -1,11 +1,16 @@
 function [pC, error] = projC(w)
     globals;
 
-    dx  = @(m) (m(:,[2:end end]) - m); % dérivation selon ---> x
-    dt  = @(f) (f([2:end end],:) - f); % dérivation selon ---> t 
-    dxS = @(dm) [-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
-    dtS = @(df) [-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
+    dx  = @(m)  N*(m(:,[2:end end]) - m); % dérivation selon ---> x
+    dt  = @(f)  Q*(f([2:end end],:) - f); % dérivation selon ---> t 
+    dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
+    dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
 
+%      dx  = @(m)  0.5*N*[zeros(Q+1,1), m(:,3:end) - m(:,1:end-2), zeros(Q+1,1)]; % dérivation centrée selon ---> x
+%      dxS = @(dm) 0.5*N*[-dm(:,2), -dm(:,3), dm(:,2:end-3) - dm(:,4:end-1), dm(:,end-2), dm(:,end-1)];
+%     dt  = @(f) Q*(f([2:end end],:) - f); % dérivation centrée selon ---> t 
+%     dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
+    
      %% check adjoint
 %     rm = rand(Q+1,N+1); rdxrm = rand(Q+1,N+1);
 %     dxrm = dx(rm); dxSrdxrm = dxS(rdxrm);

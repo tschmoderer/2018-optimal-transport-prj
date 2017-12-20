@@ -33,7 +33,7 @@ dtrf = dt(rf); dtSrdtrf = dtS(rdtrf);
 
 dtF = sum(sum(sum(rf.*dtSrdtrf - rdtrf.*dtrf)))
     
-return
+
     %% construction opérateurs 
 %     grad = @(w) [dx(w)]; 
      div  = @(w) -dxS(w(:,:,1));
@@ -44,10 +44,10 @@ return
 
        
     %% check adjoint
-%     rw = rand(Q+1,N+1,2); rArw = rand(Q+3,N+1);
-%     Arw = A(rw); ASrArw = AS(rArw);
-% 
-%     AAS = sum(sum(sum(rw.*ASrArw))) - sum(sum(sum(rArw.*Arw)))
+    rw = rand(Q+1,N+1,2); rArw = rand(Q+3,N+1);
+    Arw = A(rw); ASrArw = AS(rArw);
+
+    AAS = sum(sum(sum(rw.*ASrArw))) - sum(sum(sum(rArw.*Arw)))
 
     %% opérateurs de projetction
     y = [zeros(Q+1,N+1);f0;f1]; % second membre
@@ -63,7 +63,7 @@ return
     err = @(w) norm(A(w)-y)/norm(y);
     error = err(pC);
     %% check div=0
-%     w = rand(Q+1,N+1,2);
-%     err = @(w) norm(A(w)-y)/norm(y);
-%     fprintf('Error before projection: %.2e\n', err(w));
-%     fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
+    w = rand(Q+1,N+1,2);
+    err = @(w) norm(A(w)-y)/norm(y);
+    fprintf('Error before projection: %.2e\n', err(w));
+    fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
