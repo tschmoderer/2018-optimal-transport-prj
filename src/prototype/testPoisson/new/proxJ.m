@@ -7,7 +7,7 @@ function Pw = proxJ(w,g)
     x0 = 1000;
     x1 = 0;
     k = 0;
-    g = 1.0;
+
     % Newton
     while norm(x0-x1,1) > 1e-5 && k < 1500
         x0 = x1;

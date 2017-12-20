@@ -16,8 +16,8 @@ f0 = normalise(epsilon + gauss(0.3,0.05,N));
 f1 = normalise(epsilon + gauss(0.8,0.05,N));% + gauss(0.7,0.05,N));
 %f1 = normalise(epsilon + 1./(1+10000*(X-0.5).^2));
 
-f0 = normalise(epsilon + indicatrix(0.1,0.2,N));
-f1 = normalise(epsilon + indicatrix(0.7,0.8,N) + indicatrix(0.3,0.5,N));
+%f0 = normalise(epsilon + indicatrix(0.2,0.8,N));
+%f1 = normalise(epsilon + indicatrix(0.7,0.8,N) + indicatrix(0.3,0.5,N));
 
 J = @(w) sum(sum(sum(w(:,:,1).^2./max(w(:,:,2),max(epsilon,1e-10))))); % cost 
 
@@ -29,7 +29,7 @@ t  = [Q:-1:0]/Q;
 tt = repmat(t',1,N+1);
 w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
 
-niter = 500;
+niter = 150;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);
