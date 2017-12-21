@@ -26,6 +26,8 @@ f1 = normalise(epsilon + gauss(0.8,0.05,N));% + gauss(0.7,0.05,N));
 % f1 = normalise(epsilon + f1 + miniF1);
 %!!%
 
+obstacle = ones(Q+1,N+1);
+
 J = @(w) sum(sum(sum(w(:,:,1).^2./max(w(:,:,2),max(epsilon,1e-10))))); % cost 
 
 alpha = 1.0; beta = 0.5; gamma = 2.0;
@@ -43,7 +45,7 @@ divV = zeros(1,niter);
 
 tic
 for l = 1:niter
-    w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma) - z);
+    w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma,obstacle) - z);
     [z, divV(l)] = projC(w1);
     w0 = w1;
     if mod(l,10) == 0
