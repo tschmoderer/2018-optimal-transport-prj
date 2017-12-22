@@ -26,9 +26,11 @@ f0 = normalise(epsilon + f0 + miniF0);
 % f1 = normalise(epsilon + f1 + miniF1);
 %!!%
 
+obstacle = zeros(Q+1,N+1); % 0 : no obstacle, 1 : obstacle
+
 J = @(w) sum(sum(sum(w(:,:,1).^2./max(w(:,:,2),max(epsilon,1e-10))))); % cost 
 
-alpha = 1.0; g = 2.0;
+alpha = 1.0; beta = 0.5; gamma = 2.0;
 
 z  = zeros(Q+1,N+1,2);
 w0 = zeros(Q+1,N+1,2); w1 = zeros(Q+1,N+1,2);
@@ -43,7 +45,7 @@ divV = zeros(1,niter);
 
 tic
 for l = 1:niter
-    w1 = w0 + alpha*(proxJ(2*z-w0,g) - z);
+    w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma,obstacle) - z);
     [z, divV(l)] = projC(w1);
     w0 = w1;
     if mod(l,10) == 0
