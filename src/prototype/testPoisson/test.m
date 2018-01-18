@@ -89,7 +89,7 @@ mustBeCloseToZeros = sum(sum(abs(N*(Cmbar(:,2:end)-Cmbar(:,1:end-1)) + Q*(Cfbar(
 
 
 A = @(mbar,fbar) N*(Cmbar(:,2:end)-Cmbar(:,1:end-1)) + Q*(Cfbar(2:end,:) - Cfbar(1:end-1,:));
-AS = 
+
 
 % 
 % est non nulle
