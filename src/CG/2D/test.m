@@ -2,12 +2,12 @@ clc
 clear all
 close all
 
-N = 2; P = 3; Q = 4;
+N = 2; P = 3; Q = 2;
 w = rand(P+1,N+1,Q,3); m = w(:,:,:,1:2); f = w(:,:,:,3); 
 
 normalise = @(f) f/sum(f(:)); epsilon = 1e-10;
-f0 = normalise(epsilon + gauss(0.3,0.9,0.05,0.05,N,P));
-f1 = normalise(epsilon + gauss(0.8,0.8,0.05,0.05,N,P));
+f0 = normalise(epsilon + gauss(0.3,0.3,0.05,N,P));
+f1 = normalise(epsilon + gauss(0.8,0.8,0.05,N,P));
 
 dx  = @(m1)  N*(m1(:,[2:end end],:) - m1); % dérivation selon ---> x
 dy  = @(m2)  P*(m2([2:end end],:,:) - m2); % derivation selon ---> y
@@ -35,7 +35,7 @@ sum(sum(sum(f.*dtSrdtf - dtf.*rdtf)))
 grad = @(u) cat(4,dx(u),dy(u));
 div  = @(w) -dxS(w(:,:,:,1)) - dyS(w(:,:,:,2));
 
-A    = @(w)  cat(3,div(w(:,:,:,1:2)) + dt(w(:,:,:,3)), w(:,:,1,3) , w(:,:,end,3));
+A    = @(w)  cat(3,div(w(:,:,:,1:2)) + dt(w(:,:,:,3)), w(:,:,1,3) , w(:,:,end,3)); % on extrait la premiere et la derniere couche du cube
 U    = @(y0,y1) cat(3,y0,zeros(P+1,N+1,Q-2),y1);
 AS   = @(Aw) cat(4,-grad(Aw(:,:,1:Q)),dtS(Aw(:,:,1:Q)) + U(Aw(:,:,end-1),Aw(:,:,end)));
 
@@ -69,7 +69,7 @@ err = @(w) mynorm(A(w)-y)/norm(y(:));
 error = err(pC);
 
 %% check div=0
-    w = rand(P+1,N+1,Q,3);
+w = rand(P+1,N+1,Q,3);
 
-    fprintf('Error before projection: %.2e\n', err(w));
-    fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
+fprintf('Error before projection: %.2e\n', err(w));
+fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));

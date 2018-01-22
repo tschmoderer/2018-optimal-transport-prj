@@ -5,23 +5,19 @@ close all
 globals;
 
 %% New implementation without staggered grid %%
-N = 21; 
-P = 19;
+N = 20; 
+P = 20;
 Q = 20; 
 
-X = (0:N)/N; Y = (0:P)/P; T = (0:Q)/Q;
+X = (0:N)/N; Y = 0:P]/P; T = [0:Q]/Q;
 [XX,YY] = meshgrid(X,Y); %YY = flipud(YY);
 
 normalise = @(f) f/sum(f(:)); epsilon = 0.05;
-f0 = normalise(epsilon + gauss(0.2,0.2,0.1,N,P));
-f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P));% + 0.6*gauss(0.7,0.4,0.07,N,P));
+f0 = normalise(epsilon + gauss(0.2,0.3,0.1,N,P));
+f1 = normalise(epsilon + gauss(0.6,0.7,0.7,N,P) + 0.6*gauss(0.7,0.4,0.7,N,P));
 
-f0 = normalise(epsilon + indicatrix(0.2,0.8,0.1,0.16,N,P));
-f1 = normalise(epsilon + indicatrix(0.8,0.9,0.8,0.9,N,P));
-
-
-
-
+contour(XX,YY,f0); hold on; contour(XX,YY,f1)
+return
 J = @(w) sum(sum(sum((w(:,:,:,1).^2 + w(:,:,:,2).^2)./max(w(:,:,:,3),max(epsilon,1e-10))))); % cost 
 
 alpha = 1.0; % must be in ]0,2[
@@ -31,7 +27,7 @@ gamma = 0.5; % must be > 0
 z  = zeros(P+1,N+1,Q,3);
 w0 = zeros(P+1,N+1,Q,3); w1 = zeros(P+1,N+1,Q,3);
 
-niter = 200;
+niter = 500;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);
@@ -41,7 +37,7 @@ for l = 1:niter
     w1 = w0 + alpha*(proxJ(2*z-w0,gamma) - z);
     [z, divV(l)] = projC(w1);
     w0 = w1;
-    if mod(l,10) == 0
+    if mod(l,10) == -1
         contour(XX,YY,z(:,:,floor(Q/2)))
         title(['Iteration ',num2str(l)]);
         drawnow;
@@ -58,11 +54,21 @@ subplot(2,3,1),
 contour(XX,YY,z(:,:,1,3));
 title('initial density - t=0');
 
-for i = 2:5
-   subplot(2,3,i),
-   contour(XX,YY,z(:,:,i*I,3));
-   title(['density at t = ',num2str(T(i*I))]);
-end
+subplot(2,3,2),
+contour(XX,YY,z(:,:,I,3));
+title(['density at t = ',num2str(T(I))]);
+
+subplot(2,3,3),
+contour(XX,YY,z(:,:,2*I,3));
+title(['density at t = ',num2str(T(2*I))]);
+
+subplot(2,3,4),
+contour(XX,YY,z(:,:,3*I,3));
+title(['density at t = ',num2str(T(3*I))]);
+
+subplot(2,3,5),
+contour(XX,YY,z(:,:,4*I,3));
+title(['density at t = ',num2str(T(4*I))]);
 
 subplot(2,3,6), 
 contour(XX,YY,z(:,:,end,3));

@@ -27,8 +27,8 @@ function [pC, error] = projC(w)
     grad = @(u) cat(4,dx(u),dy(u));
     div  = @(w) -dxS(w(:,:,:,1)) - dyS(w(:,:,:,2));
 
-    A    = @(w)  cat(3,div(w(:,:,:,1:2)) + dt(w(:,:,:,3)), w(:,:,end,3) , w(:,:,1,3));
-    U    = @(y0,y1) cat(3,y1,zeros(P+1,N+1,Q-2),y0);
+    A    = @(w)  cat(3,div(w(:,:,:,1:2)) + dt(w(:,:,:,3)), w(:,:,1,3) , w(:,:,end,3));
+    U    = @(y0,y1) cat(3,y0,zeros(P+1,N+1,Q-2),y1);
     AS   = @(Aw) cat(4,-grad(Aw(:,:,1:Q)),dtS(Aw(:,:,1:Q)) + U(Aw(:,:,end-1),Aw(:,:,end)));
 
     %% check adjoint -- ok
@@ -38,7 +38,7 @@ function [pC, error] = projC(w)
 % 
 %     sum(sum(sum(sum(m.*g)))) + sum(sum(sum(divW.*rdivW))) % un + car grad* = -div /!\
 % 
-%     Aw = A(w);
+%     Aw = A(w);200
 % 
 %     rAw = rand(size(Aw));
 %     ASrAw = AS(rAw);

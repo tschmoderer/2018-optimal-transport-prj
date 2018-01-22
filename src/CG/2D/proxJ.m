@@ -16,7 +16,7 @@ function Pw = proxJ(w,g)
     while norm(x0(:)-x1(:),1) > 1e-5 && k < 100
         x0 = x1;
         if b == 1 % cas transport
-            poly = (x0-ft).*((x0+g).^2)-0.5*g*(mt(:,:,1).^2 + mt(:,:,2).^2);
+            poly = (x0-ft).*((x0+g).^2)-0.5*g*(mt(:,:,:,1).^2 + mt(:,:,:,2).^2);
             dpoly = 2*(x0+g).*(x0-ft)+(x0+g).^2;
         elseif b == 0 % cas interpolation 
             x1 = ft;
