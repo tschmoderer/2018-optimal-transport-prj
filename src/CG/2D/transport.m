@@ -16,17 +16,14 @@ normalise = @(f) f/sum(f(:)); epsilon = 0.05;
 f0 = normalise(epsilon + gauss(0.2,0.2,0.1,N,P));
 f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P));% + 0.6*gauss(0.7,0.4,0.07,N,P));
 
-f0 = normalise(epsilon + indicatrix(0.2,0.8,0.1,0.16,N,P));
-f1 = normalise(epsilon + indicatrix(0.8,0.9,0.8,0.9,N,P));
-
-
-
-
-J = @(w) sum(sum(sum((w(:,:,:,1).^2 + w(:,:,:,2).^2)./max(w(:,:,:,3),max(epsilon,1e-10))))); % cost 
+% f0 = normalise(epsilon + indicatrix(0.2,0.8,0.1,0.16,N,P));
+% f1 = normalise(epsilon + indicatrix(0.8,0.9,0.8,0.9,N,P));
 
 alpha = 1.0; % must be in ]0,2[
-beta  = 1; % must be ine [0,1]
+beta  = 0.5; % must be ine [0,1]
 gamma = 0.5; % must be > 0
+
+J = @(w) sum(sum(sum((w(:,:,:,1).^2 + w(:,:,:,2).^2)./(2*max(w(:,:,:,3),max(epsilon,1e-10))).^(beta)))); % cost 
 
 z  = zeros(P+1,N+1,Q,3);
 w0 = zeros(P+1,N+1,Q,3); w1 = zeros(P+1,N+1,Q,3);
@@ -38,7 +35,7 @@ divV = zeros(1,niter);
 
 tic
 for l = 1:niter
-    w1 = w0 + alpha*(proxJ(2*z-w0,gamma) - z);
+    w1 = w0 + alpha*(proxJ(2*z-w0,gamma,beta) - z);
     [z, divV(l)] = projC(w1);
     w0 = w1;
     if mod(l,10) == 0

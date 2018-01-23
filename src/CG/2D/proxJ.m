@@ -1,10 +1,7 @@
 % Validée
 % generealised cost 
 
-function Pw = proxJ(w,g)
-    b = 1;
-    % to do : generalised polynome
-    
+function Pw = proxJ(w,g,b)
     mt = w(:,:,:,1:2);
     ft = w(:,:,:,3);
     
@@ -22,13 +19,13 @@ function Pw = proxJ(w,g)
             x1 = ft;
             break
         else
-            poly = x0.^(1-b).*(x0-ft).*((x0.^b+g).^2)-0.5*b*g*mt.^2;
+            poly = x0.^(1-b).*(x0-ft).*((x0.^b+g).^2)-0.5*b*g*(mt(:,:,:,1).^2 + mt(:,:,:,2).^2);
             dpoly = (1-b)*x0.^(-b).*(x0-ft).*((x0.^b+g).^2) + x0.^(1-b).*((x0.^b+g).^2 +2*b*(x0-ft).*x0.^(b-1).* (x0.^b+g) );
         end
         x1 = x0 - poly./dpoly;
         k = k+1;
     end
-    
+
     Pf = x1;
     Pm = (Pf.^b).*mt./(Pf.^b + g);
 
