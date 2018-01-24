@@ -43,7 +43,7 @@ for l = 1:niter
     minF(l) = min(min(z(:,:,2)));    
     
     % Affichage
-    if mod(l,50) == 0
+    if mod(l,10) == 0
         contour(XX,YY,z(:,:,floor(Q/2)))
         title(['Iteration ',num2str(l)]);
         drawnow;
