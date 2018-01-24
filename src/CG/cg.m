@@ -15,7 +15,7 @@ function [x, err] = cg(A,b)
     p0 = r0;
     
     k = 1;
-    niter = 10000;
+    niter = 1000;
     err = zeros(niter,1);
         
     while k < niter
@@ -44,6 +44,7 @@ function [x, err] = cg(A,b)
        x0 = x1;
        k = k+1;
     end
+
     err = err(1:k);
     x = x1;
 end

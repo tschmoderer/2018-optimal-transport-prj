@@ -17,11 +17,11 @@ f1 = normalise(epsilon + gauss(0.8,0.05,N));% + gauss(0.7,0.05,N));
 %f1 = normalise(epsilon + 1./(1+10000*(X-0.5).^2));
 
 %f0 = normalise(epsilon + indicatrix(0.2,0.8,N));
-f1 = normalise(epsilon + indicatrix(0.7,0.8,N) + indicatrix(0.3,0.5,N));
+% f1 = normalise(epsilon + indicatrix(0.7,0.8,N) + indicatrix(0.3,0.5,N));
 
 %!!% test musicale
-f0 = sin(2*pi*440*X); miniF0 = max(abs(f0)); % LA 440Hz
-f0 = normalise(epsilon + f0 + miniF0);
+% f0 = sin(2*pi*440*X); miniF0 = max(abs(f0)); % LA 440Hz
+% f0 = normalise(epsilon + f0 + miniF0);
 % f1 = sin(2*pi*55*X); miniF1 = max(abs(f1));
 % f1 = normalise(epsilon + f1 + miniF1);
 %!!%
