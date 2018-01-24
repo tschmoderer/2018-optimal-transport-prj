@@ -5,6 +5,8 @@
 %          = 1 si transport impossible
 
 function Pw = proxJ(w,b,g,obstacle)
+    globals; 
+    
     mt = w(:,:,1);
     ft = w(:,:,2);
     
@@ -34,7 +36,7 @@ function Pw = proxJ(w,b,g,obstacle)
 
     idx = find(Pf <= 0 | obstacle > 0); % ou la racine est négative ou la ou il y a obstacles
     Pm(idx) = 0;
-    Pf(idx) = 0;
+    Pf(idx) = epsilon;
     
     Pw = zeros(size(w));
     Pw(:,:,1) = real(Pm);

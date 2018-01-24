@@ -5,3 +5,4 @@ global Q;
 
 global f0;
 global f1;
+global epsilon;
