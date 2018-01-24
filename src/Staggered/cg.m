@@ -6,7 +6,7 @@ function [x, err] = cg(A,b)
     dotp = @(x,y) sum(x(:).*y(:));
     
     % initial guess
-    x0 = rand(size(b));
+    x0 = zeros(size(b));
     if isnumeric(A)
         r0 = b - A*x0;
     else
@@ -15,7 +15,7 @@ function [x, err] = cg(A,b)
     p0 = r0;
     
     k = 1;
-    niter = 10000;
+    niter = 1000;
     err = zeros(niter,1);
         
     while k < niter
