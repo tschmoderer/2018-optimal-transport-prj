@@ -14,13 +14,14 @@ X = (0:N)/N; Y = (0:P)/P; T = (0:Q)/Q;
 
 normalise = @(f) f/sum(f(:)); epsilon = 0.05;
 f0 = normalise(epsilon + gauss(0.2,0.2,0.1,N,P));
-f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P));% + 0.6*gauss(0.7,0.4,0.07,N,P));
+f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P) + 0.6*gauss(0.7,0.4,0.07,N,P) + gauss(0.1,0.9,0.005,N,P));
+
 
 % f0 = normalise(epsilon + indicatrix(0.2,0.8,0.1,0.16,N,P));
 % f1 = normalise(epsilon + indicatrix(0.8,0.9,0.8,0.9,N,P));
 
 alpha = 1.0; % must be in ]0,2[
-beta  = 0; % must be ine [0,1] : 0 = interpolation, 1 = full transport
+beta  = 1.0; % must be ine [0,1] : 0 = interpolation, 1 = full transport
 gamma = 0.5; % must be > 0
 
 J = @(w) sum(sum(sum((w(:,:,:,1).^2 + w(:,:,:,2).^2)./(2*max(w(:,:,:,3),max(epsilon,1e-10))).^(beta)))); % cost 
@@ -28,7 +29,7 @@ J = @(w) sum(sum(sum((w(:,:,:,1).^2 + w(:,:,:,2).^2)./(2*max(w(:,:,:,3),max(epsi
 z  = zeros(P+1,N+1,Q,3);
 w0 = zeros(P+1,N+1,Q,3); w1 = zeros(P+1,N+1,Q,3);
 
-niter = 200;
+niter = 1000;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);
@@ -44,7 +45,7 @@ for l = 1:niter
     
     % Affichage
     if mod(l,50) == 0
-        contour(XX,YY,z(:,:,floor(Q/2)))
+        contour(XX,YY,z(:,:,floor(4*Q/5)))
         title(['Iteration ',num2str(l)]);
         drawnow;
     end
