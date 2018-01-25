@@ -48,6 +48,144 @@ language=Matlab,
 \maketitle
 \tableofcontents
 \newpage
+\section{Introduction}
+Le problème de transport optimal fut étudié dans sa forme primitive par \emph{Gaspard Monge} dans son \emph{Mémoire sur la théorie des déblais et des remblais} de 1871 \cite{monge}. Il s'intéressait au déplacement de tas de matériaux d'un site d'extraction à un site de construction en minimisant le coût de transport (le coût de déplacement d'une unité est le produit de la charge déplacée par la distance). \\
+La formulation moderne a été introduite par \emph{Leonid Kantorovitch}, prix Nobel d'économie en 1975 pour sa contribution aux allocations optimales.  
+\newpage
+
+\section{Notions générales}
+Introduisons des notions essentielles qui nous amèneront à définir le problème de transport optimal et sa formulation en terme de géodésiques. 
+\subsection{Problème de transport optimal}
+\begin{definition}{Transport}
+Soient deux mesures de probabilité $\nu$ et $\mu$ sur $\RR^n$ munie de la tribu borélienne $\mathcal{B}(\RR^n)$. Un transport est une application $T\ :\ \RR^n\rightarrow\RR^n$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
+\begin{align}
+\forall B\in\mathcal{B}(\RR^n),\quad \mu(T^{-1}(B))=\nu(B)
+\label{eq:trspmesures}
+\end{align}
+C'est une relation de conservation de masse. Nous notons $T_{\#}\mu=\nu$. 
+\end{definition}
+Introduisons petit à petit des hypothèses simplificatrices mais pas aberrantes. Supposons que les mesures aient une densité : $\mu = f_0 dx$ et $\nu = f_1 dx$. La relation \eqref{eq:trspmesures} devient alors : 
+\begin{align*}
+\forall B \in\mathcal{B}(\RR^n),\quad \int_B f_1(y)dy&=\int_{T^{-1}(B)} f_0(x) dx \\
+&= \int_B \sum_{x\in T^{-1}(y)} \left(\frac{f_0(x)}{|det\ \nabla T(x)|}\right)dy\\
+\end{align*}
+C'est à dire $f_1(y) = \sum_{x\in T^{-1}(y)} \left(\frac{f_0(x)}{|det\ \nabla T(x)|}\right)$.\\
+Supposons de plus que le transport est injectif et lisse, i.e. $x\in T^{-1}(y) \leftrightarrow y=T(x)$. Nous obtenons alors l'équation dite de Jacobienne : 
+\begin{align}
+f_1(T(x)) = \frac{f_0(x)}{|det\ \nabla T(x)|}
+\label{eq:jacobienne}
+\end{align}
+
+Notons $\mathcal{T}(f_0,f_1)$ l'ensemble des applications qui vérifient \eqref{eq:jacobienne}.
+
+\begin{definition}{Coût}
+Le coût est une application 
+$$
+\fonction{C}{\RR^n\times\RR^n}{\RR^+}{(x,y)}{C(x,y)}
+$$
+qui représente intuitivement le coût d'affecter $x$ en $y$.
+\end{definition}
+
+Nous pouvons alors donner la définition qui donne le titre à ce projet. 
+\begin{definition}{Problème de transport optimal}
+Soient, $f_0$ et $f_1$ deux densités de probabilité et un coût $C$. Le problème de transport optimal est alors le suivant.\\
+Trouver $T\in\mathcal{T}(f_0,f_1)$ qui réalise le 
+\begin{align}
+\min_{T\in\mathcal{T}(f_0,f_1)} \int C(x,T(x)) dx
+\label{eq:trspOpt}
+\end{align}
+\end{definition}
+
+\remarques{\begin{enumerate}
+\item Un ensemble de coût est particulièrement intéressant, ce sont ceux qui s'écrivent sous la forme $C(x,y) = \|x-y\|^p$. Et plus précisément dans notre problème $p=2$. Nous verrons que le problème de transport optimal possède alors de jolies propriétés. 
+\item La valeur de \eqref{eq:trspOpt} est alors appelée distance $L^2$ de Wasserstein entre $f_0$ et $f_1$, et est notée $d(f_0,f_1)$.
+\end{enumerate}
+}
+\begin{theoreme}{}
+Dans le cas du coût quadratique, il existe une unique application de transport optimal qui s'écrit comme le gradient d'une fonction convexe. 
+\begin{align}
+T(x) = \nabla \Psi(x)
+\label{eq:opttrspGrdient}
+\end{align}
+\end{theoreme}
+\begin{preuve}
+
+\end{preuve}
+A partir de l'équation de la jacobienne \eqref{eq:jacobienne}, $\Psi$ est solution de l'équation de \emph{Monge - Ampère} 
+\begin{align}
+f_1(\nabla\Psi(x)) = \frac{f_0(x)}{det\ H\Psi(x)}
+\label{eq:mongemapere}
+\end{align}
+
+
+\subsection{Formulation de J.D. Benamou et Y. Brenier}
+Pour le moment, le coût ne dépend que des densités initiales et finale, cependant il semble pertinent de chercher à connaître ce qu'il se passe pendant le transport, cela nous amènera à prendre en compte la notion d'obstacles. 
+Dans leur article de 1999 \cite{benamoubrenier}, J.D. Benamou et Y. Brenier ont donné une autre formulation au problème de transport optimal en réintroduisant le temps comme variable. Ils obtiennent alors une interprétation très simple du problème de transport optimal en terme de mécanique des fluides. 
+
+\begin{theoreme}{Benamou, Brenier}
+Soient $f_0$ et $f_1$ deux densités de probabilité assez régulières. Alors, 
+\begin{align}
+\min_{T\in\mathcal{T}(f_0,f_1)} \int\|x-T(x)\|^2dx =\min_{(f,v)\in\mathcal{C}_v}\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dtdx
+\end{align}
+Avec,
+\begin{align*}
+f(t,x)\ :&\ \RR\times\RR^n\rightarrow \RR \quad \text{la densité}\\
+v(t,x)\ :&\ \RR\times\RR^n\rightarrow \RR^n \quad \text{champ de vecteurs vitesses}
+\end{align*}
+et 
+\begin{align}
+C_v=\left\{(f,v) | \frac{\partial f}{\partial t} + \text{div}_x (fv) =0,\ f(0,\cdot) = f_0,\ f(1,\cdot)=f_1 \right\}
+\label{eq:contraintes}
+\end{align}
+\end{theoreme}
+\begin{preuve}
+Nous redonnons la preuve donnée par Benamou et Brenier en complétant les points qui nous semble obscures.\\
+La preuve repose sur l'utilisation des variables lagrangiennes $X(t,x)$ qui décrivent le comportement d'un fluide en "suivant" les particules. 
+\begin{align*}
+X(0,x)=x\quad\frac{\partial X}{\partial t}(t,x) = v(t,X(t,x))
+\end{align*}
+Ainsi, pour toute fonctions $\phi$ :
+\begin{align}
+\int \phi(t,x)f(t,x) dxdt &=\int \phi(t,X(t,x))f_0(x)dxdt \label{eq:coordlagrangienn}\\ 
+\int \phi(t,x)f(t,x)v(t,x) dxdt &= \int \frac{\partial X}{\partial t}(t,x)\phi(t,X(t,x))f_0(x)dxdt \nonumber
+\end{align}
+la première égalité vient du changement de variable $x=X(t,x)$, or, $f(t,X(t,x))$ décrit la densité de la particule de fluide déplacée le long du champ de vitesse $v$ à l'instant t, c'est donc la densité initiale en $x$, $f_0(x)$. \\
+
+Remarquons que \eqref{eq:coordlagrangienn} et la condition $f(0,\cdot)=f_0,\ f(1,\cdot) = f_1$ impliquent que $T(x)=X(1,x)$ est un transport valide. Puis remarquons que : 
+$$
+\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt = \int_{\RR^n}\int_0^1 f_0(x)\|v(t,X(t,x))\|^2dxdt
+$$
+En prenant comme fonction test $\phi(t,x) = \|v(t,x)\|^2$. Nous obtenons, 
+\begin{align*}
+&= \int_{\RR^n}\int_0^1  f_0(x)\left\|\frac{\partial X}{\partial t} (t,x)\right\|^2dxdt \\
+&= \int_{\RR^n} f_0(x)\int_0^1 \left\|\frac{\partial X}{\partial t} (t,x)\right\|^2dtdx\\
+&\leq \int_{\RR^n} f_0(x)\left\|\int_0^1\frac{\partial X}{\partial t} (t,x) dt \right\|^2dx \\
+&\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-X(0,x) \right\|^2dx \\
+&\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-x \right\|^2dx \\
+\end{align*}
+
+Or, $X(1,x) = M(x) =\nabla\Psi(x)$ par la propriété .. 
+$$
+\leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx
+$$
+Nous avons ainsi montré que : 
+$$
+\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt \leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx = d(f_0,f_1)^2
+$$
+Et avec le choix $x(t,x) = x+t(\nabla\Psi(x)-x)$ on obtient que pour toute fonction test $\phi$ nous avons, 
+$$
+\int \phi(t,x)f(t,x)v(t,x)dtdx =\int (\nabla\Psi(x) -x)\phi(t,x+t(\nabla\Psi(x)-x)f_0(x)dxdt
+$$
+ce qui achève la preuve. 
+\end{preuve}
+
+
+
+
+
+
+
+
 
 \section{Pbm de transport optimal}
 Soient deux densités $f_0$ et $f_1$ de même masse, suffisamment régulière, sur un domaine $[0,1]^d$.\\
@@ -240,6 +378,12 @@ On montre alors que pour $\alpha\in ]0,2[$ et $\gamma>0$ la méthode converge $z
 $$
 z^l=(U^l,V^l)\rightarrow (U^{\star},V^{\star}) \qquad V^{\star}=(m^{\star},f^{\star})
 $$
+
+
+\bibliographystyle{plain}
+\bibliography{biblio.bib}
+\appendix
+
 
 \newpage
 \addcontentsline{toc}{section}{\listfigurename}

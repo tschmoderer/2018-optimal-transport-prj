@@ -5,8 +5,8 @@ close all
 globals;
 
 %% New implementation without staggered grid %%
-N = 21; 
-P = 19;
+N = 20; 
+P = 20;
 Q = 20; 
 
 X = (0:N)/N; Y = (0:P)/P; T = (0:Q)/Q;
@@ -15,6 +15,9 @@ X = (0:N)/N; Y = (0:P)/P; T = (0:Q)/Q;
 normalise = @(f) f/sum(f(:)); epsilon = 0.05;
 f0 = normalise(epsilon + gauss(0.2,0.2,0.1,N,P));
 f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P) + 0.6*gauss(0.7,0.4,0.07,N,P) + gauss(0.1,0.9,0.005,N,P));
+
+% f0 = normalise(epsilon + double(rgb2gray(imread('fourati.jpg'))));
+% f1 = normalise(epsilon + double(imread('knippel.jpg')));
 
 % f0 = normalise(epsilon + indicatrix(0.2,0.8,0.1,0.16,N,P));
 % f1 = normalise(epsilon + indicatrix(0.8,0.9,0.8,0.9,N,P));
@@ -78,4 +81,30 @@ title('Minimum de F');
 subplot(313);
 plot([1:niter],divV);
 title('divergence violation');
+
+
+
+
+
+
+
+% Affichage images
+I = floor(Q/16);
+figure; 
+subplot(4,4,1), 
+imshow(mat2gray(z(:,:,1,3)));
+title('initial density - t=0');
+
+for i = 2:15
+   subplot(4,4,i),
+   imshow(mat2gray(z(:,:,i*I,3)));
+   title(['density at t = ',num2str(T(i*I))]);
+end
+
+subplot(4,4,16), 
+imshow(mat2gray(z(:,:,end,3)));
+title('Target density - t=1');
+
+
+
 

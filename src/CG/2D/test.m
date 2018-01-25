@@ -2,8 +2,20 @@ clc
 clear all
 close all
 
-N = 2; P = 3; Q = 2;
+globals;
+N = 20; P = 20; Q = 20;
 w = rand(P+1,N+1,Q,3); m = w(:,:,:,1:2); f = w(:,:,:,3); 
+normalise = @(f) f/sum(f(:)); epsilon = 1e-10;
+f0 = normalise(epsilon + gauss(0.3,0.3,0.05,N,P));
+f1 = normalise(epsilon + gauss(0.8,0.8,0.05,N,P));
+
+% test performance 
+f = @() proxJ(w,1,0.5);
+timeit(f)
+
+g = @() projC(w);
+timeit(g,2)
+return
 
 normalise = @(f) f/sum(f(:)); epsilon = 1e-10;
 f0 = normalise(epsilon + gauss(0.3,0.3,0.05,N,P));
