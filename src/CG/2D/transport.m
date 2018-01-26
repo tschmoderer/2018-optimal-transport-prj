@@ -14,7 +14,7 @@ X = (0:N)/N; Y = (0:P)/P; T = (0:Q)/Q;
 
 normalise = @(f) f/sum(f(:)); epsilon = 0.05;
 f0 = normalise(epsilon + gauss(0.2,0.2,0.1,N,P));
-f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P) + 0.6*gauss(0.7,0.4,0.07,N,P) + gauss(0.1,0.9,0.005,N,P));
+f1 = normalise(epsilon + gauss(0.8,0.8,0.1,N,P));% + 0.6*gauss(0.7,0.4,0.07,N,P) + gauss(0.1,0.9,0.005,N,P));
 
 % f0 = normalise(epsilon + double(rgb2gray(imread('fourati.jpg'))));
 % f1 = normalise(epsilon + double(imread('knippel.jpg')));
@@ -43,7 +43,7 @@ for l = 1:niter
     w0 = w1;
     
     cout(l) = J(z);
-    minF(l) = min(min(z(:,:,2)));    
+    minF(l) = min(min(min(z(:,:,:,2))));    
     
     % Affichage
     if mod(l,50) == 0

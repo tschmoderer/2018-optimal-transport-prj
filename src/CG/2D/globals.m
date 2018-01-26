@@ -10,7 +10,3 @@ global f1; % densité initiale
 %% Data structure %%
 % w(:,:,:,1:2) = vector m at (y,x,t)
 % w(:,:,:,3)   = field f at (y,x,t)
-% 
-% 
-%%
-
