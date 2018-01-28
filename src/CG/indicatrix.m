@@ -1,10 +1,17 @@
-% renvoi l'indicatrice de [a,b]
-% ou 0<=a<b<=1
-% avec [0,1]discrétisé dan N+1 pts
+% Fonction indicadrix
+% Out : 
+%     - f = 1 si x \in [a,b], 0 sinon
+% In  :
+%     - a : borne à gauche 
+%     - b : borne à droite 
+%     - N : nombre d'intervals de subdivision
+% /!\ 0<= a < b <= 1
+% Timothée Schmoderer
+% INSA Rouen Normandie 2017/2018
 
 function f = indicatrix(a,b,N)
-    x = [0:N]/N;
+    x = (0:N)/N;
     f = zeros(size(x));
-    f(find(a<=x & x<=b)) = 1;
+    f(a<=x & x<=b) = 1;
 end
 

@@ -1,13 +1,23 @@
+% Fonction projC
+% Out : 
+%     - pC : la projection sur les contraintes de w
+%      - error : l'erreur commise sur le respect des contraintes
+% In  : 
+%     - w  : le point d'évaluation 
+% Timothée Schmoderer 
+% INSA Rouen Normandie 2017/2018
+
 function [pC, error] = projC(w)
     globals;
-
+    
+    % derivative with Neumann conditions
     dx  = @(m)  N*(m(:,[2:end end]) - m); % dérivation selon ---> x
     dt  = @(f)  Q*(f([2:end end],:) - f); % dérivation selon ---> t 
-    dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
-    dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
+    dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)]; % adjoint de dx
+    dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)]; % adjoint de dt
 
-%      dx  = @(m)  0.5*N*[zeros(Q+1,1), m(:,3:end) - m(:,1:end-2), zeros(Q+1,1)]; % dérivation centrée selon ---> x
-%      dxS = @(dm) 0.5*N*[-dm(:,2), -dm(:,3), dm(:,2:end-3) - dm(:,4:end-1), dm(:,end-2), dm(:,end-1)];
+%     dx  = @(m)  0.5*N*[zeros(Q+1,1), m(:,3:end) - m(:,1:end-2), zeros(Q+1,1)]; % dérivation centrée selon ---> x
+%     dxS = @(dm) 0.5*N*[-dm(:,2), -dm(:,3), dm(:,2:end-3) - dm(:,4:end-1), dm(:,end-2), dm(:,end-1)];
 %     dt  = @(f) Q*(f([2:end end],:) - f); % dérivation centrée selon ---> t 
 %     dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
     
@@ -22,14 +32,12 @@ function [pC, error] = projC(w)
 % 
 %     dtF = sum(sum(sum(rf.*dtSrdtrf - rdtrf.*dtrf)))
     %% construction opérateurs 
-%     grad = @(w) [dx(w)]; 
      div  = @(w) -dxS(w(:,:,1));
     
      A    = @(w)  [div(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ; w(1,:,2)];
      U    = @(y0,y1) [y1;zeros(Q-1,N+1);y0];
      AS   = @(Aw) cat(3,-dx(Aw(1:Q+1,:)),dtS(Aw(1:Q+1,:)) + U(Aw(Q+2,:),Aw(Q+3,:)));
-
-       
+ 
     %% check adjoint
 %     rw = rand(Q+1,N+1,2); rArw = rand(Q+3,N+1);
 %     Arw = A(rw); ASrArw = AS(rArw);
@@ -50,9 +58,9 @@ function [pC, error] = projC(w)
     err = @(w) norm(A(w)-y)/norm(y);
     error = err(pC);
     %% check div=0
-%     w = rand(Q+1,N+1,2);
-%     err = @(w) norm(A(w)-y)/norm(y);
-%     fprintf('Error before projection: %.2e\n', err(w));
-%     fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
+% w = rand(Q+1,N+1,2);
+% err = @(w) norm(A(w)-y)/norm(y);
+% fprintf('Error before projection: %.2e\n', err(w));
+% fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
 end
 

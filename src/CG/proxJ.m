@@ -1,8 +1,13 @@
-% Validée
-% generealised cost 
-% with obstacle is matrix [Q+1]x[N+1] 
-% obstacle = 0 si ok 
-%          = 1 si transport impossible
+% Fonction proxJ 
+% Out : 
+%     - Pw : l'opérateur proximale associé à J évalué en w
+% In  : 
+%     - w  : le point d'évaluation 
+%     - b  : le coefficient beta du cout généralisé
+%     - g  : le coefficient gamma qui pondère l'opérateur proximal 
+%     - obstacle : la matrice des obstacle
+% Timothée Schmoderer 
+% INSA Rouen Normandie 2017/2018
 
 function Pw = proxJ(w,b,g,obstacle)
     globals; 
