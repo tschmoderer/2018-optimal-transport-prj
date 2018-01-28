@@ -5,8 +5,8 @@ close all
 globals;
 
 %% New implementation without staggered grid %%
-N = 31; 
-Q = 29; 
+N = 30; 
+Q = 30; 
 
 X       = [0:N]/N; T = [0:Q]/Q;
 [XX,YY] = meshgrid(X,T); YY = flipud(YY);
@@ -27,7 +27,9 @@ f1 = normalise(epsilon + gauss(0.8,0.05,N));% + gauss(0.7,0.05,N));
 %!!%
 
 obstacle = zeros(Q+1,N+1); % 0 : no obstacle, 1 : obstacle
-%obstacle(15,1:end) = 1; obstacle(15,4:6) = 0;
+obstacle(15,1:end) = 1; obstacle(15,4:6) = 0;
+obstacle(20,1:end) = 1; obstacle(20,16:18) = 0;
+obstacle(7,1:end)  = 1; obstacle(7,12:14) = 0;
 
 J = @(w) sum(sum(sum(w(:,:,1).^2./max(w(:,:,2),max(epsilon,1e-10))))); % cost 
 
@@ -37,11 +39,11 @@ gamma = 2.0; % must be > 0
 
 z  = zeros(Q+1,N+1,2);
 w0 = zeros(Q+1,N+1,2); w1 = zeros(Q+1,N+1,2);
-% t  = [Q:-1:0]/Q;
-% tt = repmat(t',1,N+1);
-% w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
+t  = [Q:-1:0]/Q;
+tt = repmat(t',1,N+1);
+w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
 
-niter = 1000;
+niter = 5000;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);

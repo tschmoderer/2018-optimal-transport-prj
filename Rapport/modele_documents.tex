@@ -9,7 +9,12 @@
 \usepackage{framed} % des contours
 \usepackage[framed]{ntheorem} % un théoreme
 
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
+\makeatletter
+\renewcommand{\ALG@name}{Algorithme}
+\makeatother
 
 \usepackage[all]{xy}
 %
@@ -308,7 +313,10 @@
 }
 
 
-
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\interior}[1]{%
+  {\kern0pt#1}^{\mathrm{o}}%
+}
 
 
 \usepackage{tikz,tkz-tab}
