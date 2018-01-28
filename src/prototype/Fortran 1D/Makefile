@@ -1,6 +1,5 @@
 FC = gfortran
-FFLAGS  = -g
-LLFLAGS  = -llapack
+FFLAGS  = -g -Wall
 EXEC = transport
 
 .DEFAULT_GOAL = all
@@ -12,8 +11,8 @@ OBJS = $(SRCS:.f90=.o)
 %.o : %.f90
 	$(FC) $(FFLAGS) −c $<
 
-all : *.f90
-	$(FC) $(FFLAGS) -o $(EXEC) *.f90 $(LLFLAGS)
+all : projC.o transport.o
+	$(FC) $(FFLAGS) -o $(EXEC) *.o
 
 clean : 
-	rm *.out *.o $(EXEC) 		
+	rm *.out *.o $(EXEC) 
