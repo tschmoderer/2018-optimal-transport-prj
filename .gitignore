@@ -8,6 +8,7 @@ src/prototype/Fortran/transport
 *.dat
 transport
 a.out
+*~
 *.o
 
 ## Core latex/pdflatex auxiliary files:
