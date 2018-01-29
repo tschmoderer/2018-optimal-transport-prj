@@ -1,142 +1,12 @@
-module helpers
-implicit none
-	
-contains 
-!! Gaussienne 
-	function gauss(mu,sigma,N) result(f)
-		implicit none
-		real :: mu, sigma
-		integer :: N 
-		double precision, dimension(1:N+1) :: f
-		integer :: i
-		do i = 1,N+1 
-			f(i) = exp(-0.5*(((i-1)/(1.0*N) - mu)/sigma)**2)
-		end do
-	end function gauss 
-	
-!! Normalise 	
-	function normalise(f,N) result(res)
-		implicit none
-		integer :: N
-		double precision, dimension(1:N+1) :: f, res
-		res = f/sum(f)
-	end function normalise
-	
-!! Dérivation selon x
-	function dx(m,N,Q) result(dm)
-		implicit none
-		integer :: N,Q
-		double precision, dimension(1:Q+1,1:N+1) :: m, dm    
-		dm = 0;
-		dm(:,1:N) = N*(m(:,2:N+1) - m(:,1:N))
-	end function dx
-
-!! Dérivation selon t
-	function dt(f,N,Q) result(df)
-		implicit none
-		integer :: N,Q
-		double precision, dimension(1:Q+1,1:N+1)  :: f,df
-		df = 0;
-		df(1:Q,:) = Q*(f(2:Q+1,:) - f(1:Q,:))
-	end function dt
-
-!! Adjoint de dx
-	function dxS(dm,N,Q) result(m)
-		integer :: N,Q
-		double precision, dimension(1:Q+1,1:N+1) :: dm, m
-		m(:,1)   = -dm(:,1)
-		m(:,2:N) = dm(:,1:N-1) - dm(:,2:N)
-		m(:,N+1) = dm(:,N)
-		m(:,1:N+1) = N*m(:,1:N+1) 
-	end function dxS
-
-!! Adjoint de dt 
-	function dtS(df,N,Q) result(f)
-		integer :: N,Q
-		double precision, dimension(1:Q+1,1:N+1) :: df, f
-		f(1,:)   = -df(1,:)
-		f(2:Q,:) = df(1:Q-1,:) - df(2:Q,:)
-		f(Q+1,:) = df(Q,:) 
-		f(1:Q+1,:) = Q*f(1:Q+1,:)
-	end function dtS
-
-!! Opérateur A
-	function A(w,N,Q) result(Aw)
-		implicit none
-		integer :: N,Q;
-		double precision, dimension(1:Q+1,1:N+1,2) :: w 
-		double precision, dimension(1:Q+3,1:N+1) :: Aw
-
-		Aw(1:Q+1,:) = -dxS(w(:,:,1),N,Q) + dt(w(:,:,2),N,Q)
-		Aw(Q+2,:) = w(Q+1,:,2)
-		Aw(Q+3,:) = w(1,:,2)
-	end function A
-
-!! Opérateur adjoint de A
-	function AS(Aw,N,Q) result(ASAw)
-		implicit none
-		integer :: N,Q;
-		double precision, dimension(1:Q+3,1:N+1) :: Aw
-		double precision, dimension(1:Q+1,1:N+1,2) :: ASAw 
-
-		ASAw(:,:,1) = -dx(Aw(1:Q+1,:),N,Q)
-		ASAw(:,:,2) = dtS(Aw(1:Q+1,:),N,Q)
-
-		ASAw(1,:,2) = ASAw(1,:,2) + Aw(Q+3,:);
-		ASAw(Q+1,:,2) = ASAw(Q+1,:,2) + Aw(Q+2,:);
-	end function AS
-	
-!! Function aplatir
-	function flat(x,N,Q) result(fx)
-		implicit none
-		integer :: N,Q;
-		double precision, dimension(1:Q+3,1:N+1) :: x
-		double precision, dimension(1:(Q+3)*(N+1)) :: fx
-		fx = reshape(x,(/(Q+3)*(N+1)/)) ! une colonne pleins de lignes
-	end function flat
-
-!! Fonction reshape
-	function resh(x,N,Q) result(rx)
-		implicit none
-		integer :: N,Q;
-		double precision, dimension(1:(Q+3)*(N+1)) :: x
-		double precision, dimension(1:Q+3,1:N+1):: rx
-		rx = reshape(x,(/Q+3,N+1/));
-	end function resh	
-
-!! Fonction gradient conjugué
-	function cg(b,N,Q) result(x)
-		implicit none
-		integer :: N,Q 
-		double precision, dimension(1:(Q+3)*(N+1)) :: b, x, r, p, Ap 
-		double precision :: alpha, rold, rnew
-		integer :: i
-		x = 0; 
-		r = b - flat(A(AS(resh(x,N,Q),N,Q),N,Q),N,Q)
-		p = r
-		rold = sum(r*r)
-		do i = 1,(Q+3)*(N+1)
-			Ap = flat(A(AS(resh(p,N,Q),N,Q),N,Q),N,Q)
-			alpha = rold/sum(p*Ap)
-			x = x + alpha*p
-			r = r - alpha*Ap
-			rnew = sum(r*r)
-			if (dsqrt(rnew) .LT. 1e-10) then 
-				exit 
-			end if
-			p = r + (rnew/rold)*p
-			rold = rnew 
-		end do
-	end function cg	
-end module helpers
-
-
-
-
 program test 
-use helpers
+use procedures
     implicit none 
-    integer, parameter :: N = 50, Q = 30;
+    integer, parameter :: N1 = 2, Q1 = 2;
+    double precision, dimension(1:Q1+1,1:N1+1,2) :: w1, pJw, pCw;
+    double precision, dimension(1:N1+1) :: f01, f11;
+    integer :: i,j
+
+    integer, parameter :: N = 100, Q = 30;
 	double precision, dimension(1:Q+1,1:N+1) :: rm, dxrm, rdxrm, dxSrdxrm
 	double precision, dimension(1:Q+1,1:N+1) :: rf, dtrf, rdtrf, dtSrdtrf
 	double precision, dimension(1:Q+1,1:N+1,2) :: rw, ASrArw
@@ -172,16 +42,62 @@ use helpers
   
 	!! test projection
 	epsilon = 1e-10
-	f0 = normalise(epsilon + gauss(0.5,0.05,N),N)
-	f1 = normalise(epsilon + gauss(0.5,0.05,N),N)
+	f0 = normalise(epsilon + gauss(0.5d0,0.05d0,N),N)
+	f1 = normalise(epsilon + gauss(0.5d0,0.05d0,N),N)
 	y(1:Q+1,:) = 0
 	y(Q+2,:) = f0
 	y(Q+3,:) = f1
 	
 	call random_number(w)
-	print *, 'error before projection : ', sum(dabs(A(w,N,Q) - y))/sum(y)	
+	print *, 'error before projection : ', sum((A(w,N,Q) - y)**2)/sum(y**2)	
 	pC = w + AS(resh(cg(flat(y-A(w,N,Q),N,Q),N,Q),N,Q),N,Q) 
-	print *, 'error after projection : ', sum(dabs(A(pC,N,Q) - y))/sum(y)
+	print *, 'error after projection : ', sum((A(pC,N,Q) - y)**2)/sum(y**2)
+
+
+    print *,
+    print *, '******************************'
+    print *, 'ANOTHER PART OF THE TEST'
+    print *, '******************************'
+    print *,
+
+    w1(1,1,1) = 1;
+    w1(1,2,1) = 2;
+    w1(1,3,1) = 3;
+    w1(2,1,1) = 4;
+    w1(2,2,1) = 5;
+    w1(2,3,1) = 6;    
+    w1(3,1,1) = 7;
+    w1(3,2,1) = 8;
+    w1(3,3,1) = 9;
+
+    w1(1,1,2) = 10;
+    w1(1,2,2) = 11;
+    w1(1,3,2) = 12;
+    w1(2,1,2) = 13;
+    w1(2,2,2) = 14;
+    w1(2,3,2) = 15;    
+    w1(3,1,2) = 16;
+    w1(3,2,2) = 17;
+    w1(3,3,2) = 18;
+    
+    pJw = proxJ(w1,1.d0,N1,Q1)  
+
+    do j = 1,2
+        do i = 1,Q+1
+!            print *, pJw(i,:,j), 'ENDL'
+        end do
+!        print *, 'END BLOCK'
+    end do 
+
+    f01 = 1; f11 = 1;
+    ! pCw = projC(w1,f01,f11,N1,Q1)
+!    print *, 'Projection sur C : '
+    do j = 1,2
+        do i = 1,Q+1
+!            print *, pCw(i,:,j), 'ENDL'
+        end do
+!        print *, 'END BLOCK'
+    end do 
 end program
 
 
