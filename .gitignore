@@ -5,8 +5,8 @@ src/prototype/Fortran/transport
 
 
 *.mod
-*.dat
-transport
+src/protorype/Fortran 1D/results/*.dat
+src/protorype/Fortran 1D/transport
 a.out
 *~
 *.o
