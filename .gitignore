@@ -1,9 +1,13 @@
 # Ajout personnel
-Ressources/*
 src/prototype/Fortran/files/*
 src/prototype/Fortran/results/*
 src/prototype/Fortran/transport
 
+
+*.mod
+*.dat
+transport
+a.out
 *.o
 
 ## Core latex/pdflatex auxiliary files:
