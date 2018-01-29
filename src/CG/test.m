@@ -17,9 +17,9 @@ w = rand(Q+1,N+1,2);
 dx  = @(m)  0.5*N*[zeros(Q+1,1), m(:,3:end) - m(:,1:end-2), zeros(Q+1,1)]; % dérivation centrée selon ---> x
 dxS = @(dm) 0.5*N*[-dm(:,2), -dm(:,3), dm(:,2:end-3) - dm(:,4:end-1), dm(:,end-2), dm(:,end-1)];
 
-% dx  = @(m) N*(m(:,[2:end end]) - m); % dérivation selon ---> x
+dx  = @(m) N*(m(:,[2:end end]) - m); % dérivation selon ---> x
 dt  = @(f) Q*(f([2:end end],:) - f); % dérivation selon ---> t 
-% dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
+dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
 dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
 
 %% check adjoint
@@ -36,9 +36,9 @@ dtF = sum(sum(sum(rf.*dtSrdtrf - rdtrf.*dtrf)))
 
 %% construction opérateurs 
 %     grad = @(w) [dx(w)]; 
- div  = @(w) -dxS(w(:,:,1));
+ div  = @(w) -dxS(w);
 
- A    = @(w)  [div(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ; w(1,:,2)];
+ A    = @(w)  [-dxS(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ; w(1,:,2)];
  U    = @(y0,y1) [y1;zeros(Q-1,N+1);y0];
  AS   = @(Aw) cat(3,-dx(Aw(1:Q+1,:)),dtS(Aw(1:Q+1,:)) + U(Aw(Q+2,:),Aw(Q+3,:)));
 
@@ -67,5 +67,6 @@ error = err(pC);
 %% check div=0
 w = rand(Q+1,N+1,2);
 err = @(w) norm(A(w)-y)/norm(y);
+err = @(w) sum(sum(sum(sum(abs(A(w) - y)))))/sum(y(:));
 fprintf('Error before projection: %.2e\n', err(w));
 fprintf('Error after projection: %.2e\n', err(w + AS(pA(y - A(w)))));

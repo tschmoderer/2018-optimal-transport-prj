@@ -46,6 +46,23 @@ function Pw = proxJ(w,b,g,obstacle)
     Pw = zeros(size(w));
     Pw(:,:,1) = real(Pm);
     Pw(:,:,2) = real(Pf);
+    
+    Pw(:,:,2) = x1;
+    Pw(:,:,1) = x1.*mt./(x1+g);
+    
+    for i = 1:Q+1
+        for j = 1:N+1
+            if x1(i,j) <= 0
+                Pw(i,j,1) = 0;
+                Pw(i,j,1) = 1e-10;
+            end
+        end
+    end
+    
+    
+    
+    
+    
 end
 
 
