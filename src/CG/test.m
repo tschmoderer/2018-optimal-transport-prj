@@ -2,8 +2,8 @@ clear all
 close all
 clc
 %% test new finite difference method
-N = 10;
-Q = 9;
+N = 50;
+Q = 30;
 
 X       = [0:N]/N; T = [0:Q]/Q;
 [XX,YY] = meshgrid(X,T); YY = flipud(YY);
@@ -34,36 +34,38 @@ dtrf = dt(rf); dtSrdtrf = dtS(rdtrf);
 dtF = sum(sum(sum(rf.*dtSrdtrf - rdtrf.*dtrf)))
     
 
-    %% construction opérateurs 
+%% construction opérateurs 
 %     grad = @(w) [dx(w)]; 
-     div  = @(w) -dxS(w(:,:,1));
-    
-     A    = @(w)  [div(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ; w(1,:,2)];
-     U    = @(y0,y1) [y1;zeros(Q-1,N+1);y0];
-     AS   = @(Aw) cat(3,-dx(Aw(1:Q+1,:)),dtS(Aw(1:Q+1,:)) + U(Aw(Q+2,:),Aw(Q+3,:)));
+ div  = @(w) -dxS(w(:,:,1));
 
-       
-    %% check adjoint
-    rw = rand(Q+1,N+1,2); rArw = rand(Q+3,N+1);
-    Arw = A(rw); ASrArw = AS(rArw);
+ A    = @(w)  [div(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ; w(1,:,2)];
+ U    = @(y0,y1) [y1;zeros(Q-1,N+1);y0];
+ AS   = @(Aw) cat(3,-dx(Aw(1:Q+1,:)),dtS(Aw(1:Q+1,:)) + U(Aw(Q+2,:),Aw(Q+3,:)));
 
-    AAS = sum(sum(sum(rw.*ASrArw))) - sum(sum(sum(rArw.*Arw)))
 
-    %% opérateurs de projetction
-    y = [zeros(Q+1,N+1);f0;f1]; % second membre
+%% check adjoint
+rw = rand(Q+1,N+1,2); rArw = rand(Q+3,N+1);
+Arw = A(rw); ASrArw = AS(rArw);
 
-    flat = @(x) x(:);
-    resh = @(x) reshape(x,Q+3,N+1);
- 
-    do_cg =@(B,y) resh(cg(@(r)flat(B(resh(r))),y(:))); % solve B*x = y with CG
-    pA = @(r) do_cg(@(s)A(AS(s)),r); % solve (A*A')*x = r
+AAS = sum(sum(sum(rw.*ASrArw))) - sum(sum(sum(rArw.*Arw)))
 
-    pC = w + AS(pA(y - A(w)));
-    
-    err = @(w) norm(A(w)-y)/norm(y);
-    error = err(pC);
-    %% check div=0
-    w = rand(Q+1,N+1,2);
-    err = @(w) norm(A(w)-y)/norm(y);
-    fprintf('Error before projection: %.2e\n', err(w));
-    fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
+%% opérateurs de projetction
+y = [zeros(Q+1,N+1);f0;f1]; % second membre
+
+flat = @(x) x(:);
+resh = @(x) reshape(x,Q+3,N+1);
+
+% do_cg =@(B,y) resh(cg(@(r)flat(B(resh(r))),y(:))); % solve B*x = y with CG
+% pA = @(r) do_cg(@(s)A(AS(s)),r); % solve (A*A')*x = r
+
+pA = @(r) resh(cg(@(s)flat(A(AS(resh(s)))),r(:)));
+
+pC = w + AS(pA(y - A(w)));
+
+err = @(w) norm(A(w)-y)/norm(y);
+error = err(pC);
+%% check div=0
+w = rand(Q+1,N+1,2);
+err = @(w) norm(A(w)-y)/norm(y);
+fprintf('Error before projection: %.2e\n', err(w));
+fprintf('Error after projection: %.2e\n', err(w + AS(pA(y - A(w)))));

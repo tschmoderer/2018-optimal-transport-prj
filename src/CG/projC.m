@@ -52,7 +52,7 @@ function [pC, error] = projC(w)
  
     do_cg =@(B,y) resh(cg(@(r)flat(B(resh(r))),y(:))); % solve B*x = y with CG
     pA = @(r) do_cg(@(s)A(AS(s)),r); % solve (A*A')*x = r
-
+pA = @(r) resh(cg(@(s)flat(A(AS(resh(s)))),r(:)));
     pC = w + AS(pA(y - A(w)));
     
     err = @(w) norm(A(w)-y)/norm(y);
