@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS  = -g -Wall
+FFLAGS  = -g -Wall -Wno-tabs
 EXEC = transport
 
 .DEFAULT_GOAL = all
@@ -8,11 +8,11 @@ EXEC = transport
 SRCS  =  $(wildcard ∗.f90)
 OBJS = $(SRCS:.f90=.o)
 
-%.o : %.f90
-	$(FC) $(FFLAGS) −c $<
+all : procedures.f90 transport.f90
+	$(FC) $(FFLAGS) -o $(EXEC) procedures.f90 transport.f90
 
-all : projC.o transport.o
-	$(FC) $(FFLAGS) -o $(EXEC) *.o
+test : procedures.f90 test.f90
+	$(FC) $(FFLAGS) procedures.f90 test.f90
 
 clean : 
-	rm *.out *.o $(EXEC) 
+	rm *.out *.o *.mod $(EXEC) 
