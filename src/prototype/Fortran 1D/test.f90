@@ -1,33 +1,30 @@
 program test 
 use procedures
     implicit none 
-    integer, parameter :: N1 = 2, Q1 = 2;
-    double precision, dimension(1:Q1+1,1:N1+1,2) :: w1, pJw, pCw;
-    double precision, dimension(1:N1+1) :: f01, f11;
-    integer :: i,j
 
-    integer, parameter :: N = 100, Q = 30;
-	double precision, dimension(1:Q+1,1:N+1) :: rm, dxrm, rdxrm, dxSrdxrm
-	double precision, dimension(1:Q+1,1:N+1) :: rf, dtrf, rdtrf, dtSrdtrf
-	double precision, dimension(1:Q+1,1:N+1,2) :: rw, ASrArw
-	double precision, dimension(1:Q+3,1:N+1) :: Arw, rArw
+	real, dimension(1:Q+1,1:N+1) :: rm, dxrm, rdxrm, dxSrdxrm
+	real, dimension(1:Q+1,1:N+1) :: rf, dtrf, rdtrf, dtSrdtrf
+	real, dimension(1:Q+1,1:N+1,2) :: rw, ASrArw
+	real, dimension(1:Q+3,1:N+1) :: Arw, rArw
 	
 	! variables projection 
-	double precision, dimension(1:N+1) :: f0, f1
-	double precision, dimension(1:Q+3,1:N+1) :: y
-	double precision, dimension(1:Q+1,1:N+1,2) :: w, pC
-	double precision :: epsilon 
+	real , dimension(1:N+1) :: f0, f1
+	real , dimension(1:Q+3,1:N+1) :: y
+	real , dimension(1:Q+1,1:N+1,2) :: w, pC, pW, pW2
+	real, dimension(1:(Q+3)*(N+1)) :: positif
+	real :: div, J1, J2, J3
+	integer :: i,j
 	
 	call random_number(rm)
 	call random_number(rdxrm)
 	call random_number(rf)
 	call random_number(rdtrf)
 	
-	dxrm     = dx(rm,N,Q)
-	dxsrdxrm = dxS(rdxrm,N,Q)
+	dxrm     = dx(rm)
+	dxsrdxrm = dxS(rdxrm)
 	
-	dtrf     = dt(rf,N,Q)
-	dtSrdtrf = dtS(rdtrf,N,Q)
+	dtrf     = dt(rf)
+	dtSrdtrf = dtS(rdtrf)
 
     print *, 'divergence m : ', sum(rm*dxSrdxrm - dxrm*rdxrm)
     print *, 'dérivée en t : ', sum(rf*dtSrdtrf - dtrf*rdtrf)
@@ -35,69 +32,92 @@ use procedures
 	call random_number(rw)
 	call random_number(rArw)
 	
-	Arw    = A(rw,N,Q)
-	ASrArw = AS(rArw,N,Q)
+	Arw    = A(rw)
+	ASrArw = AS(rArw)
 	
 	print *, 'test A(AS) : ', sum(rw*ASrArw) - sum(rArw*Arw) 
   
 	!! test projection
-	epsilon = 1e-10
-	f0 = normalise(epsilon + gauss(0.5d0,0.05d0,N),N)
-	f1 = normalise(epsilon + gauss(0.5d0,0.05d0,N),N)
+	f0 = normalise(eps + gauss(0.5,0.05))
+	f1 = normalise(eps + gauss(0.5,0.05))
 	y(1:Q+1,:) = 0
 	y(Q+2,:) = f0
 	y(Q+3,:) = f1
 	
 	call random_number(w)
-	print *, 'error before projection : ', sum((A(w,N,Q) - y)**2)/sum(y**2)	
-	pC = w + AS(resh(cg(flat(y-A(w,N,Q),N,Q),N,Q),N,Q),N,Q) 
-	print *, 'error after projection : ', sum((A(pC,N,Q) - y)**2)/sum(y**2)
+	print *, 'error before projection : ', sum((A(w) - y)**2)/sum(y**2)	
+	pC = w + AS(resh(cg(flat(y-A(w))))) 
+	print *, 'error after projection : ', sum((A(pC) - y)**2)/sum(y**2)
 
-
-    print *,
-    print *, '******************************'
-    print *, 'ANOTHER PART OF THE TEST'
-    print *, '******************************'
-    print *,
-
-    w1(1,1,1) = 1;
-    w1(1,2,1) = 2;
-    w1(1,3,1) = 3;
-    w1(2,1,1) = 4;
-    w1(2,2,1) = 5;
-    w1(2,3,1) = 6;    
-    w1(3,1,1) = 7;
-    w1(3,2,1) = 8;
-    w1(3,3,1) = 9;
-
-    w1(1,1,2) = 10;
-    w1(1,2,2) = 11;
-    w1(1,3,2) = 12;
-    w1(2,1,2) = 13;
-    w1(2,2,2) = 14;
-    w1(2,3,2) = 15;    
-    w1(3,1,2) = 16;
-    w1(3,2,2) = 17;
-    w1(3,3,2) = 18;
-    
-    pJw = proxJ(w1,1.d0,N1,Q1)  
-
-    do j = 1,2
-        do i = 1,Q+1
-!            print *, pJw(i,:,j), 'ENDL'
-        end do
-!        print *, 'END BLOCK'
-    end do 
-
-    f01 = 1; f11 = 1;
-    ! pCw = projC(w1,f01,f11,N1,Q1)
-!    print *, 'Projection sur C : '
-    do j = 1,2
-        do i = 1,Q+1
-!            print *, pCw(i,:,j), 'ENDL'
-        end do
-!        print *, 'END BLOCK'
-    end do 
+	w(1,1,1) = 1;
+	w(1,2,1) = 2;
+	w(1,3,1) = 3;
+	w(2,1,1) = 4;
+	w(2,2,1) = 5;
+	w(2,3,1) = 6;
+	w(3,1,1) = 7;
+	w(3,2,1) = 8;
+	w(3,3,1) = 9;
+	
+	w(1,1,2) = 10;
+	w(1,2,2) = 11;
+	w(1,3,2) = 12;
+	w(2,1,2) = 13;
+	w(2,2,2) = 14;
+	w(2,3,2) = 15;
+	w(3,1,2) = 16;
+	w(3,2,2) = 17;
+	w(3,3,2) = 18;	
+	
+   pw = proxJ(w)
+   
+	do i = 1,2
+		do j = 1,N+1
+			print *, Pw(j,:,i), 'ENDL'
+		end do 
+		print *, 'END BLOCK'
+	end do
+	
+	f0 = 1;
+	f1 = 1;
+	
+	call projC(pC,div,w,f0,f1)
+	
+	print *, ''
+	print *, '*********************************'
+	print *, ''
+	do i = 1,2
+		do j = 1,N+1
+			print *, pC(j,:,i), 'ENDL'
+		end do 
+		print *, 'END BLOCK'
+	end do
+	
+	print *, ''
+	print *, '*********************************'
+	print *, ''
+	print *, 'div', div
+	
+	call random_number(positif) 
+	print *, ''
+	print *, '*********************************'
+	print *, ''
+	print *, 'test AAS > 0 :', sum(positif*flat(A(AS(resh(positif)))))	
+	
+	call random_number(pW2)
+	J1 = cost(pW) +  0.5*sum((w-pW)**2)
+	J2 = cost(pW2) + 0.5*sum((w-pW2)**2)
+	J3 = cost(pW+0.0001) + 0.5*sum((w-pW-0.0001)**2)
+	
+	print *, ''
+	print *, '*********************************'
+	print *, ''	
+	print *, 'test prox J :'
+	print *, 'pW : ', J1, 'pW2 :', J2, 'pW3 :', J3
+	
+	print *, ''
+	print *, '*********************************'
+	print *, ''		
 end program
 
 
