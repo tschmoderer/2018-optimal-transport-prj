@@ -73,9 +73,9 @@ use procedures
    
 	do i = 1,2
 		do j = 1,N+1
-			print *, Pw(j,:,i), 'ENDL'
+	!		print *, Pw(j,:,i), 'ENDL'
 		end do 
-		print *, 'END BLOCK'
+	!	print *, 'END BLOCK'
 	end do
 	
 	f0 = 1;
@@ -83,41 +83,41 @@ use procedures
 	
 	call projC(pC,div,w,f0,f1)
 	
-	print *, ''
-	print *, '*********************************'
-	print *, ''
+!	print *, ''
+!	print *, '*********************************'
+!	print *, ''
 	do i = 1,2
 		do j = 1,N+1
-			print *, pC(j,:,i), 'ENDL'
+	!		print *, pC(j,:,i), 'ENDL'
 		end do 
-		print *, 'END BLOCK'
+	!	print *, 'END BLOCK'
 	end do
 	
-	print *, ''
-	print *, '*********************************'
-	print *, ''
-	print *, 'div', div
+!	print *, ''
+!	print *, '*********************************'
+!	print *, ''
+!	print *, 'div', div
 	
 	call random_number(positif) 
-	print *, ''
-	print *, '*********************************'
-	print *, ''
-	print *, 'test AAS > 0 :', sum(positif*flat(A(AS(resh(positif)))))	
+!	print *, ''
+!	print *, '*********************************'
+!	print *, ''
+!	print *, 'test AAS > 0 :', sum(positif*flat(A(AS(resh(positif)))))	
 	
 	call random_number(pW2)
-	J1 = cost(pW) +  0.5*sum((w-pW)**2)
-	J2 = cost(pW2) + 0.5*sum((w-pW2)**2)
-	J3 = cost(pW+0.0001) + 0.5*sum((w-pW-0.0001)**2)
+!	J1 = cost(pW) +  0.5*sum((w-pW)**2)
+!	J2 = cost(pW2) + 0.5*sum((w-pW2)**2)
+!	J3 = cost(pW+0.0001) + 0.5*sum((w-pW-0.0001)**2)
 	
-	print *, ''
-	print *, '*********************************'
-	print *, ''	
-	print *, 'test prox J :'
-	print *, 'pW : ', J1, 'pW2 :', J2, 'pW3 :', J3
+!	print *, ''
+!	print *, '*********************************'
+!	print *, ''	
+!	print *, 'test prox J :'
+!	print *, 'pW : ', J1, 'pW2 :', J2, 'pW3 :', J3
 	
-	print *, ''
-	print *, '*********************************'
-	print *, ''		
+!	print *, ''
+!	print *, '*********************************'
+!	print *, ''		
 end program
 
 

@@ -11,6 +11,11 @@ use procedures
 	f0 = normalise(eps + gauss(0.5,0.05))
 	f1 = normalise(eps + gauss(0.5,0.05))
 
+    do i = 1,Q+1
+        w0(i,:,2) = normalise(w0(i,:,2) + eps) 
+        z(i,:,2)  = normalise(z(i,:,2) + eps) 
+    end do 
+
     do i = 1,niter
 		w1 = w0 + alpha*(proxJ(2.0*z - w0) - z)
 		call projC(z,div(i),w1,f0,f1)
@@ -18,7 +23,7 @@ use procedures
         cout(i) = cost(z)
         minF(i) = minval(z(:,:,2))
 
-		print *, i, ' ',sum(w0), sum(w1), sum(z), cout(i), minF(i), div(i)
+		print *, i, sum(w0(:,:,2)), sum(w1(:,:,2)), sum(z(:,:,2)), cout(i), minF(i), div(i)
         
         w0 = w1;
     end do

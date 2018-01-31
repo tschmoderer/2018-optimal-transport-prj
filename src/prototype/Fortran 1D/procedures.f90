@@ -1,7 +1,7 @@
 module procedures
 implicit none
-	integer, parameter :: N = 2, Q = 2
-	integer, parameter :: niter = 59
+	integer, parameter :: N = 10, Q = 11
+	integer, parameter :: niter = 5
     real, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0
     
 contains 
@@ -100,26 +100,51 @@ contains
 !! Fonction gradient conjugué
 	function cg(b) result(x)
 		implicit none
-		real, dimension(1:(Q+3)*(N+1)) :: b, x, r, p, Ap 
-		real :: alpha, rold, rnew
-		integer :: i
-		
-		x = 0
-		r = b - flat(A(AS(resh(x))))
-		p = r
-		rold = sum(r*r)
-		do i = 1,(Q+3)*(N+1)
-			Ap = flat(A(AS(resh(p))))
-			alpha = rold/sum(p*Ap)
-			x = x + alpha*p
-			r = r - alpha*Ap
-			rnew = sum(r*r)
-			if (sqrt(rnew) .LT. 1e-10) then
-				exit 
-			end if
-			p = r + (rnew/rold)*p
-			rold = rnew 
-		end do
+		real, dimension(1:(Q+3)*(N+1)) :: b, x
+		real, dimension(1:(Q+3)*(N+1)) :: r0, x0, p0
+		real, dimension(1:(Q+3)*(N+1)) :: r1, x1, p1
+		real :: alpha, beta, err
+		integer :: k, maxiter
+
+		x0 = 0
+		r0 = b - flat(A(AS(resh(x0))))
+		p0 = r0
+
+		k = 0
+		maxiter = 20000
+		do while (k .LT. maxiter)
+			alpha = sum(r0*r0)/sum(p0*flat(A(AS(resh(p0)))))
+			r1 = r0 - alpha*flat(A(AS(resh(p0))))
+			x1 = x0 + alpha*p0
+			err = maxval(abs(r1))
+			if (err .LT. 1e-9) then
+				exit
+			end if 
+			beta = sum(r1*r1)/sum(r0*r0)
+			p1 = r1 + beta*p0
+
+			r0 = r1
+			p0 = p1
+			x0 = x1
+			k = k+1
+		end do 
+		x = x1
+!		x = 0
+!		r = b - flat(A(AS(resh(x))))
+!		p = r
+!		rold = sum(r*r)
+!		do i = 1,(Q+3)*(N+1) + 10**6
+!			Ap = flat(A(AS(resh(p))))
+!			alpha = rold/sum(p*Ap)
+!			x = x + alpha*p
+!			r = r - alpha*Ap
+!			rnew = sum(r*r)
+!			if (sqrt(rnew) .LT. 1e-10) then
+!				exit 
+!			end if
+!			p = r + (rnew/rold)*p
+!			rold = rnew 
+!		end do
 	end function cg	
 
 !! Projection sur C
@@ -140,17 +165,17 @@ contains
 	function cost(w) result(c)
 		real, dimension(1:Q+1,1:N+1,2) :: w
 		real:: c
-		c = sum(w(:,:,1)**2/w(:,:,2))
+		c = sum(w(:,:,1)**2/(eps + w(:,:,2)))
 	end function cost
 
 !! Prox de J
-	function proxJ(w) result(Pw)
+	function proxJ(w) result(pw)
 		implicit none
-		real, dimension(1:Q+1,1:N+1,2) :: w, Pw
+		real, dimension(1:Q+1,1:N+1,2) :: w, pw
 		real, dimension(1:Q+1,1:N+1) :: mt, ft, x0, x1, poly, dpoly
 		integer :: i, j, k = 0
 		
-		x0 = 1000; x1 = 2000; 
+		x0 = 1; x1 = 2; pw = 0;
 		mt = w(:,:,1); ft = w(:,:,2);
 
 		do while ((sum(abs(x0-x1)) .GT. 1e-10) .AND. (k .LT. 1500))
@@ -160,14 +185,13 @@ contains
 			x1 = x0 - poly/dpoly
 			k = k+1
 		end do 
-		Pw(:,:,2) = x1
-		Pw(:,:,1) = x1*mt/(x1+g)
-		
+		pw(:,:,2) = x1
+		pw(:,:,1) = x1*mt/(x1+g)
 		do i = 1,Q+1
 			do j = 1,N+1
 				if (x1(i,j) .LT. 0) then
-					Pw(i,j,1) = 0
-					Pw(i,j,2) = 0
+					pw(i,j,1) = 0
+					pw(i,j,2) = 0
 				end if
 			end do
 		end do

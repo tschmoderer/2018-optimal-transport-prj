@@ -23,7 +23,6 @@ obstacle = zeros(Q+1,N+1);
 f0 = normalise(epsilon + gauss(0.5,0.05,N));
 f1 = normalise(epsilon + gauss(0.5,0.05,N));
 
-
 % %% Test 2 %%
 % f0 = normalise(epsilon + gauss(0.2,0.05,N));
 % f1 = normalise(epsilon + gauss(0.8,0.05,N) + gauss(0.5,0.05,N));
@@ -57,7 +56,7 @@ w0 = zeros(Q+1,N+1,2); w1 = zeros(Q+1,N+1,2);
 % tt = repmat(t',1,N+1);
 % w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
 
-niter = 57;
+niter = 200;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);
@@ -66,12 +65,12 @@ tic
 for l = 1:niter
     w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma,obstacle) - z);
     [z, divV(l)] = projC(w1);
-    [floor(l) sum(w0(:)) sum(w1(:)) sum(z(:))]
+
     w0 = w1;
     
     cout(l) = J(z);
     minF(l) = min(min(z(:,:,2)));
-    
+
     % Affichage
     if mod(l,20) == 0
         contour(XX,YY,z(:,:,2),35)

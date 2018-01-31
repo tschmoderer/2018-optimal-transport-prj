@@ -15,8 +15,8 @@ function Pw = proxJ(w,b,g,obstacle)
     mt = w(:,:,1);
     ft = w(:,:,2);
     
-    x0 = 1000;
-    x1 = 2000;
+    x0 = 1;
+    x1 = 2;
     k = 0;
 
     % Newton
@@ -57,12 +57,7 @@ function Pw = proxJ(w,b,g,obstacle)
                 Pw(i,j,1) = 1e-10;
             end
         end
-    end
-    
-    
-    
-    
-    
+    end   
 end
 
 
