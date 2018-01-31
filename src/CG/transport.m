@@ -48,7 +48,7 @@ f1 = normalise(epsilon + gauss(0.5,0.05,N));
 J = @(w) sum(sum(sum(w(:,:,1).^2./w(:,:,2)))); % cost 
 
 alpha = 1.0; % must be in ]0,2[
-beta  = 1; % must be ine [0,1]
+beta  = 1.0; % must be ine [0,1]
 gamma = 1.0; % must be > 0
 
 z  = zeros(Q+1,N+1,2);
@@ -57,7 +57,7 @@ w0 = zeros(Q+1,N+1,2); w1 = zeros(Q+1,N+1,2);
 % tt = repmat(t',1,N+1);
 % w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
 
-niter = 600;
+niter = 57;
 cout = zeros(1,niter);
 minF = zeros(1,niter);
 divV = zeros(1,niter);
@@ -66,7 +66,7 @@ tic
 for l = 1:niter
     w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma,obstacle) - z);
     [z, divV(l)] = projC(w1);
-    [l sum(w0(:)) sum(w1(:)) sum(z(:))]
+    [floor(l) sum(w0(:)) sum(w1(:)) sum(z(:))]
     w0 = w1;
     
     cout(l) = J(z);
