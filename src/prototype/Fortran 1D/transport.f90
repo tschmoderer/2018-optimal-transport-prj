@@ -15,7 +15,7 @@ use procedures
 		w1 = w0 + alpha*(proxJ(2.0*z - w0) - z)
 		call projC(z,div(i),w1,f0,f1)
 
- !       cout(i) = cost(z)
+        cout(i) = cost(z)
         minF(i) = minval(z(:,:,2))
 
 		print *, i, ' ',sum(w0), sum(w1), sum(z), cout(i), minF(i), div(i)

@@ -153,7 +153,7 @@ contains
 		x0 = 1000; x1 = 2000; 
 		mt = w(:,:,1); ft = w(:,:,2);
 
-		do while (sum(abs(x0-x1)) .GT. 1e-10 .AND. k .LT. 1500)
+		do while ((sum(abs(x0-x1)) .GT. 1e-10) .AND. (k .LT. 1500))
 			x0 = x1
 			poly = (x0-ft)*(x0+g)*(x0+g)-0.5*g*mt*mt
 			dpoly = 2*(x0+g)*(x0-ft) + (x0+g)*(x0+g)
