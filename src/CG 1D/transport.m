@@ -20,8 +20,8 @@ normalise = @(f) f/sum(f(:)); epsilon = 1e-10;
 obstacle = zeros(Q+1,N+1);
 
 %% Test 1 %%
-f0 = normalise(epsilon + gauss(0.5,0.05,N));
-f1 = normalise(epsilon + gauss(0.5,0.05,N));
+f0 = normalise(epsilon + gauss(0.2,0.05,N));
+f1 = normalise(epsilon + gauss(0.8,0.05,N));
 
 % %% Test 2 %%
 % f0 = normalise(epsilon + gauss(0.2,0.05,N));
@@ -32,13 +32,13 @@ f1 = normalise(epsilon + gauss(0.5,0.05,N));
 % f1 = normalise(epsilon + indicatrix(0.7,0.8,N) + indicatrix(0.3,0.5,N));
 % 
 % %% Test 4 %%
-% f0 = normalise(epsilon + gauss(0.2,0.05,N));
-% f1 = normalise(epsilon + gauss(0.8,0.05,N));
-% 
-% obstacle = zeros(Q+1,N+1); % 0 : no obstacle, 1 : obstacle
-% obstacle(15,1:end) = 1; obstacle(15,4:6) = 0;
-% obstacle(20,1:end) = 1; obstacle(20,16:18) = 0;
-% obstacle(7,1:end)  = 1; obstacle(7,12:14) = 0;
+f0 = normalise(epsilon + gauss(0.2,0.05,N));
+f1 = normalise(epsilon + gauss(0.8,0.05,N));
+
+obstacle = zeros(Q+1,N+1); % 0 : no obstacle, 1 : obstacle
+obstacle(15,1:end) = 1; obstacle(15,4:6) = 0;
+%obstacle(20,1:end) = 1; obstacle(20,16:18) = 0;
+obstacle(7,1:end)  = 1; obstacle(7,12:14) = 0;
 % 
 % %% Test 5 %%
 % obstacle(45,1:end) = 1; obstacle(45,40:45) = 0;
