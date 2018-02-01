@@ -1,14 +1,20 @@
 program new
     implicit none
-    integer, parameter :: N = 21, Q = 19, niter = 2000
+    integer, parameter :: N = 51, Q = 49, niter = 2000
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
     double precision, dimension(N+1) :: f0, f1
     double precision, dimension(Q+1,N+1,2) :: z = 0, w0 = 0, w1 = 0
+	integer, dimension(Q+1,N+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i,k
 	 
     f0 = normalise(eps + gauss(0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.05d0) + 0.6*gauss(0.6d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.05d0))
+
+	obstacle(25,:) = 1; obstacle(25,2:4) = 0
+!	obstacle(7,:)  = 1; obstacle(7,12:14) = 0
+!	obstacle(10,:) = 1; obstacle(10,2:4) = 0
+!	obstacle(4,:) = 1; obstacle(4,17:19) = 0
 
     do i = 1,niter
         w1 = w0 + alpha*(proxJ(2*z-w0) - z)
@@ -17,7 +23,7 @@ program new
 		
         cout(i) = J(z)
        
-        if (modulo(i,10) .EQ. 0) print *, i, cout(i)
+        if (modulo(i,50) .EQ. 0) print *, i, cout(i)
         minF(i) = minval(z(:,:,2))
     end do 
 
@@ -65,7 +71,6 @@ program new
 	write(8,*) 'splot "results/transport.dat" with lines'
 	close(8);
 	call system("gnuplot -p results/plot.gnu");
-    
     
     contains
 
@@ -125,7 +130,7 @@ program new
         end do
 
         where (x1 .LT. eps) x1 = eps
-        
+        where (obstacle .GT. 0) x1 = eps
         pw(:,:,2) = x1
         pw(:,:,1) = (x1**b)*mt/(x1**b+g) 
     end function proxJ
