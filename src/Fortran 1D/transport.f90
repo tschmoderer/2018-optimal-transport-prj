@@ -1,4 +1,4 @@
-program new
+program transport
     implicit none
     integer, parameter :: N = 51, Q = 49, niter = 2000
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
@@ -139,12 +139,31 @@ program new
     function projC(w) result(pc)
     implicit none
         double precision, dimension(Q+1,N+1,2) :: w, pc
-        double precision, dimension(Q+3,N+1) :: y
+        double precision, dimension(Q+3,N+1) :: y, b, x, r, p, Ap
+        double precision :: alpha, rold, rnew
+        integer :: i 
+        
         y = 0
         y(Q+2,:) = f0
         y(Q+3,:) = f1
         
-        pc = w + AS(resh(cg(flat(y-A(w))))) 
+     !! Gradient conjugué
+        x = 0
+        b = y - A(w)
+        r = b - A(AS(x))
+        p = r
+        rold = sum(r*r)
+        do i = 1,(N+1)*(Q+3)
+			Ap = A(AS(p))
+			alpha = rold/sum(p*Ap)
+			x = x + alpha*p
+			r = r - alpha*Ap
+			rnew = sum(r*r)
+			if (dsqrt(rnew) .LT. 1e-10) exit
+			p = r + (rnew/rold)*p
+			rold = rnew
+        end do
+        pc = w + AS(x) 
     end function projC
     
 !! Dérivation en x
@@ -201,44 +220,4 @@ program new
 		w(1,:,2) = w(1,:,2) + aw(Q+3,:)
 		w(Q+1,:,2) = w(Q+1,:,2) + aw(Q+2,:)
 	end function AS
-
-!! Flat 
-	function flat(x) result(f)
-	implicit none
-		double precision, dimension(Q+3,N+1) :: x
-		double precision, dimension((Q+3)*(N+1)) :: f
-		f = reshape(x,(/(Q+3)*(N+1)/))
-	end function flat
-
-!! Reshape
-	function resh(x) result(r)
-	implicit none
-		double precision, dimension(Q+3,N+1) :: r
-		double precision, dimension((Q+3)*(N+1)) :: x
-		r = reshape(x,(/Q+3,N+1/))	
-	end function resh
-	
-!! Gradient conjugué
-	function cg(b)result(x)
-	implicit none
-		double precision, dimension((Q+3)*(N+1)) :: b, x, r, p, Ap
-		double precision :: rold, rnew, alpha
-		integer :: i 
-		x = 0
-		r = b - flat(A(AS(resh(x))))
-		p = r
-		rold = sum(r*r)
-		do i = 1,(Q+3)*(N+1)
-			Ap = flat(A(AS(resh(p))))
-			alpha = rold/sum(p*Ap)
-			x = x + alpha*p
-			r = r - alpha*Ap
-			rnew = sum(r*r)
-			if (dsqrt(rnew) .LT. 1e-10) then 
-				exit
-			end if
-			p = r + (rnew/rold)*p
-			rold = rnew
-		end do
-	end function cg
-end program new
+end program transport

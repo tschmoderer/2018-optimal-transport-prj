@@ -1,15 +1,30 @@
-program new
+program transport
     implicit none
-    integer, parameter :: N = 21, P = 18, Q = 19, niter = 200
-    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 0
+    integer, parameter :: N = 20, P = 20, Q = 20, niter = 1000
+    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
     double precision, dimension(P+1,N+1) :: f0, f1
     double precision, dimension(P+1,N+1,Q,3) :: z = 0, w0 = 0, w1 = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i,k,l
 	character(10) :: charI;
 
-    f0 = normalise(eps + gauss(0.2d0,0.8d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
+	open(1,file='input/f0.dat') 
+	do i = 1,P+1
+		read(1,*) f0(i,:)
+	end do 
+	close(1)
+	
+	open(1,file='input/f1.dat') 
+	do i = 1,P+1
+		read(1,*) f1(i,:)
+	end do 
+	close(1)
+	
+	f0 = normalise(eps + f0)
+	f1 = normalise(eps + f1)
+	
+    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0) + 0.8*gauss(0.8d0,0.3d0,0.05d0))
 
     do i = 1,niter
         w1 = w0 + alpha*(proxJ(2*z-w0) - z)
@@ -19,7 +34,7 @@ program new
         cout(i) = J(z)
        
         if (modulo(i,10) .EQ. 0) print *, i, cout(i)
-     !   minF(i) = minval(z(:,:,2))
+        minF(i) = minval(z(:,:,:,3))
     end do 
     
     open(1,file='results/transport.dat');
@@ -160,12 +175,29 @@ program new
     function projC(w) result(pc)
     implicit none
         double precision, dimension(P+1,N+1,Q,3) :: w, pc
-        double precision, dimension(P+1,N+1,Q+2) :: y
+        double precision, dimension(P+1,N+1,Q+2) :: y, b, x, r, dir, Adir
+        double precision :: alpha, rold, rnew
+        integer :: i
         y = 0
         y(:,:,Q+1) = f0
         y(:,:,Q+2) = f1
-        
-        pc = w + AS(resh(cg(flat(y-A(w))))) 
+        !! Gradient conjugué
+        x = 0
+        b = y - A(w)
+        r = b - A(AS(x))
+        dir = r
+        rold = sum(r*r)
+        do i = 1,(P+1)*(N+1)*(Q+2)
+			Adir = A(AS(dir))
+			alpha = rold/sum(dir*Adir)
+			x = x + alpha*dir
+			r = r - alpha*Adir
+			rnew = sum(r*r)
+			if (dsqrt(rnew) .LT. 1e-10) exit
+			dir = r + (rnew/rold)*dir
+			rold = rnew
+        end do
+        pc = w + AS(x) 
     end function projC
     
 !! Dérivation en x
@@ -240,44 +272,4 @@ program new
 		w(:,:,1,3) = w(:,:,1,3) + aw(:,:,Q+1)
 		w(:,:,Q,3) = w(:,:,Q,3) + aw(:,:,Q+2)
 	end function AS
-
-!! Flat 
-	function flat(x) result(f)
-	implicit none
-		double precision, dimension(P+1,N+1,Q+2) :: x
-		double precision, dimension((P+1)*(N+1)*(Q+2)) :: f
-		f = reshape(x,(/(P+1)*(N+1)*(Q+2)/))
-	end function flat
-
-!! Reshape
-	function resh(x) result(r)
-	implicit none
-		double precision, dimension(P+1,N+1,Q+2) :: r
-		double precision, dimension((P+1)*(N+1)*(Q+2)) :: x
-		r = reshape(x,(/P+1,N+1,Q+2/))	
-	end function resh
-	
-!! Gradient conjugué
-	function cg(b)result(x)
-	implicit none
-		double precision, dimension((P+1)*(N+1)*(Q+2)) :: b, x, r, p, Ap
-		double precision :: rold, rnew, alpha
-		integer :: i 
-		x = 0
-		r = b - flat(A(AS(resh(x))))
-		p = r
-		rold = sum(r*r)
-		do i = 1,(Q+3)*(N+1)
-			Ap = flat(A(AS(resh(p))))
-			alpha = rold/sum(p*Ap)
-			x = x + alpha*p
-			r = r - alpha*Ap
-			rnew = sum(r*r)
-			if (dsqrt(rnew) .LT. 1e-10) then 
-				exit
-			end if
-			p = r + (rnew/rold)*p
-			rold = rnew
-		end do
-	end function cg
-end program new
+end program transport
