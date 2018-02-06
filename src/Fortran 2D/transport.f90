@@ -1,7 +1,7 @@
 program transport
     implicit none
-    integer, parameter :: N = 20, P = 20, Q = 20, niter = 1000
-    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
+    integer, parameter :: N = 20, P = 20, Q = 40, niter = 1000
+    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1
     double precision, dimension(P+1,N+1) :: f0, f1
     double precision, dimension(P+1,N+1,Q,3) :: z = 0, w0 = 0, w1 = 0
     double precision, dimension(niter) :: cout, minF

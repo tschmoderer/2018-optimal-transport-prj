@@ -1,10 +1,10 @@
-%% Define globals variable %%
+% Variables globales utilisées dans la méthode de transport optimal 
+% Timothéee Schmoderer
+% INSA Rouen Normandie 2017/2018
 
-global N; % # pts in x direction
-global Q; % # pts in t direction
+global N; % le nombre d'intervals de discrétisation dans la direction --> x
+global Q; % le nombre d'intervals de discrétisation dans la direction --> t
 
-global epsilon; % minimum value of density
-global f0; % initial density
-global f1; % final density
-
-global g; % gamma
+global f0; % la densité initiale
+global f1; % la densité finale
+global epsilon;% le minimum de densité dans une cellule

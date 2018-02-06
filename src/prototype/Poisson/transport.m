@@ -44,7 +44,7 @@ obstacle = zeros(Q+1,N+1); % 0 : no obstacle, 1 : obstacle
 % obstacle(45,1:end) = 1; obstacle(45,40:45) = 0;
 % obstacle(30,1:end) = 1; obstacle(30,4:6) = 0;
 
-J = @(w) sum(sum(sum(w(:,:,1).^2./w(:,:,2)))); % cost 
+J = @(w) sum(sum(sum(w(2:end-1,2:end-1,1).^2./w(2:end-1,2:end-1,2)))); % cost 
 
 alpha = 1.0; % must be in ]0,2[
 beta  = 1.0; % must be ine [0,1]

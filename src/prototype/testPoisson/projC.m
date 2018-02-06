@@ -1,43 +1,30 @@
-function [pmC,pfC] = projC(mbar,fbar)
+% Fonction projC
+% Out : 
+%     - pC : la projection sur les contraintes de w
+%      - error : l'erreur commise sur le respect des contraintes
+% In  : 
+%     - w  : le point d'évaluation 
+% Timothée Schmoderer 
+% INSA Rouen Normandie 2017/2018
+
+function [pC, error] = projC(w)
     globals;
+    dx  = @(m) N*(m(:,[2:end end]) - m); % dérivation selon ---> x
+    dt  = @(f) Q*(f([2:end end],:) - f); % dérivation selon ---> t 
+    dxS = @(dm) N*[-dm(:,1) , dm(:,1:end-2) - dm(:,2:end-1) , dm(:,end-1)];
+    dtS = @(df) Q*[-df(1,:) ; df(1:end-2,:) - df(2:end-1,:) ; df(end-1,:)];
 
-    %Cst = poisson(zeros(Q+1,N+1),0,0,f1,f0,N,Q,1e-5);
-    % Calcul de la constante %
-    %!!%
-    ymbar = zeros(Q+1,N+2); 
-    yfbar = zeros(Q+2,N+1); yfbar(1,:) = f1; yfbar(end,:) = f0;
-    yy = N*(ymbar(:,2:end)-ymbar(:,1:end-1)) + Q*(yfbar(2:end,:) - yfbar(1:end-1,:));
-    %!!%
+    A  = @(w)  [-dxS(w(:,:,1)) + dt(w(:,:,2)); w(end,:,2) ;w(1,:,2)];
+    AS = @(Aw) cat(3,-dx(Aw(1:Q+1,:)),dtS(Aw(1:Q+1,:)) + [Aw(Q+3,:);zeros(Q-1,N+1);Aw(Q+2,:)]);
 
-    C1 = poisson2d_Neumann(-yy); 
-    Cmbar = zeros(Q+1,N+2); Cfbar = zeros(Q+2,N+1);
+    y = [zeros(Q+1,N+1);f0;f1];
 
-    Cmbar(:,1) = -C1(:,1); Cmbar(:,end) = C1(:,end);  Cmbar(:,1) = 0; Cmbar(:,end) = 0;
-    Cmbar(:,2:end-1) = (C1(:,1:end-1) - C1(:,2:end));
+    flat = @(x) reshape(x,(Q+3)*(N+1),1);
+    resh = @(x) reshape(x,Q+3,N+1);
 
-    Cfbar(1,:) = -C1(1,:); Cfbar(end,:) = C1(end,:); Cfbar(1,:) = f1/Q; Cfbar(end,:) = f0/Q;
-    Cfbar(2:end-1,:) = (C1(1:end-1,:) - C1(2:end,:));
+    pC = w + AS(resh(cg(@(s)flat(A(AS(resh(s)))),flat(y-A(w)))));
 
-    Cstmbar = N*Cmbar; Cstfbar = Q*Cfbar; 
-    
-    % calcul de la projection
-    
-    d = N*(mbar(:,2:end) - mbar(:,1:end-1)) + Q*(fbar(2:end,:) - fbar(1:end-1,:));
-
-    S = poisson2d_Neumann(-d);
-
-    Smbar = zeros(Q+1,N+2); Sfbar = zeros(Q+2,N+1);
-    
-    Smbar(:,1) = mbar(:,1)/N; Smbar(:,end) = mbar(:,end)/N;
-    Smbar(:,2:end-1) = S(:,1:end-1) - S(:,2:end);
-    
-    Sfbar(1,:) = fbar(1,:)/Q; Sfbar(end,:) = fbar(end,:)/Q;
-    Sfbar(2:end-1,:) = S(1:end-1,:) - S(2:end,:);
-    
-    Smbar = N*Smbar; Sfbar = Q*Sfbar;
-
-    % la projection
-    pmC = mbar - Smbar + Cstmbar;
-    pfC = fbar - Sfbar + Cstfbar;
+    err = @(w) norm(A(w)-y)/norm(y);
+    error = err(pC);
 end
 

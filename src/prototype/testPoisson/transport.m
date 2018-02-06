@@ -1,73 +1,103 @@
 clc
 clear all
-close all
+close all 
+
+% Programme principal
+% On essaye d'agir que sur l'intérieur de la grille 
+% Timothée Schmoderer 
+% INSA Rouen Normandie 2017/2018
 
 globals;
 
-%% Initialisation %%
+%% New implementation without staggered grid %%
+N = 21; 
+Q = 19; 
 
-N = 20;
-Q = 30;
+X       = (0:N)/N; T = (0:Q)/Q;
+[XX,YY] = meshgrid(X,T); YY = flipud(YY);
 
-epsilon = 0.0001;
+normalise = @(f) f/sum(f(:)); epsilon = 1e-10;
+obstacle = zeros(Q+1,N+1);
 
-g = 1.0;
+f0 = normalise(epsilon + gauss(0.2,0.05,N));
+f1 = normalise(epsilon + gauss(0.8,0.05,N));
+epsilon = min(f0);
 
-normalise = @(f) f/sum(f(:));
+alpha = 1.0; % must be in ]0,2[
+beta  = 1.0; % must be ine [0,1]
+gamma = 1.0; % must be > 0
 
-f0 = normalise(epsilon + gauss(0.4,0.05,N));
-f1 = normalise(epsilon + gauss(0.6,0.05,N));
-    
-alpha = 1.0; g = 0.0125;
+J = @(w) sum(sum(sum(w(:,:,1).^2./max(w(:,:,2),max(epsilon,1e-10)).^beta))); % cost 
 
-[XX,YY] = meshgrid(linspace(0,1,N+1),linspace(0,1,Q+1)); %YY = flipud(YY);
+z  = zeros(Q+1,N+1,2);
+t  = (Q:-1:0)/Q; tt = repmat(t',1,N+1);
+w0 = (1-tt).*repmat(f0,Q+1,1) + tt.*repmat(f1,Q+1,1);
+w1 = w0;
 
-wmbar0 = zeros(Q+1,N+2); wmbar1 = zeros(Q+1,N+2); zmbar = zeros(Q+1,N+2);
-wfbar0 = zeros(Q+2,N+1); wfbar1 = zeros(Q+2,N+1); zfbar = zeros(Q+2,N+1);
-wm0 = zeros(Q+1,N+1); wm1 = zeros(Q+1,N+1); zm = zeros(Q+1,N+1);
-wf0 = zeros(Q+1,N+1); wf1 = zeros(Q+1,N+1); zf = zeros(Q+1,N+1);
-
-% Itérations
-niter = 50;
+niter = 200;
 cout = zeros(1,niter);
-div = zeros(1,niter);
 minF = zeros(1,niter);
+divV = zeros(1,niter);
 
-tic;
+tic
 for l = 1:niter
-    % etape 1
-    [wmbar1,wfbar1,wm1,wf1] = proxG1(2*zmbar-wmbar0,2*zfbar-wfbar0,2*zm-wm0,2*zf-wf0);    
+    w1 = w0 + alpha*(proxJ(2*z-w0,beta,gamma,obstacle) - z);
+    [z, divV(l)] = projC(w1);
+
+    w0 = w1;
     
-    wmbar1 = wmbar0 + alpha*(wmbar1 - zmbar); wfbar1 = wfbar0 + alpha*(wfbar1 - zfbar);
-    wm1 = wm0 + alpha*(wm1 - zm); wf1 = wf0 + alpha*(wf1 - zf);
-    
-    % etape 2
-    [zmbar,zfbar,zm,zf] = proxG2(wmbar1,wfbar1,wm1,wf1,N,Q);
-   
-    % iterate
-    wmbar0 = wmbar1; wfbar0 = wfbar1;
-    wm0 = wm1; wf0 = wf1;
-    
-    surf(XX,YY,zf)
-    xlabel('x');
-    ylabel('t');
-    zlabel('f');
-    title(['itération : ',num2str(l)]);
-    drawnow
-    
-    cout(l) = cost(zm,zf);
-   % div(l)  = sum(D*zU0);
-    minF(l) = min(zf(:));
+    cout(l) = J(z);
+    minF(l) = min(min(z(:,:,2)));
+
+    % Affichage
+    if mod(l,20) == 0
+        contour(XX,YY,z(:,:,2),35)
+        title(['Iteration ',num2str(l)]);
+        drawnow;
+    end
 end
 toc
 
-figure;
-subplot(3,1,1)
-plot([1:niter],cout);
-title('cout')
-subplot(3,1,2)
-plot([1:niter],div)
-title('div')
-subplot(3,1,3)
+
+close all
+
+figure; 
+surf(XX,YY,z(:,:,2),'EdgeColor','none');
+title('Transport optimal');
+xlabel('x')
+ylabel('t')
+
+
+figure; 
+plot(X,f0)
+title('Densité initiale');
+xlabel('x')
+
+figure; 
+plot(X,f1)
+title('Densité cible');
+xlabel('x')
+
+figure; 
+contour(XX,YY,z(:,:,2),50);
+title('Transport optimal');
+xlabel('x')
+ylabel('t')
+if sum(sum(obstacle)) > 0
+ hold on; 
+ contour(XX,YY,obstacle,50,'LineColor','k');
+end
+
+figure; 
+subplot(311)
+plot((1:niter),cout);
+title('Energie');
+xlabel('Iteration')
+subplot(312)
 plot([1:niter],minF);
-title('min de f');
+title('Minimum de la densité');
+subplot(313);
+plot([1:niter],divV);
+title('Violation de la contrainte div = 0');
+
+
