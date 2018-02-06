@@ -1,12 +1,12 @@
 program transport
     implicit none
-    integer, parameter :: N = 20, P = 20, Q = 40, niter = 1000
-    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1
+    integer, parameter :: N = 30, P = 30, Q = 50, niter = 1000
+    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 0.5
     double precision, dimension(P+1,N+1) :: f0, f1
     double precision, dimension(P+1,N+1,Q,3) :: z = 0, w0 = 0, w1 = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i,k,l
-	character(10) :: charI;
+		character(10) :: charI;
 
 	open(1,file='input/f0.dat') 
 	do i = 1,P+1
@@ -23,8 +23,8 @@ program transport
 	f0 = normalise(eps + f0)
 	f1 = normalise(eps + f1)
 	
-    f0 = normalise(eps + gauss(0.2d0,0.5d0,0.05d0) + gauss(0.8d0,0.5d0,0.05d0))
-    f1 = normalise(eps + gauss(0.5d0,0.2d0,0.05d0) + gauss(0.5d0,0.8d0,0.05d0))
+    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0)) ! + gauss(0.8d0,0.5d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0)) ! + gauss(0.5d0,0.8d0,0.05d0))
 
     do i = 1,niter
         w1 = w0 + alpha*(proxJ(2*z-w0) - z)
@@ -50,7 +50,7 @@ program transport
 
 	do l = 1,Q 
 		write(charI,'(I5.5)') l
-		open(1,file='results/Transport/f_'//trim(charI)//'.dat'); 
+		open(1,file='results/Transport/'//trim(charI)//'.dat'); 
 		write(1,*) "# ", "X ", "Y ", "T ", "Z "
 		do i = 1,P+1 ! y direction
 			do k = 1,N+1 ! x direction 
@@ -96,8 +96,9 @@ program transport
 	write(8,*) 'set title "Transport Optimal"'
 	write(8,*) 'set xlabel "x"'
 	write(8,*) 'set ylabel "t"'
-	write(8,*) 'set dgrid3d ', Q+1, ',', N+1
-	write(8,*) 'splot "results/transport.dat" with lines'
+	write(8,*) 'set palette gray'
+ 	write(8,*) 'set view 0,0'
+	write(8,*) 'set dgrid3d ', P+1, ',', N+1
 	close(8);
 !	call system("gnuplot -p results/plot.gnu");    
     

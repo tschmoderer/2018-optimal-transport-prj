@@ -1,28 +1,32 @@
 program transport
     implicit none
-    integer, parameter :: N = 31, Q = 29, niter = 1000
+    integer, parameter :: N = 100, Q = 100, niter = 10000
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
     double precision, dimension(N+1) :: f0, f1
     double precision, dimension(Q+1,N+1,2) :: zV = 0, wV0 = 0, wV1 = 0
     double precision, dimension(Q+2,N+2,2) :: zU = 0, wU0 = 0, wU1 = 0
-	integer, dimension(Q+1,N+1) :: obstacle = 0
+		integer, dimension(Q+1,N+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF
-    integer :: i,k
+    integer :: i, k, l 
+  	character(10) :: charI;
 	 
     f0 = normalise(eps + gauss(0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.05d0))
     
-    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
-    f1 = normalise(eps + indicatrix(0.3d0,0.4d0) + indicatrix(0.7d0,0.8d0))
+!    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
+!    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
+    
+!    f0 = normalise(eps + gauss(0.2d0,0.05d0))
+!    f1 = normalise(eps + gauss(0.8d0,0.05d0) + 0.6*gauss(0.4d0,0.05d0))
     
     do i = 1,niter
-		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
-		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
-		zU  = projCs(wU1,wV1)
-		zV  = interp(zU)
+				wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
+				wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
+				zU  = projCs(wU1,wV1)
+				zV  = interp(zU)
 
-		wU0 = wU1
-		wV0 = wV1
+				wU0 = wU1
+				wV0 = wV1
 		
         cout(i) = J(zV)
        
@@ -30,7 +34,7 @@ program transport
         minF(i) = minval(zV(:,:,2))
     end do 
     
-	open(1,file='results/transport.dat');
+	  open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "T ", "Z "
     do i = 1,Q+1
         do k = 1,N+1
@@ -38,6 +42,17 @@ program transport
         end do
     end do
     close(1)
+    
+    do l = 1,Q+1
+			write(charI,'(I5.5)') Q+2 - l
+			open(1,file='results/Transport/'//trim(charI)//'.dat'); 
+			write(1,*) "# ", "X ", "T "
+				do k = 1,N+1 ! x direction 
+					write(1,*) (k-1)/(1.0*N),  zV(l,k,2)
+			end do
+			close(1)
+	  end do 
+    
     
     open(1,file='results/energie.dat');
     write(1,*) "# ", "X ", "T ", "Z "
@@ -70,6 +85,8 @@ program transport
 	write(8,*) 'set title "Transport Optimal"'
 	write(8,*) 'set xlabel "x"'
 	write(8,*) 'set ylabel "t"'
+	write(8,*) 'set palette gray'
+	write(8,*) 'set view 0,0'
 	write(8,*) 'set dgrid3d ', Q+1, ',', N+1
 	write(8,*) 'splot "results/transport.dat" with lines'
 	close(8);
@@ -78,7 +95,7 @@ program transport
 
 !! Gauss
     function gauss(mu,sigma) result(f) 
-	implicit none
+		implicit none
         double precision :: mu, sigma 
         double precision, dimension(N+1) :: f
         integer :: i
