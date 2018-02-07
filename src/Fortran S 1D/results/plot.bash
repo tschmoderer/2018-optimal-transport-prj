@@ -10,7 +10,7 @@ gnuplot <<- EOF
     set term png
 		set title "Transport Optimal"
 		set xr [0:1]
-		set yr [-0.1:0.5]
+		set yr [-0.1:0.2]
  		set xlabel "x"
  		set ylabel "f"
     set output "${postFile}"
