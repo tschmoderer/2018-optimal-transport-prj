@@ -9,5 +9,5 @@
  set ylabel "t"
  set palette gray
  set view 0,0
- set dgrid3d           51 ,          51
+ set dgrid3d          101 ,         101
  splot "results/transport.dat" with lines
