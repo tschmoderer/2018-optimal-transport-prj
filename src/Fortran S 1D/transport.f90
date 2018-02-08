@@ -1,7 +1,7 @@
 program transport
     implicit none
-    integer, parameter :: N = 100, Q = 100, niter = 10000
-    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
+    integer, parameter :: N = 100, Q = 100, niter = 5000
+    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1.0
     double precision, dimension(N+1) :: f0, f1
     double precision, dimension(Q+1,N+1,2) :: zV = 0, wV0 = 0, wV1 = 0
     double precision, dimension(Q+2,N+2,2) :: zU = 0, wU0 = 0, wU1 = 0
@@ -12,6 +12,14 @@ program transport
 	 
     f0 = normalise(eps + gauss(0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.05d0))
+    
+    obstacle(5,:) = 1; obstacle(5,90:95) = 0;
+    obstacle(10,:) = 1; obstacle(10,5:10) = 0;
+    obstacle(15,:) = 1; obstacle(15,45:50) = 0;
+    obstacle(25,:) = 1; obstacle(25,75:80) = 0;
+    obstacle(30,:) = 1; obstacle(30,70:75) = 0;
+    obstacle(50,:) = 1; obstacle(50,5:10) = 0;
+    obstacle(90,:) = 1; obstacle(50,5:10) = 0;
     
 !    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
 !    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
