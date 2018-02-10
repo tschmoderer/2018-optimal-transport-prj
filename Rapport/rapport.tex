@@ -49,7 +49,7 @@ language=Matlab,
 \tableofcontents
 \newpage
 \section{Introduction}
-Le problème de transport optimal fut étudié dans sa forme primitive par \emph{Gaspard Monge} dans son \emph{Mémoire sur la théorie des déblais et des remblais} de 1871 \cite{monge}. Il s'intéressait au déplacement de tas de matériaux d'un site d'extraction à un site de construction en minimisant le coût de transport (le coût de déplacement d'une unité est le produit de la charge déplacée par la distance). \\
+Le problème de transport optimal fut étudié dans sa forme primitive par \emph{Gaspard Monge} dans son \emph{Mémoire sur la théorie des déblais et des remblais} de 1781 \cite{monge}. Il s'intéressait au déplacement de tas de matériaux d'un site d'extraction à un site de construction en minimisant le coût de transport (le coût de déplacement d'une unité est le produit de la charge déplacée par la distance). \\
 La formulation moderne a été introduite par \emph{Leonid Kantorovitch}, prix Nobel d'économie en 1975 pour sa contribution aux allocations optimales.  \\
 
 
@@ -111,7 +111,7 @@ Nous pouvons alors donner la définition qui donne le titre à ce projet.
 Soient, $f_0$ et $f_1$ deux densités de probabilité et un coût $C$. Le problème de transport optimal est alors le suivant.\\
 Trouver $T\in\mathcal{T}(f_0,f_1)$ qui réalise le 
 \begin{align}
-\min_{T\in\mathcal{T}(f_0,f_1)} \int C(x,T(x)) dx
+\min_{T\in\mathcal{T}(f_0,f_1)} \int C(x,T(x)) f_0(x)dx
 \label{eq:trspOpt}
 \end{align}
 \end{definition}
@@ -121,6 +121,14 @@ Trouver $T\in\mathcal{T}(f_0,f_1)$ qui réalise le
 \item La valeur de \eqref{eq:trspOpt} est alors appelée distance $L^2$ de Wasserstein entre $f_0$ et $f_1$, et est notée $d(f_0,f_1)$.
 \end{enumerate}
 }
+
+\begin{theoreme}{Existence et unicité du transport optimal}
+
+\end{theoreme}
+\begin{preuve}
+
+\end{preuve}
+
 \begin{theoreme}{}
 Dans le cas du coût quadratique, il existe une unique application de transport optimal qui s'écrit comme le gradient d'une fonction convexe. 
 \begin{align}
@@ -159,48 +167,107 @@ C_v=\left\{(f,v)\ |\ \frac{\partial f}{\partial t} + \text{div}_x (fv) =0,\ f(0,
 \end{align}
 \end{theoreme}
 \begin{preuve}
-Nous redonnons la preuve donnée par Benamou et Brenier en complétant les points qui nous semble obscures.\\
+Nous redonnons la preuve donnée par Benamou et Brenier en complétant les points qui nous semble obscurs.\\
+
+
+\begin{minipage}{0.5\linewidth}
 La preuve repose sur l'utilisation des variables lagrangiennes $X(t,x)$ qui décrivent le comportement d'un fluide en "suivant" les particules. 
-\begin{align*}
+Supposons $f_0$ et $f_1$ bornées et à support compact de $\RR^n$. Considérons $(f,v)$, suffisamment régulières, vérifiant \eqref{eq:contraintes}.
+\end{minipage}\hfill
+\begin{minipage}{0.55\linewidth}
+\begin{center}
+\includegraphics[scale=0.3]{img/lagrange.png}
+\end{center}
+\end{minipage}
+
+
+En termes formels, cela donne, 
+\begin{align}
 X(0,x)=x\quad\frac{\partial X}{\partial t}(t,x) = v(t,X(t,x))
-\end{align*}
-Ainsi, pour toute fonctions $\phi$ :
+\label{eq:defcoordlag}
+\end{align}
+Ainsi, pour toute fonction test $\phi$ :
 \begin{align}
 \int \phi(t,x)f(t,x) dxdt &=\int \phi(t,X(t,x))f_0(x)dxdt \label{eq:coordlagrangienn}\\ 
-\int \phi(t,x)f(t,x)v(t,x) dxdt &= \int \frac{\partial X}{\partial t}(t,x)\phi(t,X(t,x))f_0(x)dxdt \nonumber
+\int \phi(t,x)f(t,x)v(t,x) dxdt &= \int \frac{\partial X}{\partial t}(t,x)\phi(t,X(t,x))f_0(x)dxdt 
 \end{align}
 la première égalité vient du changement de variable $x=X(t,x)$, or, $f(t,X(t,x))$ décrit la densité de la particule de fluide déplacée le long du champ de vitesse $v$ à l'instant t, c'est donc la densité initiale en $x$, $f_0(x)$. \\
 
-Remarquons que \eqref{eq:coordlagrangienn} et la condition $f(0,\cdot)=f_0,\ f(1,\cdot) = f_1$ impliquent que $T(x)=X(1,x)$ est un transport valide. Puis remarquons que : 
+Remarquons que \eqref{eq:coordlagrangienn} et la condition $f(0,\cdot)=f_0,\ f(1,\cdot) = f_1$ impliquent que $T(x)=X(1,x)$ est un transport valide. En effet, pour tout borélien $B$, $\int_{T(x)\in B}f_0(x) dx = \int_{X(1,x)\in B}f_0(x) dx$ Ce qui signifie, qu'au temps $1$, la particule $x$ est dans le borélien $B$, comme la densité au temps $1$ est donnée par $f_1$ on a bien : $\int_{X(1,x)\in B}f_0(x) dx = \int_B f_1(x)dx$.
+
+
+Puis remarquons, en prenant comme fonction test $\phi(t,x) = \|v(t,x)\|^2$ dans \eqref{eq:coordlagrangienn}, que: 
 $$
 \int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt = \int_{\RR^n}\int_0^1 f_0(x)\|v(t,X(t,x))\|^2dxdt
 $$
-En prenant comme fonction test $\phi(t,x) = \|v(t,x)\|^2$. Nous obtenons, 
+Nous obtenons, 
 \begin{align*}
-&= \int_{\RR^n}\int_0^1  f_0(x)\left\|\frac{\partial X}{\partial t} (t,x)\right\|^2dxdt \\
+&= \int_{\RR^n}\int_0^1  f_0(x)\left\|\frac{\partial X}{\partial t} (t,x)\right\|^2dxdt \quad \text{par } \eqref{eq:defcoordlag}\\
 &= \int_{\RR^n} f_0(x)\int_0^1 \left\|\frac{\partial X}{\partial t} (t,x)\right\|^2dtdx\\
+&\text{par l'inégalité de Jensen : }\\
 &\leq \int_{\RR^n} f_0(x)\left\|\int_0^1\frac{\partial X}{\partial t} (t,x) dt \right\|^2dx \\
 &\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-X(0,x) \right\|^2dx \\
-&\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-x \right\|^2dx \\
+&\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-x \right\|^2dx  \quad \text{par } \eqref{eq:defcoordlag}\\
 \end{align*}
 
-Or, $X(1,x) = M(x) =\nabla\Psi(x)$ par la propriété .. 
+Nous reconnaissons ici la forme qui apparaît dans la distance $L^2$ de Wasserstein, pour le transport $T(x) = X(1,x)$. Prenons $\nabla\Psi(x)$ le transport optimal, nous avons alors :  
 $$
 \leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx
 $$
-Nous avons ainsi montré que : 
+Finalement, nous avons montré que : 
 $$
 \int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt \leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx = d(f_0,f_1)^2
 $$
-Et avec le choix $x(t,x) = x+t(\nabla\Psi(x)-x)$ on obtient que pour toute fonction test $\phi$ nous avons, 
+Il reste un trouver un couple $(f,v)$ tel que nous ayons l'égalité et la preuve sera complète. Choisissons $X(t,x) = x+t(\nabla\Psi(x)-x)$, ce qui correspond à la paire (f,v) vérifiant pour toute fonction test $\phi$ : 
+\begin{align*}
+\int_{\RR^n} \int_0^1 \phi(t,x)f(t,x)dtdx &=\int_{\RR^n} \int_0^1 \phi(t, x+t(\nabla\Psi(x)-x)) f_0(x)dxdt \\
+\int_{\RR^n} \int_0^1 \phi (t,x)f(t,x)v(t,x) dtdx &= \int_{\RR^n} \int_0^1 \left(\nabla\Psi (x) - x\right) \phi(t, x+t(\nabla\Psi(x)-x)) f_0(x)  dtdx
+\end{align*}
+
+
+Et en reprenant le raisonnement de la première étape, nous obtenons
+\begin{align*}
+\int_{\RR^n} \int_0^1 f(t,x)\|v(t,x)\|^2dtdx &= \int_{\RR^n} \int_0^1 f_0(x)\|v(t,X(t,x)\|^2\\
+&= \int_{\RR^n} \int_0^1 f_0(x) \|\frac{\partial X(t,x)}{\partial t}(t,x)\|^2 dtdx \\
+&= \int_{\RR^n} f_0(x) \|\nabla \Psi(x) -x\|^2dx \\
+\end{align*}
+Ce qui achève la preuve. 
+\end{preuve}
+
+La première équation dans l'ensemble des contraintes correspond à une équation de continuité. Tandis que les conditions sur les bords temporels imposent l'attache au problème initial. 
+
+\subsection{Une autre utilité au transport optimal}
+Dans les années 1990, la théorie du transport optimal et devenu un outil de démonstration puissant et élégant pour démontere de nombreuses inégalités géométriques et fonctionnelles. \\
+L'exemple le plus simple est fourni par \emph{l'inégalité isopérimétrique}, solution du problème de Didon \cite{Didon}. 
+Ce problème, peut s'"noncer ainsi : de toutes les courbes fermées de longueur donnée, celle qui entoure l'aire al plus grande est le cercle. Ce problème ce généralise, en diemnsion $n$.
+\begin{theoreme}{Problème de Didon}
+Dans l'espace euclidien $\RR^n$ muni de la mesure de Lebesgue $\lambda_n$, pour tout compact $K$, 
 $$
-\int \phi(t,x)f(t,x)v(t,x)dtdx =\int (\nabla\Psi(x) -x)\phi(t,x+t(\nabla\Psi(x)-x)f_0(x)dxdt
+\frac{(\lambda_{n-1} B)^n}{(\lambda_n B) ^n} \leq \frac{(\lambda_{n-1} K)^n}{(\lambda_n K) ^n}
 $$
-ce qui achève la preuve. 
+Avec $B$, la boule unité. 
+\end{theoreme}
+
+
+En particulier en dimension $n=3$ 
+\begin{preuve}
+Considérons les fonctions de densité uniforme et d'untégrale 1, du'ne part sur le domaine de volume $V$ et d'autre part sur une boule unité, donc de volume $\frac{4\pi}{3}$. Cela induit l'éxistence d'un potentiel $\phi$ permettant le transport de la première vers la second, solution de l'équation de Monge - Ampère en tout point $x$ du volume $V$ : 
+$$
+\frac{1}{V}=det(I + H\phi (x))\frac{1}{B}
+$$
+
 \end{preuve}
 
 
+\subsection{Conclusion}
+Dans cette partie, nous avons introduit le problème de transport optimal. Démontrer l'existence et l'unicité du transport. 
+Le problèem se reformule alors. 
 
+Et nous avons montrer avec Benamou et Brenier que ce problème est équivalent au suivant : 
+
+qui a une interprétation en terme de mécanique des fluides très pratiques. \\
+
+Avant d'enatmmer la résolution numérique du problème de transport optimal, nous présentons les opérateurs proximaux qui joueront un rôle central dans notre modèle. 
 
 \newpage
 \section{Opérateurs proximaux}
