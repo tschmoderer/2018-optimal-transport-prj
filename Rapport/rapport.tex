@@ -2,8 +2,12 @@
 
 \input{modele_documents.tex}
 
+\usepackage[toc,page]{appendix}
+\renewcommand\appendixtocname{Annexes}
+\newcommand{\supp}{\text{supp }}
+
 \setlength{\parindent}{0pt}
-\newcommand\titre{OT}
+\newcommand\titre{Transport Optimal}
 \newcommand\auteur{Timothée \textsc{Schmoderer}}
 \newcommand\dateDoc{2017/2018}
 \newcommand\chapitre{Chapitre 2}
@@ -56,6 +60,7 @@ La formulation moderne a été introduite par \emph{Leonid Kantorovitch}, prix N
 Nous essaierons d'être le plus exhaustif possible dans la présentation des résultats, la plupart des énoncés seront démontrés. 
 
 
+Rendons à Santambrogio ce qui lui appartient, la première section vient en quasi-entièreté de son livre \cite{santambrogio2015optimal}, agrémenté de quelques précisions qui faciliteront la compréhension. 
 
 Le plan de rapport est le suivant, nous commencerons par présenté les notions liées au transport optimal, puis nous ferrons un court aparté sur les opérateurs proximaux. Enfin, Nous attaquerons la discrétisation et la mise en œuvre numérique. 
 {\Huge Plan : \\
@@ -73,17 +78,354 @@ Le plan de rapport est le suivant, nous commencerons par présenté les notions 
 }
 \newpage
 
-\section{Notions générales}
+\section{Problème de Transport Optimal}
 Introduisons des notions essentielles qui nous amèneront à définir le problème de transport optimal et sa formulation en terme de géodésiques. 
-\subsection{Problème de transport optimal}
+\subsection{Problème de Transport}
+La théorie du transport prend sa source dans la théorie de la mesure, en particulier de des mesures de probabilité. 
 \begin{definition}{Transport}
-Soient deux mesures de probabilité $\nu$ et $\mu$ sur $\RR^n$ munie de la tribu borélienne $\mathcal{B}(\RR^n)$. Un transport est une application $T\ :\ \RR^n\rightarrow\RR^n$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
+Soient deux mesures de probabilité $\mu$ sur $\mathcal{X}$ et $\nu$ sur $\mathcal{Y}$ munis de leur tribu borélienne $\mathcal{B}$. Un transport est une application $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
 \begin{align}
-\forall B\in\mathcal{B}(\RR^n),\quad \mu(T^{-1}(B))=\nu(B)
+\forall B\in\mathcal{B},\quad \mu(T^{-1}(B))=\nu(B)
 \label{eq:trspmesures}
 \end{align}
 C'est une relation de conservation de masse. Nous notons $T_{\#}\mu=\nu$. 
 \end{definition}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\linewidth]{img/transport.jpg}
+\caption{Illustration de l'application de transport}
+\end{figure}
+Bien sur, l'application de transport n'est pas unique, il nous faut une manière de sélectionner un transport qui serait "meilleur" que les autres. 
+\begin{definition}{Coût}
+Le coût est une application 
+$$
+\fonction{C}{\mathcal{X}\times\mathcal{Y}}{[0,+\infty]}{(x,y)}{C(x,y)}
+$$
+\end{definition}
+Cette application va représenter le coût d'affecter $x$ en $y$. Cela nous amène au problème de transport optimal : \\
+
+\fbox{
+  \parbox{\textwidth}{
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver le transport $T$ réalisant le 
+	\begin{equation}
+	\tag{MP}
+	\inf\left\{M(T) := \int_{\mathcal{X}} C(x,T(x))\ d\mu (x), \quad T_{\#}\mu = \nu\right\}
+	\label{eq:MP}
+	\end{equation}
+  }
+}
+\vspace{0.3cm}
+
+L'existence du transport optimal n'est absolument pas trivial, suivons la présentation du livre de Santambrogio  \cite{santambrogio2015optimal} pour démontrer l'existence d'un transport optimal.
+
+\subsection{Plan de Transport Optimal}
+Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. Oublions cd problème pour un temps, et regardons une forme généralisée donnée par Kantorovitch. \\
+
+\fbox{
+  \parbox{\textwidth}{
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver la mesure $\gamma$ réalisant le 
+	\begin{equation}
+	\tag{KP}
+	\inf\left\{ K(\gamma ) := \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\gamma (x,y), \quad \gamma \in\Pi(\mu,\nu )\right\}
+	\label{eq:KP}
+	\end{equation}
+	Où, $\Pi(\mu,\nu)$ est l'ensemble des plans de transports : 
+	\begin{empheq}[left={ \Pi(\mu,\nu) = \empheqlbrace}]{align}
+	  &  \gamma \text{ une probabilité sur }\mathcal{X}\times\mathcal{Y}\nonumber \\
+      &  \forall A\in\mathcal{B}(\mathcal{X}),\quad \gamma (A\times\mathcal{Y}) = \mu(A) \label{eq:contrKP}\\
+      &  \forall B\in\mathcal{B}(\mathcal{Y}),\quad \gamma (\mathcal{X}\times B) = \nu(B)  \nonumber,
+	\end{empheq}
+  }
+}
+\vspace{0.3cm}
+
+La valeur de $\gamma (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus général qu'un transport classique. A partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers de l'application $T$. Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\gamma$ et que cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.5\linewidth]{img/transport_plan.jpg}
+\caption{Illustration de la notion de plan de transport}
+\end{figure}
+
+Les minimiseurs de ce problèmes sont appelés plans de transport optimal entre $\mu$ et $\nu$. Ce problème est bien une généralisation du problème \eqref{eq:MP}, puisque si $\gamma = (Id,T)$ pour une certaine fonction mesurable $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$. Alors l'application $T$ serait un transport optimal entre $\mu$ et $\nu$. \\
+
+Nous allons montrer l'existence de solutions pour ce problème relaxé \eqref{eq:KP} à l'aide du calcul des variations.Les outils principaux de la méthode du calcul des variations sont rappelés à l'annexe \ref{sec:variations}. 
+\begin{theoreme}{}
+Soit $\mathcal{X}$ et $\mathcal{Y}$ des espaces métriques compacts. Supposons que le coût $C\ :\ \mathcal{X}\times\mathcal{Y}\rightarrow [0,+\infty]$ soit continue. Alors le problème \eqref{eq:KP} admet une solution.
+\end{theoreme}
+\begin{preuve}
+Il s'agit de montrer que l'ensemble $\Pi (\mu,\nu)$ est compact et que l'application $\gamma\rightarrow K(\gamma )$ est continue, puis d'appliquer le théorème de Weierstrass \eqref{thm:weierstrass}. \\
+Nous choisissons la notion de convergence donnée par la convergence faible des mesures de probabilités (voir \eqref{thm:prokhorov} par dualité avec $C_b(\mathcal{X}\times\mathcal{Y})$ ce qui ici est a même chose que $C(\mathcal{X}\times\mathcal{Y})$ ou $C_0(\mathcal{X}\times\mathcal{Y})$ car $\mathcal{X}$ et $\mathcal{Y}$ sont compacts). Cela nous donne la continuité de $K$ puisque $C\in C(\mathcal{X}\times\mathcal{Y})$. \\
+
+Soit une suite $\gamma_n\in\Pi (\mu,\nu )$. Ce sont des mesures de probabilités, donc de masse $1$ et sont donc bornée dans le dual de $C(\mathcal{X}\times\mathcal{Y})$. Ainsi, la compacité faible-* dans les espaces duaux, garanti l'existence d'une sus suite $\gamma_{n_k} \rightharpoonup \gamma$ convergeant vers une probabilité $\gamma$. 
+Vérifions que $\gamma \in \Pi (\mu,\nu )$. \\
+Fixons $\phi\in C(\mathcal{X})$, comme $\int\phi d\gamma_{n_k} =\int \phi d\mu $,par passage à la limite, on a : $\int\phi d\gamma =\int\phi d\mu$. De même on montre que la seconde contrainte de marginale \eqref{eq:contrKP} est vérifiée. \\
+Ainsi, l'espace $\Pi(\mu,\nu)$ est compact et le théorème de Weierstrass s'applique.
+\end{preuve}
+
+Allons vers plus de généralités. 
+
+\begin{proposition}
+Supposons que le coût soit seulement semi continue inférieurement et bornée en dessous. Alors le problème \eqref{eq:KP} admet une solution. 
+\end{proposition}
+\begin{preuve}
+La seule différence avec le cas précédent est que $K$ n'est plus continue mais semi continue inférieurement pour la convergence faible des mesures de probabilités. Cela vient du lemme suivant appliqué à $f = C$ et $\Omega = \mathcal{X}\times\mathcal{Y}$.
+\begin{lemme}
+Si $f\ :\ \Omega\rightarrow \RR\cup\{\infty\}$ est une fonction semi-continue inférieurement bornée par dessous sur une espace métrique $\Omega$. Alors la fonctionnel $J \ :\ \mathcal{M}_+(\Omega )\rightarrow \RR\cup\{\infty\}$ définie sur les mesures positives par $J(\lambda) =\int f d\lambda$ est semi continue inférieurement pour la convergence faible des mesures. 
+\end{lemme}
+\begin{preuve}
+Soit une suite $(f_k)$ de fonctions continues, bornées convergeant vers $f$ par valeurs croissantes. 
+Soit $J_k(\lambda ) =\int f_k d\lambda$, $J_k\rightarrow J$ par convergence monotone. Nous pouvons alors écrire $J(\lambda )=\sup_k J_k(\lambda )$.
+Alors $J$ est semi-continue inférieurement comme le $\sup$ de fonctionnelles continues.
+\end{preuve}
+Et donc, le théorème de Weierstrass \eqref{thm:weierstrass} s'applique.
+\end{preuve}
+
+\begin{proposition}
+Supposons que $\mathcal{X}$ et $\mathcal{Y}$ sont des espaces métriques complets et séparables (i.e. polonais). Supposons toujours que le coût $C$ est semi-continue inférieurement et bornée par dessous. Alors le problème \eqref{eq:KP} admet une solution. 
+\end{proposition}
+\begin{preuve}
+Cette fois, c'est la compacité de $\Pi(\mu,\nu)$ qui est moins évidente. Nous allons utiliser le théorème de Prokhorov \eqref{thm:prokhorov}. Ce qui revient à montrer que toute suite de $\Pi (\mu,\nu)$ est tendue. \\
+Soient $\epsilon >0$ et deux compact $K_{\mathcal{X}}\subset\mathcal{X}$ et $K_{\mathcal{Y}}\subset \mathcal{Y}$ tels que $\mu (\mathcal{X}\backslash K_{\mathcal{X}})$, $\nu (\mathcal{Y} \backslash K_{\mathcal{Y}}) < \frac{1}{2}\epsilon$. Cela est possible par la réciproque du théorème de Prokhorov, car une mesure seule est toujours tendue. 
+Alors l'ensemble $K_{\mathcal{X}}\times K_{\mathcal{Y}}$ est compact dans $\mathcal{X}\times\mathcal{Y}$, et pour toute suite $\gamma_n\in\Pi (\mu,\nu )$, nous avons 
+\begin{align*}
+\gamma_n\left((\mathcal{X}\times\mathcal{Y})\backslash (K_{\mathcal{X}}\times K_{\mathcal{Y}}) \right) &\leq \gamma_n((\mathcal{X}\backslash K_{\mathcal{X}})\times \mathcal{Y}) + \gamma_n(\mathcal{X}\times (\mathcal{Y}\backslash K_{\mathcal{Y}}))\\
+&\leq \mu (\mathcal{X} \backslash K_{\mathcal{X}}) + \nu (\mathcal{Y}\backslash K_{\mathcal{Y}}) < \epsilon
+\end{align*}
+Ce qui montre la tension et donc la compacité de toute suite de $\Pi (\mu,\nu )$. 
+\end{preuve}
+
+\subsection{Problème dual de plan de Transport Optimal}
+Maintenant que nous avons démontré l'existence de solution au problème de Kantorovitch, nous souhaiterions savoir sous quelles conditions nous pouvons remonter au problème de Monge. Comme le problème \eqref{eq:KP} est une problème d'optimisation linéaire sous contraintes d'égalité, il est donc naturel d'étudier le problème dual. \\
+
+Toujours suivant la résentation du livre de Santambrogio \cite{santambrogio2015optimal}, cherchons en premier lieu le problème dual formellement. \\
+La contrainte $\gamma\in\Pi(\mu,\nu)$ peut s'exprimer sous la forme : 
+\begin{align}
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})}& \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\gamma(x,y)\label{eq:sup1}\\
+&= \left\{\begin{array}{cl}
+0 & \text{si } \gamma \in\Pi(\mu,\nu)\\
++\infty & \text{sinon}
+\end{array}\right.\nonumber
+\end{align}
+Ainsi nous pouvons supprimer la contrainte dans le problème \eqref{eq:KP} en ajoutant l'expression \eqref{eq:sup1}, puisque si la contrainte est satisfaite, rien n'est ajoutée, si elle ne l'est pas nous obtenons $+\infty$ ce qui sera évité par la minimisation. 
+$$
+\inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\gamma + \sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\gamma(x,y)
+$$
+Il n'est pas toujours possible d'échanger le $\sup$ et l'$\inf$, mais supposons pour le moment que cela soit possible : 
+\begin{align}
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) + \inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}}(C(x,y) - \phi(x)+\psi(y))\ d\gamma(x,y)
+\label{eq:infsupexchange}
+\end{align}
+
+Avec ce problème de maximisation sur les variables $(\phi,\psi)$, l'infimum en $\gamma$ peut être réécrit comme une contraintes sur $(\phi,\psi)$ : 
+\begin{align}
+\inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}}(C - \phi\oplus\psi) \ d\gamma = 
+\left\{
+\begin{array}{cl}
+0 & \text{si } \phi\oplus\psi\leq C \text{ sur } \mathcal{X}\times\mathcal{Y}\\
+-\infty &\text{ sinon}
+\end{array}
+\right.
+\end{align}
+Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi(x)+\psi(y)$. L'égalité précédente est justifiée car, si $\phi\oplus\psi>c$ quelque part alors en utilisant des mesures $\gamma$ concentrée en cet endroit et de masse croissante, l'intégrale tend vers $-\infty$. Ce qui nous amène au problème suivant : \\
+
+\fbox{
+  \parbox{\textwidth}{
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions continues, bornée $\phi$ et $\psi$ réalisant le 
+	\begin{equation}
+	\tag{DKP}
+	\sup\left\{\int_{\mathcal{X}} \phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\mu, \quad  (\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y}) \ \phi\oplus\psi \leq C \right\}
+	\label{eq:DKP}
+	\end{equation}
+  }
+}
+\vspace{0.3cm}
+
+Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq c$ par rapport à $\gamma$ : 
+$$
+\int_{\mathcal{X}} \phi d\mu (x) + \int_{\mathcal{Y}}\psi d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\gamma \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\gamma
+$$
+
+Malheureusement le problème \eqref{eq:DKP} n'admet pas trivialement l'existence de ses maximums, car l'espace des fonctions continues bornées n'est pas compact. Montrons dans un premier temps l'existence de ces maximiseurs, puis montrons que le problème \eqref{eq:DKP} est bien le dual de \eqref{eq:DKP} au sens ou $\max\eqref{eq:DKP} =\min\eqref{eq:KP}$.
+\newpage
+
+\begin{definition}{C et $\bar{C}$-transformée, C et $\bar{C}$-concavité}
+Soit une fonction $\chi\ :\ \mathcal{X}\rightarrow [-\infty,+\infty]$. La C-transformée (ou parfois, C - conjuguée) de $\chi$ est définie par $\chi^C\ : \ \mathcal{Y}\rightarrow[-\infty,+\infty]$ : 
+$$
+\chi^C(y)=\inf_{x\in\mathcal{X}} C(x,y) -\chi(x)
+$$
+De même, la $\bar{C}$-transformée est définie pour une fonction $\tau\ :\ \mathcal{Y}\rightarrow [-\infty,+\infty]$ par 
+$$
+\tau^{\bar{C}} = \inf_{y\in\mathcal{Y}} C(x,y) -\tau(y)
+$$
+De plus, nous dirons qu'une fonction $\psi$ définie sur $\mathcal{Y}$ est $\bar{C}$-concave si il existe $\chi\ :\ \mathcal{X}\rightarrow [-\infty,+\infty]$ telle que $\psi = \chi^C$. Respectivement, une fonction $\phi$ définie sur $\mathcal{X}$ est dite $C$-concave si il existe $\tau\ :\ \mathcal{Y}\rightarrow [-\infty,+\infty]$ telle que $\phi=\tau^{\bar{C}}$. \\
+Nous noterons $C$-conc($\mathcal{X}$) et $\bar{C}$-conc($\mathcal{Y}$) les ensembles des fonctions $C$ et $\bar{C}$-concaves. 
+\end{definition}
+Remarquons que lorsque $\mathcal{X}=\mathcal{Y}$ et que $C$ est symétrique, il n'y a aucune distinction entre la transformation $C$ et $\bar{C}$, cette notation lourde sera alors abandonnée. \\
+
+Dans notre cas, $C$ est continue sur un ensemble compact, et est donc uniformément continue. C'est à dire qu'il existe une fonction continue croissante $\omega\ :\ \RR^+\rightarrow\RR^+$ et $\omega(0)=0$ (module de continuité) telle que 
+$$
+\left|C(x,y) - C(x',y')\right| \leq \omega(d(x,x') + d(y,y'))
+$$
+En reprenant la définition de $\chi^C(y) = \inf_x g_x(y)$ avec $g_x(y) = C(x,y)-\chi(x)$ qui vérifie $|g_x(y)-g_x(y')|\leq\omega(d(y,y'))$. Ce qui montre que $\chi^C$ et $C$ partagent le même module de continuité. \\
+
+Ensuite remarquons qu'étant une paire $(\phi,\psi)$ du problème \eqref{eq:DKP}, elle peut toujours être remplacée par la paire $(\phi,\phi^C)$ puis par $(\phi^{C\bar{C}},\phi^C)$, car les contraintes sont préservées et les intégrales augmentées. 
+Nous pourrions espérer itérons ce processus, mais pour toute fonction $\phi$, nous avons $\phi^{C\bar{C}C} = \phi$. Cependant les considérations précédentes nous amènes le théorèmes d'existence suivant. 
+\begin{theoreme}{}
+Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient compact et que $C$ est continue. Alors il existe une solution $(\phi,\psi)$ au problème \eqref{eq:DKP}, de la forme $\phi\in C$-conc($\mathcal{X}$), $\psi\in \bar{C}$-conc($\mathcal{Y}$) et $\psi=\phi^C$. En particulier, 
+\begin{align}
+\max\eqref{eq:DKP} = \max_{\phi\in C\text{-conc}(\mathcal{X})}\int_{\mathcal{X}}\phi\ d\mu +\int_{\mathcal{Y}} \phi^C\ d\nu
+\label{eq:existenceDKP}
+\end{align}
+\end{theoreme}
+\begin{preuve}
+Prenons une suite maximisante $(\phi_n,\psi_n)$ et améliorons là par la $C$ et la $\bar{C}$-transformée. Par les considérations précédentes, nous pouvons supposer une borne uniforme sur la continuité de ces fonctions (le même module de continuité que $C$). Gardons la notation $(\phi,\psi)$  pour désigner cette suite améliorée. \\
+Vérifions qu'elle est équibornée pour appliquer le théorème d'Ascoli Arzélà \eqref{thm:ascoli}. Remarquons qu'ajouter une constante à $\phi$ et la retirer à $\psi$ ne change pas la valeur de la fonctionnelle et n'affecte pas les contraintes. Ainsi, comme $\phi_n$ est continue sur un ensemble compact, elle est donc bornée, quitte à ajouter le minimum, nous pouvons supposer que $\min \phi_n=0$, nous avons aussi que $\max \phi_n \leq \omega (d(\mathcal{X}))$, car les oscillations d'une fonctions sont toujours plus faible que son module de continuité appliqué à la plus grande distance possible dans l'ensemble.
+Comme nous avons choisis $\psi_n=\phi_n^C$, nous avons également, $\psi_n(y)=\inf_xC(x,y)-\phi_n(x)\in[\min C- \omega (d(\mathcal{X})),\max C]$. Ce qui nous donne des bornes uniformes sur $(\phi_n,\psi_n)$ et nous permet d'appliquer le théorème d'Ascoli - Arzelà.\\
+A une sous suite près, $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\phi$ avec convergence uniforme, de ce fait : 
+\begin{align}
+\int_{\mathcal{X}}\phi_n\ d\mu + \int_{\mathcal{Y}}\psi_n\ d\nu \rightarrow \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu
+\end{align}
+De plus, 
+$$
+\phi_n(x)+\psi_n(y)\leq C(x,y) \Rightarrow \phi(x)+\psi(y)\leq C(x,y)
+$$
+Ici la convergence simple aurait suffit. Cela montre que $(\phi,\psi)$ est une paire admissible pour \eqref{eq:DKP} et optimale.
+\end{preuve}
+Montrons à présent que \eqref{eq:DKP} est bien le problème dual associé à \eqref{eq:KP}. 
+\begin{theoreme}{}
+Les problèmes \eqref{eq:KP} et \eqref{eq:DKP} sont bien duaux l'un de l'autre :
+\begin{align}
+\min\eqref{eq:KP} = \max\eqref{eq:DKP}
+\end{align}
+\end{theoreme}
+\begin{preuve}
+Par simplicité, prenons le cas $\mathcal{X}$ et $\mathcal{Y}$ compacts, et $C$ continue.\\
+Pour tout $p\in C(\mathcal{X}\times\mathcal{Y})$, posons 
+$$
+H(p) = -\max\left\{\int_{\mathcal{X}} \phi\ d\mu +\int_{\mathcal{Y}} \psi\ d\nu, \quad \phi\oplus\phi\leq C-p\right\}
+$$
+C'est l'opposée de la valeur de \eqref{eq:DKP} pour le coût $C-p$. Par la proposition, nous avons que, $H(p)$ est bien atteint et le module de continuité de la paire optimale $(\phi,\psi)$ est le même que celui de $C-p$. 
+\begin{lemme}
+La fonction $H\ :\ C(\mathcal{X}\times\mathcal{Y})\rightarrow\RR$ est convexe et semi continue inférieurement pour la convergence uniforme.
+\end{lemme}
+\begin{preuve}
+Pour la convexité, prenons $p_0$ et $p_1$ associé avec leur paire optimale $(\phi_0,\psi_0)$ et $(\phi_1,\psi_1)$. Pour $t\in [0,1]$ posons, $p_t=(1-t)p_t+tp_1$, $\phi_t=(1-t)\phi_0 + t\phi_1$ et $\psi_t=(1-t)\psi_0+t\psi_1$. La paire $(\phi_t,\psi_t)$ est admissible dans le maximum définissant $H(p_t)$. Ainsi, 
+$$
+H(p_t)\leq-\left(\int_{\mathcal{X}}\phi_t\ d\mu+\int_{\mathcal{Y}}\psi_t d\nu\right) = (1-t)H(p_0)+tH(p_1)
+$$
+Ce qui montre la convexité. Pour la semi continuité, prenons $p_n\rightarrow p$. A une sous suite près, $p_n$ réalise la $\liminf$ de $H(p_n)$. De la convergence uniforme, la suite $p_n$ est équicontinue et bornée (réciproque de théorème d'Ascoli - Arzelà \eqref{thm:ascoli}). Ainsi, les paires optimales correspondante s$(_phi_n,\psi_n)$ sont aussi équicontinues et bornées. A une sous suite près, supposons que $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\psi$ uniformément. Comme $\phi_n\oplus\psi_n\leq C-p$, nous avons $\phi\oplus\psi\leq C-p$, ainsi :
+$$
+H(p) \leq - \left(\int_{\mathcal{X}}\phi\ d\mu+\int_{\mathcal{Y}}\psi\ d\nu\right) = \lim_n H(p_n)=\liminf_n H(p_n)
+$$
+ce qui montre la semi continuité inférieure.
+\end{preuve}
+Calculons à présent la transformée de Legendre\footnote{La définition et certaines propriété de la transformée de Legendre sont exposés à la section \ref{sec:prox}.} de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\gamma\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
+$$
+H^{\star}(\gamma)= \sup_p \int_{\mathcal{X}\times\mathcal{Y}} p\ d\gamma + \sup \left\{ \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad \phi\oplus\psi\leq C- p \right\}
+$$
+Ce qui se réécrit sous la forme d'un $\sup$ unique sur $p,\ \phi,\ \psi$. Remarquons que, si $\gamma\notin\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, alors il existe $p_0\leq 0$ tel que $\int p_0\ d\gamma >0$, en prenant $\phi\equiv 0$, $\psi\equiv 0$ et $p=C+np_0$ en faisant tendre $n$ vers $+\infty$ nous obtenons $H^{\star}(\gamma)=+\infty$. D'autre part, si $\gamma\in\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, en prenant le $p$ le plus grand possible i.e. $p=C-\phi-\psi$, nous obtenons 
+$$
+H^{\star}(\gamma)=  \sup_{(\phi,\psi)} \int_{\mathcal{X}\times\mathcal{Y}} p\ d\gamma + \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu - \int_{\mathcal{X}\times\mathcal{Y}} \phi\ d\gamma -\int_{\mathcal{X}\times\mathcal{Y}} \psi\ d\gamma
+$$
+C'est exactement l'expression obtenue au \eqref{eq:sup1} pour réécrire les contraintes de \eqref{eq:KP}. 
+$$
+H^{\star}(\gamma)=\left\{
+\begin{array}{cl}
+K(\gamma) & \text{si } \gamma \in\Pi(\mu,\nu)\\
++\infty & \text{sinon}
+\end{array}
+\right.
+$$
+
+La preuve est presque terminée, $\max\eqref{eq:DKP} = -H(0) = H^{\star\star}(0)$ car $H$ est convexe et semi continue inférieurement\footnote{Ce fait est montré dans la section \ref{sec:prox}}. De plus, $H^{\star\star}(0)=\sup_{\gamma}\langle 
+,\gamma\rangle-H^{\star}(\gamma)=-\inf H^{\star}=-\min\eqref{eq:KP}$.
+\end{preuve}
+
+Ainsi, nous voyons que 
+$$
+\min\eqref{eq:KP}= \max_{\phi\in C\text{-conc}(\mathcal{X})}\int_{\mathcal{X}}\phi\ d\mu +\int_{\mathcal{Y}} \phi^C\ d\nu
+$$
+Ce qui montre que la valeur du minimum de \eqref{eq:KP} est une fonction convexe de $\mu$ et $\nu$, comme supremum de fonctionnelle linéaire. 
+\begin{definition}{Potentiel de Kantorovitch}
+Les fonctions $\phi$ réalisant le maximum de \eqref{eq:existenceDKP}sont appelés potentiels de Kantorovitch pour le transport de $\mu$ sur $\nu$.
+\end{definition}
+
+\subsection{Existence du transport optimal}
+
+A partir des résultats précédents sur le problèmes \eqref{eq:KP} et son dual \eqref{eq:DKP}, nous allons montrer l'existence du transport optimal dans le cas où, $\mathcal{X}=\mathcal{Y}=\Omega\subset\RR^n$ compact et $C(x,y)=h(x-y)$ pour une certaine fonction strictement convexe $h$. 
+
+Rappelons que pour une mesure $\gamma$, son support est le plus petit ensemble fermé sur lequel $\gamma$ est concentré : 
+$$
+\supp \gamma = \bigcap \left\{A\ |\ A \text{ fermé },\ \gamma(\mathcal{X}\backslash A) = 0 \right\}
+$$
+une autre caractérisation du support de $\gamma$ est donnée par 
+$$
+\supp\gamma = \left\{x\in\mathcal{X}\ |\ \gamma(B(x,r)) >0\ \forall r>0\right\}
+$$
+
+De l'égalité entre le minimum de \eqref{eq:KP} et le maximum de \eqref{eq:DKP} et le fait que le deux soient atteints, considérons un plan de transport optimal $\gamma$ et un potentiel de Kantorovitch $\phi$, 
+\begin{align}
+\phi(x)+\phi^C(y) &\leq C(x,y) \text{ sur } \Omega\times\Omega \\
+\phi(x)+\phi^C(y) &= C(x,y) \text{ sur }\supp\gamma
+\end{align}
+L'égalité vient de l'inégalité (qui est vraie partout) et de 
+\begin{align}
+\int_{\Omega\times\Omega} C\ d\gamma = \int_{\Omega}\phi\ d\mu +  \int_{\Omega} \phi^C\ d\nu = \int_{\Omega\times\Omega} \phi\oplus\phi^c\ d\gamma
+\end{align}
+ce qui implique l'égalité $\gamma$ presque partout. 
+
+\begin{proposition}
+Si $C\in C^1(\Omega\times\Omega,[0,+\infty]$, $\phi$ un potentiel de Kantorovitch pour le coût $C$ pour le transport de $\mu$ vers $\nu$. Soit $(x_0,y_0)\in\supp\gamma$. Alors, si $\phi$ est différentiable en $x_0$, on a $\nabla\phi(x_0)= \frac{\partial}{\partial x}C(x_0,y_0)$.\\
+En particulier les gradients de deux potentiels de Kantorovitch coïncident en tout point $x0\in\supp\gamma$ où ils sont tout les deux différentiables.
+\end{proposition}
+\begin{preuve}
+Soit $(x_0,y_0)\in\supp\gamma$ telle que $\phi$ soit différentiable en $x_0$, des calculs précédents, nous déduisons que l'application $x\mapsto\phi(x)-c(x,y_0)$ atteint sont minimum en $x=x_0$. 
+Comme $\phi$ et $C(\cdot,y_0)$ sont différentiables, nous obtenons directement le résultat souhaité. 
+\end{preuve}
+
+
+\begin{theoreme}{Existence du transport optimal}
+Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\gamma$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. 
+De plus, $\gamma$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
+\begin{align}
+T(x) = x- (\partial h)^{-1}(\nabla\phi(x))
+\end{align}
+\end{theoreme}
+
+\begin{preuve}
+Le théorème précédent nous donne l'existence d'un plan de transport optimal $\gamma$ et d'un potentiel de Kantorovitch $\phi$.\\
+
+$\phi$ partage le même module de continuité que $C$, c'est une fonction lipschitzienne sur $\Omega\times\Omega$ puisque $h$ est localement lipschitzienne et bornée sur $\Omega$. Ainsi, $\phi$ est aussi lipschitzienne.\\
+
+Pour $C(x,y) = h(x-y)$,si $h$ est différentiable, nous obtenons par la proposition précédente que $\nabla\phi (x_0)=\nabla h(x_0-y_0)$, si ce n'est pas le cas, nous avons $\nabla\phi(x_0)\in\partial h(x_0-y0)$ le sous différentiel de $h$\footnote{Nous renvoyons à la section \ref{sec:prox} pour plus de détails et de résultats sur les sous-différentiels}. Comme $h$h est strictement convexe, $(\partial h)^{-1}$ existe, et nous avons 
+$$
+x_0-y_0=(\partial h)^{-1}(\nabla\phi(x_0))
+$$
+Comme $\mu$ est absolument continue, $\partial\Omega$ et l'ensemble des points ou $\phi$ n'est pas différentiable sont négligeables (par le théorème de Rademacher). \\
+
+Cela montre que le plan de transport optimal est induit par un transport, que ce transport est donnée par $x\mapsto x -(\partial h)^{-1}(\nabla\phi(x_0))$. Ainsi il est uniquement déterminé, car $\phi$ ne dépend pas de $\gamma$. En conséquence, $\gamma$ est également unique. 
+\end{preuve}
+Ainsi, tout les coûts de la forme $C(x,y) =\|x-y\|^p$ avec $p>1$ sont traités. 
+
+
+\subsection{Le cas quadratique sur $\RR^n$}
+
+
+
+
+
+
+
+
+
+
+ 
+
+\newpage
+
+
+
 Introduisons petit à petit des hypothèses simplificatrices mais pas aberrantes. Supposons que les mesures aient une densité : $\mu = f_0 dx$ et $\nu = f_1 dx$. La relation \eqref{eq:trspmesures} devient alors : 
 \begin{align*}
 \forall B \in\mathcal{B}(\RR^n),\quad \int_B f_1(y)dy&=\int_{T^{-1}(B)} f_0(x) dx \\
@@ -98,13 +440,7 @@ f_1(T(x)) = \frac{f_0(x)}{|det\ \nabla T(x)|}
 
 Notons $\mathcal{T}(f_0,f_1)$ l'ensemble des applications qui vérifient \eqref{eq:jacobienne}.
 
-\begin{definition}{Coût}
-Le coût est une application 
-$$
-\fonction{C}{\RR^n\times\RR^n}{\RR^+}{(x,y)}{C(x,y)}
-$$
-qui représente intuitivement le coût d'affecter $x$ en $y$.
-\end{definition}
+
 
 Nous pouvons alors donner la définition qui donne le titre à ce projet. 
 \begin{definition}{Problème de transport optimal}
@@ -271,6 +607,7 @@ Avant d'enatmmer la résolution numérique du problème de transport optimal, no
 
 \newpage
 \section{Opérateurs proximaux}
+\label{sec:prox}
 L'opérateur proximal d'une fonction convexe généralise la notion de projection sur un ensemble convexe. Cette notion fût introduite pour répondre aux problèmes de minimisation de fonctions non nécessairement différentiables. 
 
 Suivant la présentation de \emph{P.L. Combettes \emph{et} JC. Pesquet} \cite{combettes} nous présentons une série de résultats sur les opérateurs proximaux, en complétant quelques preuves.
@@ -774,7 +1111,91 @@ $$
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
-\appendix
+\newpage
+\begin{appendices}
+\section{Calcul des variations}
+\label{sec:variations}
+Rapellons ici la méthode directe du calcul des variations qui nous servira pour notre démonstration.
+ 
+\begin{definition}{Fonction continue inférieurement}
+Dans un espace métrique $\mathcal{X}$, une fonction $f\ :\ \mathcal{X}\rightarrow \RR \cup \{+\infty\}$ est dite semi-continue inférieurement si pour toute suite $x_n\rightarrow x$
+$$
+f(x) \leq \liminf_n f(x_n)
+$$
+\end{definition}
+\begin{definition}{Espace compact}
+Un espace métrique $\mathcal{X}$ est dit compact si de toute suite $(x_n)$ il existe une sous suite convergente $x_{n_k} \rightarrow x\in\mathcal{X}$. 
+\end{definition}
+
+\begin{theoreme}{Weierstrass}
+\label{thm:weierstrass}
+Si $f\ :\ \mathcal{X}\rightarrow \RR \cup \{+\infty\}$ est semi-continue inférieurement, et $\mathcal{X}$ est un espace compact. Alors, il existe $\bar{x}\in\mathcal{X}$ tel que $f(\bar{x}) = \left\{f(x)\ |\ x\in\mathcal{X}\right\}$
+\end{theoreme}
+\begin{preuve}
+Soit $l := \inf\left\{f(x)\ |\ x\in\mathcal{X}\right\}\in\RR\cup\{-\infty\}$. ($l=+\infty$ si et seulement si $f$ est identiquement égale à $+\infty$ auquel cas, tout point de $\mathcal{X}$ minimise $f$. Par définition de l'infimum, il existe une suite $(x_n)\in\mathcal{X}$ telle que telle que $f(x_n) \rightarrow l$. Quitte à extraire une sous suite, on peut supposer que $x_n\rightarrow \bar{x}$.
+Par semi-continuité inférieure, nous avons $f(\bar{x}) \leq\liminf_n f(x_n)= l$. D'autre part, $f(\bar{x}) \geq l$ puique $l$ est l'infimum. \\
+Ainsi, $l=f(\bar{x})\in\RR$.
+\end{preuve}
+\begin{definition}{Convergence faible et faible-*}
+Une suite $x_n$ d'un espace de Banach $\mathcal{X}$ converge faiblement vers $x$, que nous notons $x_n \rightharpoonup x$, si pour tout $\xi\in\mathcal{X}'$ (où, $\mathcal{X}'$ est le dual topologique de $\mathcal{X}$ et $\langle \cdot,\cdot \rangle$ désigne le produit de dualité entre ces deux espaces), nous avons $\langle x_n,\xi\rangle \rightarrow \langle x,\xi\rangle$. \\
+
+Une suite $\xi_n\in\mathcal{X}'$ converge faiblement-* vers $\xi$, que nous notons $\xi_n \overset{\ast}{\rightharpoonup}\xi$, si pour tout $x\in \mathcal{X}$ nous avons $\langle
+x,\xi_n\rangle\rightarrow\langle x,\xi\rangle$.
+
+\end{definition}
+
+\begin{theoreme}{Banach - Alaoglu}
+Si $\mathcal{X}$ est séparable et $\xi_n$ est une suite bornée de $\mathcal{X}'$. Alors il existe une sous suite $\xi_{n_k}$qui converge faiblement-* vers un $\xi\in\mathcal{X}'$.  
+\end{theoreme}
+
+\begin{definition}{Mesures de Radon}
+Une mesure $\lambda$ sur la tribu borélienne d'un espace $\Omega$ séparable est dite mesure de Radon si 
+\begin{enumerate}
+\item $\lambda$ est intérieurement régulière : $\forall B\in\mathcal{B}(\Omega), \lambda (B) = \sup_{K\subset B, K \text{ compact}} \lambda (K)$,
+\item $\lambda$ est localement finie : pour tout point $x$ il existe un voisinage $B$ tel que $\lambda (B) < +\infty$. 
+\end{enumerate}
+Notons $\mathcal{M}(\Omega)$ l'ensemble des mesures de Radon sur $\Omega$. Pour ces mesures, il est possible d'associée une mesure positive $|\lambda |\in \mathcal{M}_+(\Omega)$ : 
+$$
+|\lambda |(B) = \sup \left\{ \sum_i |\lambda (B_i)| \quad B = \bigcup_i B_i \ B_i\cap B_j = \emptyset \ i\neq j \right\}
+$$
+\end{definition}
+
+\begin{theoreme}{Riesz pour les mesures de Radon}
+Soient $\Omega$ une espace séparable et localement compact, $\mathcal{X} = C_0(\Omega)$ l'espace des fonctions continues qui s'annulent à l'infini, muni de la norme $\sup$. \\
+Alors, tout élément de $\mathcal{X}'$ est représenté de façon unique par un élément de $\mathcal{M}(\Omega)$. C'est à dire, $\forall \xi\in\mathcal{X}'$il existe un unique $\lambda\in\mathcal{M}(\Omega)$ tel que $\langle \phi,\xi \rangle =\int \phi d\lambda\quad\forall\phi\in\mathcal{X}$. \\
+De plus $\mathcal{X}'$ est isomorphe $\mathcal{M}(\Omega)$ muni de la norme $\|\lambda\|=|\lambda|(\Omega)$. 
+\end{theoreme}
+
+Pour les mesures de Radon de $\mathcal{M}(\Omega)$, la converge faible-* devrait être celle de la dualité avec $C_0(\Omega)$. Cependant, une autre notion de convergence est intéressante, celle avec la dualité de $C_b(\Omega)$, les fonctions continues bornées sur $\Omega$. Par abus de notations, nous la noterons aussi $\rightharpoonup$ : $\lambda_n\rightharpoonup\lambda$ si et seulement si pour toute fonction $\phi\in C_b(\Omega)$ nous avons $\int \phi d\lambda_n=\int \phi d\lambda$. Remarquons que si $\Omega$ est compact, $C(\Omega)=C_0(\Omega)=C_b(\Omega)$ et ces notions de convergences sont alors égales. \\
+
+Les mesures de probabilités sur $\Omega$, $\mathcal{P}(\Omega)$, sont un sous-ensemble particulier de $\mathcal{M}(\Omega)$. $\mu\in\mathcal{P}(\Omega) \Leftrightarrow \mu \in\mathcal{M}_+(\Omega)$ et $\mu(\Omega) = 1$, dans ce cas, $\mu$ et $|\mu |$ coïncident. 
+\begin{definition}{Tension d'une suite de mesure de probabilité}
+Une suite $\mu_n$ de probabilité sur $_Omega$ est dite tendue si pour tout $\epsilon>0$ il existe un sous-ensemble compact $K\subset\Omega$ tel que $\mu_n(\Omega\backslash K) <\epsilon$ pour tout $n$. 
+\end{definition}
+\begin{theoreme}{Prokhorov}
+\label{thm:prokhorov}
+Soit $\mu_n$ une suite tendue de mesure de probabilité sur un espace métrique complet et séparable $\Omega$. Alors il existe une de probabilité sur $\Omega$, $\mu$, et une sous -suite $\mu_{n_k}$ telle que $\mu_{n_k} \rightharpoonup \mu$ (dans la dualité avec $C_b(\Omega)$). \\
+Réciproquement, toute suite $\mu_n\rightharpoonup \mu$ est nécessairement tendue.  
+\end{theoreme}
+
+Rappelons le résultat principal concernant la compacité dans l'espace des fonctions continues. 
+\begin{theoreme}{Ascoli - Arzelà}
+\label{thm:ascoli}
+Si $\Omega$ est un espace métrique compact et $f_n\ :\ \Omega\rightarrow\RR$ est équicontinue et équiborné. Alors il existe une sous suite $f_{n_k}$ qui converge uniformément vers une fonction continue $f\ :\ \Omega\rightarrow\RR$. \\
+Réciproquement, un sous-ensemble de $C(\Omega)$ est relativement compact pour la convergence uniforme si et seulement si tout ses éléments sont équicontinus et équibornés.
+\end{theoreme}
+
+
+
+
+
+
+
+
+
+
+
+\end{appendices}
 
 
 \newpage
