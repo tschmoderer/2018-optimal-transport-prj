@@ -7,7 +7,30 @@ function pU = projC(U)
     divAdj = @(D) cat(3,N*[cat(2,-D(:,1),D(:,1:N) - D(:,2:N+1),D(:,N+1)); zeros(1,N+2)],Q*[cat(1,-D(1,:),D(1:Q,:) - D(2:Q+1,:),D(Q+1,:)),zeros(Q+2,1)]);
     A      = @(U) [[div(U) , U(1:Q+1,1,1) , U(1:Q+1,N+2,1)]; [U(Q+2,1:N+1,2) 0 0] ; [U(1,1:N+1,2) 0 0]];
     AS     = @(R) divAdj(R(1:Q+1,1:N+1)) + cat(3,[[R(1:Q+1,N+2) zeros(Q+1,N) R(1:Q+1,N+3)]; zeros(1,N+2)],[[R(Q+3,1:N+1) ; zeros(Q,N+1) ; R(Q+2,1:N+1)], zeros(Q+2,1) ]);
+   
+    grad   = @(D) cat(3,N*[cat(2,-D(:,1),D(:,1:N) - D(:,2:N+1),D(:,N+1)); zeros(1,N+2)],Q*[cat(1,-D(1,:),D(1:Q,:) - D(2:Q+1,:),D(Q+1,:)),zeros(Q+2,1)]);
     bS     = @(mL,mR,fU,fD) cat(3,[mL zeros(Q+1,N) mR ; zeros(1,N+2)],[[fU ; zeros(Q,N+1) ; fD],zeros(Q+2,1)]);
+    
+    x = zeros(Q+3,N+3);
+    b = y - A(U);
+    r = b - A(AS(x));
+    p = r;
+    rold = sum(r(:).*r(:));
+
+    for i = 1:(Q+3)*(N+3)
+        Ap = A(AS(p));
+        alpha = rold/sum(p(:).*Ap(:));
+        x = x + alpha*p;
+        r = r - alpha*Ap;
+        rnew = sum(r(:).*r(:));
+        if (sqrt(rnew) < 1e-10) 
+            break
+        end
+        p = r + (rnew/rold) * p;
+        rold = rnew;
+    end
+    pU = U + AS(x);
+    
     
     mL0 = zeros(Q+1,1); mR0 = zeros(Q+1,1);
     fU0 = f1; fD0 = f0;
@@ -17,7 +40,11 @@ function pU = projC(U)
     w  = div(U + B);
     x1 = poisson2d_Neumann(-w);
     
-    pU = U - divAdj(x1) + B;
+    
+    gx1 =  grad(x1);
+    pU1 = U + B;
+    pU1(1:Q+1,2:N+1,1) = pU1(1:Q+1,2:N+1,1) - gx1(1:Q+1,2:N+1,1);
+    pU1(2:Q+1,1:N+1,2) = pU1(2:Q+1,1:N+1,2) - gx1(2:Q+1,1:N+1,2);
 end
 
 %     x = zeros(Q+3,N+3);
@@ -39,8 +66,6 @@ end
 %         rold = rnew;
 %     end
 %     pU = U + AS(x);
-
-%    U(1:Q+1,[1 end],1) = 0; U([1 end],1:N+1,2) = [f1 ; f0]; 
 
 
 % function D = div(U)
