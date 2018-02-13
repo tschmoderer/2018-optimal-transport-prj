@@ -1,86 +1,58 @@
-function [pC, error] = projC(w)
+function pU = projC(U)
     globals;
-
-    dx  = @(m1)  N*(m1(:,[2:end end],:) - m1); % dérivation selon ---> x
-    dy  = @(m2)  P*(m2([2:end end],:,:) - m2); % derivation selon ---> y
-    dt  = @(f)   Q*(f(:,:,[2:end end]) - f); % dérivation selon ---> t 
-
-    dxS = @(dm1) N*cat(2, -dm1(:,1,:) , dm1(:,1:end-2,:) - dm1(:,2:end-1,:) , dm1(:,end-1,:));
-    dyS = @(dm2) P*cat(1, -dm2(1,:,:) , dm2(1:end-2,:,:) - dm2(2:end-1,:,:) , dm2(end-1,:,:));
-    dtS = @(df)  Q*cat(3, -df(:,:,1) , df(:,:,1:end-2) - df(:,:,2:end-1) , df(:,:,end-1));
-
-    %% check adjoint -- ok
-%     dxm = dx(m(:,:,:,1)); dym = dy(m(:,:,:,2));
+    y = zeros(P+3,N+3,Q+2);
+    y(1:P+1,1:N+1,Q+1) = f0;
+    y(1:P+1,1:N+1,Q+2) = f1;
+    x = zeros(P+3,N+3,Q+2);
+    b = y - A(U);
+    r = b - A(AS(x));
+    dir = r;
+    rold = sum(r(:).*r(:));
+    for i = 1:(Q+3)*(N+3)
+        Adir = A(AS(dir));
+        alpha = rold/sum(dir(:).*Adir(:));
+        x = x + alpha*dir;
+        r = r - alpha*Adir;
+        rnew = sum(r(:).*r(:));
+        if (sqrt(rnew) < 1e-10) 
+            break
+        end
+        dir = r + (rnew/rold) * dir;
+        rold = rnew;
+    end
+		
+    pU = U + AS(x);
+    Apu = A(pU);
+    err = norm(y(:) - Apu(:))/norm(y(:))
+    %% gniah 
+    
+%     U(1:P+1,1:N+1,1,3)   = f1;  U(1:P+1,1,1:Q,1)   = 0; U(1,1:N+1,1:Q,2)   = 0;
+%     U(1:P+1,1:N+1,Q+1,3) = f0;  U(1:P+1,N+2,1:Q,1) = 0; U(P+2,1:N+1,1:Q,2) = 0;
 % 
-%     rdxm = rand(size(dxm)); rdym = rand(size(dym));
-%     dxSrdxm = dxS(rdxm); dySrdym = dyS(rdym);
-% 
-%     dtf = dt(f); 
-%     rdtf = rand(size(dtf));
-%     dtSrdtf = dtS(rdtf);
-% 
-%     sum(sum(sum(m(:,:,:,1).*dxSrdxm - dxm.*rdxm)))
-%     sum(sum(sum(m(:,:,:,2).*dySrdym - dym.*rdym)))
-%     sum(sum(sum(f.*dtSrdtf - dtf.*rdtf)))
-
-    %% construction opérateurs 
-    grad = @(u) cat(4,dx(u),dy(u));
-    div  = @(w) -dxS(w(:,:,:,1)) - dyS(w(:,:,:,2));
-
-    A    = @(w)  cat(3,div(w(:,:,:,1:2)) + dt(w(:,:,:,3)), w(:,:,1,3) , w(:,:,end,3));
-    U    = @(y0,y1) cat(3,y0,zeros(P+1,N+1,Q-2),y1);
-    AS   = @(Aw) cat(4,-grad(Aw(:,:,1:Q)),dtS(Aw(:,:,1:Q)) + U(Aw(:,:,end-1),Aw(:,:,end)));
-
-    %% check adjoint -- ok
-%     divW = div(m);
-%     rdivW = rand(size(divW));
-%     g = grad(rdivW);
-% 
-%     sum(sum(sum(sum(m.*g)))) + sum(sum(sum(divW.*rdivW))) % un + car grad* = -div /!\
-% 
-%     Aw = A(w);200
-% 
-%     rAw = rand(size(Aw));
-%     ASrAw = AS(rAw);
-% 
-%     sum(sum(sum(sum(w.*ASrAw)))) - sum(sum(sum(sum(Aw.*rAw))))
-
-    %% opérateurs de projetction
-    y = cat(3, zeros(P+1,N+1,Q),f0,f1); % second membre
-
-    flat = @(x) x(:);
-    resh = @(x) reshape(x,P+1,N+1,Q+2);
-
-    do_cg =@(B,y) resh(cg(@(r)flat(B(resh(r))),y(:))); % solve B*x = y with CG
-    pA = @(r) do_cg(@(s)A(AS(s)),r); % solve (A*A')*x = r
-
-    pC = w + AS(pA(y - A(w)));
-
-    mynorm = @(x) norm(x(:));
-    err = @(w) mynorm(A(w)-y)/norm(y(:));
-    error = err(pC);
-
-    %% check div=0
-%     w = rand(P+1,N+1,Q,3);
-% 
-%     fprintf('Error before projection: %.2e\n', err(w));
-%     fprintf('Error before projection: %.2e\n', err(w + AS(pA(y - A(w)))));
-
-
-%     globals;
-%     
-%     U(1,1:N+1,2)   = f1;
-%     U(Q+2,1:N+1,2) = f0;
-% 
-%     p = (N+1)*diff(U(1:Q+1,:,1),[],2)  + (Q+1)*diff(U(:,1:N+1,2),[],1);
+%     p = (N+1)*diff(U(1:P+1,:,1:Q,1),[],2)  + (P+1)*diff(U(:,1:N+1,1:Q,2),[],1)  + (Q)*diff(U(1:P+1,1:N+1,:,3),[],3);
 % 
 %     f = poisson(-p);
-%     D = f;
-%     gf = -cat(3,(N+1)*[cat(2,-D(:,1),D(:,1:N) - D(:,2:N+1),D(:,N+1)); zeros(1,N+2)],(Q+1)*[cat(1,-D(1,:),D(1:Q,:) - D(2:Q+1,:),D(Q+1,:)),zeros(Q+2,1)]);
+%     
+%     gf = zeros(P+2,N+2,Q+1,3);
+%     gf(1:P+1,1,1:Q,1)     = -f(:,1,:);
+%     gf(1:P+1,2:N+1,1:Q,1) = f(:,1:N,:) - f(:,2:N+1,:);
+%     gf(1:P+1,N+2,1:Q,1)   = f(:,N+1,:);
+%     gf(:,:,:,1) = (N+1)*gf(:,:,:,1);
+% 
+%     gf(1,1:N+1,1:Q,2)     = -f(1,:,:);
+%     gf(2:P+1,1:N+1,1:Q,2) = f(1:P,:,:) - f(2:P+1,:,:);
+%     gf(P+2,1:N+1,1:Q,2)   = f(P+1,:,:);
+%     gf(:,:,:,2) = (P+1)*gf(:,:,:,2);
+% 
+%     gf(1:P+1,1:N+1,1,3)     = -f(:,:,1);
+%     gf(1:P+1,1:N+1,2:Q,3)   = f(:,:,1:Q-1) - f(:,:,2:Q);
+%     gf(1:P+1,1:N+1,Q+1,3)   = f(:,:,Q);
+%     gf(:,:,:,3) = Q*gf(:,:,:,3);
+%   %  gf = -cat(3,(N+1)*[cat(2,-D(:,1),D(:,1:N) - D(:,2:N+1),D(:,N+1)); zeros(1,N+2)],(Q+1)*[cat(1,-D(1,:),D(1:Q,:) - D(2:Q+1,:),D(Q+1,:)),zeros(Q+2,1)]);
 %     
 %     pU = U; 
-%     pU(:,2:N+1,1) = pU(:,2:N+1,1) - gf(:,2:N+1,1);
-%     pU(2:Q+1,:,2) = pU(2:Q+1,:,2) - gf(2:Q+1,:,2);
-
+%     pU(:,2:N+1,:,1) = pU(:,2:N+1,:,1) - gf(:,2:N+1,:,1);
+%     pU(2:P+1,:,:,2) = pU(2:P+1,:,:,2) - gf(2:P+1,:,:,2);
+%     pU(:,:,2:Q-1,3) = pU(:,:,2:Q-1,3) - gf(:,:,2:Q-1,3);
 end
 
