@@ -1,6 +1,6 @@
 program transport
     implicit none
-    integer, parameter :: N = 21, P = 22, Q = 23, niter = 1000
+    integer, parameter :: N = 20, P = 20, Q = 20, niter = 200
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1.0
     double precision, dimension(P+1,N+1) :: f0, f1
     double precision, dimension(P+1,N+1,Q,3) :: zV = 0, wV0 = 0, wV1 = 0
@@ -11,55 +11,50 @@ program transport
   	character(10) :: charI;
   	
   	!! var pour les tests adj
-  	double precision, dimension(P+2,N+2,Q+1,3) :: U, ISV, dSD, ASrA
-  	double precision, dimension(P+1,N+1,Q,3) :: V, IU
-  	double precision, dimension(P+1,N+1,Q) :: D, dU
-    double precision, dimension(P+3,N+3,Q+2) :: Au, rA
+!  	double precision, dimension(P+2,N+2,Q+1,3) :: U, ISV, dSD, ASrA
+!  	double precision, dimension(P+1,N+1,Q,3) :: V, IU
+!  	double precision, dimension(P+1,N+1,Q) :: D, dU
+!    double precision, dimension(P+3,N+3,Q+2) :: Au, rA
     
     f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
     
     !! test adjoint 
-    call random_number(U)
-    IU  = interp(U)
-    call random_number(V)
-    ISV = interpAdj(V)
+!    call random_number(U)
+!    IU  = interp(U)
+!    call random_number(V)
+!    ISV = interpAdj(V)
     
-    print *, 'Interp adjoint     ', sum(U*ISV), sum(V*IU) 
+!    print *, 'Interp adjoint     ', sum(U*ISV), sum(V*IU) 
     
-    call random_number(U) 
-    dU = div(U)
-    call random_number(D)
-    dSD = divAdj(D)
+!    call random_number(U) 
+!    dU = div(U)
+!    call random_number(D)
+!    dSD = divAdj(D)
     
-    print *, 'Divergence adjoint ', sum(U*dSD), sum(D*dU) 
+!    print *, 'Divergence adjoint ', sum(U*dSD), sum(D*dU) 
 
-	call random_number(U) 
-	Au = A(U)
-	call random_number(rA)
-	ASrA = AS(rA)
+!	call random_number(U) 
+!	Au = A(U)
+!	call random_number(rA)
+!	ASrA = AS(rA)
 	
-	print *, 'Opérateur A adjoint', sum(U*ASrA), sum(Au*rA) 
-
-
+!	print *, 'Opérateur A adjoint', sum(U*ASrA), sum(Au*rA) 
 
 ! call exit()
 
-
-
-
 	   do i = 1,niter
-				wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
-				wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
-				zU  = projCs(wU1,wV1)
-				zV  = interp(zU)
+		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
+		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
+		zU  = projCs(wU1,wV1)
+		zV  = interp(zU)
 
-				wU0 = wU1
-				wV0 = wV1
+		wU0 = wU1
+		wV0 = wV1
 		
         cout(i) = J(zV)
        
-        if (modulo(i,1) .EQ. 0) print *, i, cout(i)
+        if (modulo(i,10) .EQ. 0) print *, i, cout(i)
         minF(i) = minval(zV(:,:,:,3))
     end do 
     
@@ -113,21 +108,10 @@ program transport
     close(1)
 
 	open(8,file="results/plot.gnu"); 
-	write(8,*) 'set contour' 
-	write(8,*) 'set cntrparam levels 30'
-	write(8,*) 'unset key'
-	write(8,*) 'set pm3d'
-	write(8,*) 'unset colorbox'
-	write(8,*) 'set hidden3d'
-	write(8,*) 'set title "Transport Optimal"'
-	write(8,*) 'set xlabel "x"'
-	write(8,*) 'set ylabel "t"'
-	write(8,*) 'set palette gray'
-	write(8,*) 'set view 0,0'
 	write(8,*) 'set dgrid3d ', P+1, ',', N+1
-	write(8,*) 'splot "results/transport.dat" with lines'
+	write(8,*) 'set zr [', minval(minF) , ':', maxval(zV(:,:,:,3)), ']'
 	close(8);
-!	call system("gnuplot -p results/plot.gnu");
+
     contains
 
 !! Gauss
@@ -171,7 +155,7 @@ program transport
         mt = w(:,:,:,1:2); ft = w(:,:,:,3);
         x0 = 1; x1 = 2; k = 0;
 
-        do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 1500)
+        do while (maxval(dabs(x0-x1)) .GT. 1e-10  .AND. k .LT. 1500)
             x0 = x1
             if (b .EQ. 1) then ! Cas transport
 				poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
@@ -192,7 +176,7 @@ program transport
 
         where (x1 .LT. eps) x1 = eps
         where (obstacle .GT. 0) x1 = eps
-        pw(:,:,:,3)   = x1
+        pw(:,:,:,3) = x1
         pw(:,:,:,1) = (x1**b)*mt(:,:,:,1)/(x1**b+g) 
         pw(:,:,:,2) = (x1**b)*mt(:,:,:,2)/(x1**b+g) 
     end function proxJ
@@ -218,7 +202,7 @@ program transport
 		U(1:P+1,2:N+1,1:Q,1) = V(:,2:N+1,:,1) + V(:,1:N,:,1)
 		U(1:P+1,N+2,1:Q,1)   = V(:,N+1,:,1)
 		
-		U(1,1:N+1,1:Q,2)     = V(1,:,:,2);
+		U(1,1:N+1,1:Q,2)     = V(1,:,:,2)
 		U(2:P+1,1:N+1,1:Q,2) = V(2:P+1,:,:,2) + V(1:P,:,:,2)
 		U(P+2,1:N+1,1:Q,2)   = V(P+1,:,:,2)
 		
@@ -247,7 +231,7 @@ program transport
 			pU = pU + alpha*dir
 			r = r - alpha*Idir
 			rnew = sum(r*r) 
-			if (dsqrt(rnew) .LT. 1e-5) exit
+			if (dsqrt(rnew) .LT. 1e-10) exit
 			dir = r + (rnew/rold)*dir
 			rold = rnew
 		end do 
@@ -258,8 +242,8 @@ program transport
 	implicit none
 		double precision, dimension(P+2,N+2,Q+1,3) :: U
 		double precision, dimension(P+1,N+1,Q) :: D
-		D = N*(U(1:P+1,2:N+2,1:Q,1) - U(1:P+1,1:N+1,1:Q,1))
-		D = D + P*(U(2:P+2,1:N+1,1:Q,2) - U(1:P+1,1:N+1,1:Q,2))
+		D = (N + 1)*(U(1:P+1,2:N+2,1:Q,1) - U(1:P+1,1:N+1,1:Q,1))
+		D = D + (P + 1)*(U(2:P+2,1:N+1,1:Q,2) - U(1:P+1,1:N+1,1:Q,2))
 		D = D + Q*(U(1:P+1,1:N+1,2:Q+1,3) - U(1:P+1,1:N+1,1:Q,3))
 	end function div	
 
@@ -273,16 +257,16 @@ program transport
 		U(1:P+1,1,1:Q,1)     = -D(:,1,:)
 		U(1:P+1,2:N+1,1:Q,1) = D(:,1:N,:) - D(:,2:N+1,:)
 		U(1:P+1,N+2,1:Q,1)   = D(:,N+1,:)
-		U(:,:,:,1) = N*U(:,:,:,1)
+		U(:,:,:,1) = (N + 1)*U(:,:,:,1)
 		
 		U(1,1:N+1,1:Q,2)     = -D(1,:,:)
 		U(2:P+1,1:N+1,1:Q,2) = D(1:P,:,:) - D(2:P+1,:,:)
 		U(P+2,1:N+1,1:Q,2)   = D(P+1,:,:)
-		U(:,:,:,2) = P*U(:,:,:,2)
+		U(:,:,:,2) = (P + 1)*U(:,:,:,2)
 		
-		U(1:P+1,1:N+1,1,3)     = -D(:,:,1)
-		U(1:P+1,1:N+1,2:Q,3)   = D(:,:,1:Q-1) - D(:,:,2:Q)
-		U(1:P+1,1:N+1,Q+1,3)   = D(:,:,Q)
+		U(1:P+1,1:N+1,1,3)   = -D(:,:,1)
+		U(1:P+1,1:N+1,2:Q,3) = D(:,:,1:Q-1) - D(:,:,2:Q)
+		U(1:P+1,1:N+1,Q+1,3) = D(:,:,Q)
 		U(:,:,:,3) = Q*U(:,:,:,3)
 	end function divAdj
 
@@ -346,7 +330,7 @@ program transport
 			x = x + alpha*dir
 			r = r - alpha*Adir
 			rnew = sum(r*r)
-			if (dsqrt(rnew) .LT. 1e-5) exit
+			if (dsqrt(rnew) .LT. 1e-10) exit
 			dir = r + (rnew/rold) * dir
 			rold = rnew
 		end do

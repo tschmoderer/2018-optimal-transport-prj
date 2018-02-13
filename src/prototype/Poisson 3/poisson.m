@@ -1,6 +1,6 @@
 function p = poisson(f)
 %    globals;
-    
+
     N                     = size(f,1);
     M                     = size(f,2);
     R                     = size(f,3);
@@ -18,9 +18,7 @@ function p = poisson(f)
     denom                = repmat(depn(:)/hx^2,[1,M,R]) + repmat(depm(:)'/hy^2,[N,1,R]) + permute(repmat(depr(:)/hz^2,[1,N,M]),[2 3 1]);
     denom(denom(:)==0)  = 1;
 
-
-
-    fhat                  = dctn(f);
+    fhat                  = dct(f);
     uhat                  = -(fhat)./denom;
-    p                     = idctn(uhat);
+    p                     = real(idct(uhat));
 end

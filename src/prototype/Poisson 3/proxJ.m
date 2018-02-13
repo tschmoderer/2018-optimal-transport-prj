@@ -2,6 +2,8 @@
 % generealised cost 
 
 function Pw = proxJ(w,g,b)
+    globals; 
+    
     mt = w(:,:,:,1:2);
     ft = w(:,:,:,3);
     
@@ -24,18 +26,18 @@ function Pw = proxJ(w,g,b)
         end
         x1 = x0 - poly./dpoly;
         k = k+1;
-    end
+    end   
 
+    idx = find(x1 < 0); % ou la racine est négative
+    x1(idx) = eps;
+    
     Pf = x1;
-    Pm = (Pf.^b).*mt./(Pf.^b + g);
-
-    idx = find(Pf < 0); % ou la racine est négative
-    Pm(idx) = 0;
-    Pf(idx) = 0;
+    Pm(:,:,:,1) = (Pf.^b).*mt(:,:,:,1)./(Pf.^b + g);
+    Pm(:,:,:,2) = (Pf.^b).*mt(:,:,:,2)./(Pf.^b + g);
     
     Pw = zeros(size(w));
     Pw(:,:,:,1:2) = real(Pm);
-    Pw(:,:,:,3) = real(Pf);
+    Pw(:,:,:,3)   = real(Pf);
 end
 
 
