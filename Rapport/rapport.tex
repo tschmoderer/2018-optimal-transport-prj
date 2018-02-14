@@ -79,34 +79,44 @@ Le plan de rapport est le suivant, nous commencerons par présenté les notions 
 \newpage
 
 \section{Problème de Transport Optimal}
-Introduisons des notions essentielles qui nous amèneront à définir le problème de transport optimal et sa formulation en terme de géodésiques. 
-\subsection{Problème de Transport}
-La théorie du transport prend sa source dans la théorie de la mesure, en particulier de des mesures de probabilité. 
+Dans cette section, nous nous attachons à décrire le problème de transport optimal. Nous donnerons des preuves de l'existence de solution à ce problème. Nous finirons par donner la formulation du problème par Benamou et Brenier, que nous nous attacherons de résoudre numériquement dans la partie \ref{sec:numerique}. 
+
+\subsection{Formulation du problème de Transport Optimal}
+Intuitivement, le problème de transport optimal consiste à trouver une méthode pour déplacer un tas de matériaux d'un endroit à un autre, de façon à minimiser un coût, lié au transport des matériaux par exemple. 
+\begin{figure}[!h]
+\centering
+\includegraphics[width=\linewidth]{img/tractopelle.png}
+\caption{\label{fig:tractopelle}Le transport optimal dans sa version vulgarisée}
+\end{figure}\\
+Dans des termes plus formels et modernes, les tas de sables représentent des ensembles mesurables dans des espaces métriques, le tractopelle est l'application de transport et le coût est la "distance" entre un ensemble de départ et d'arrivée. 
 \begin{definition}{Transport}
-Soient deux mesures de probabilité $\mu$ sur $\mathcal{X}$ et $\nu$ sur $\mathcal{Y}$ munis de leur tribu borélienne $\mathcal{B}$. Un transport est une application $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
+Soient deux mesures de probabilité $\mu$ sur $(\mathcal{X},\mathcal{B}(\mathcal{X}))$ et $\nu$ sur $(\mathcal{Y},\mathcal{B}(\mathcal{Y}))$ munis de leur tribu borélienne. Un transport est une application $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
 \begin{align}
-\forall B\in\mathcal{B},\quad \mu(T^{-1}(B))=\nu(B)
+\forall B\in\mathcal{B}(\mathcal{Y}),\quad \mu(T^{-1}(B))=\nu(B)
 \label{eq:trspmesures}
 \end{align}
-C'est une relation de conservation de masse. Nous notons $T_{\#}\mu=\nu$. 
+Cela signifie que $\nu$ est la mesure image de $\mu$ par l'application $T$.\\
+Nous noterons $T_{\#}\mu=\nu$, une application $T$ vérifiant \eqref{eq:trspmesures}.
 \end{definition}
+Pour présager du théorème de Benamou et Brenier, remarquons que la relation \eqref{eq:trspmesures} traduit une relation de conservation de masse. La figure \ref{fig:illustrans} illustre cette relation dans le cas où les mesures possèdent des densités.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.8\linewidth]{img/transport.jpg}
-\caption{Illustration de l'application de transport}
-\end{figure}
+\caption{\label{fig:illustrans}Illustration de l'application de transport}
+\end{figure}\\
 Bien sur, l'application de transport n'est pas unique, il nous faut une manière de sélectionner un transport qui serait "meilleur" que les autres. 
+\newpage
 \begin{definition}{Coût}
 Le coût est une application 
 $$
 \fonction{C}{\mathcal{X}\times\mathcal{Y}}{[0,+\infty]}{(x,y)}{C(x,y)}
 $$
 \end{definition}
-Cette application va représenter le coût d'affecter $x$ en $y$. Cela nous amène au problème de transport optimal : \\
+Cette application représente le coût d'affecter $x$ en $y$. Ces deux définitions nous amènent au problème de transport optimal : \\
 
 \fbox{
   \parbox{\textwidth}{
-  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver le transport $T$ réalisant le 
+  Étant donné deux mesures de probabilités $\mu$ sur $\mathcal{X}$ et $\nu$ sur $\mathcal{Y}$ et un coût $C$, trouver une application de transport $T$ réalisant le 
 	\begin{equation}
 	\tag{MP}
 	\inf\left\{M(T) := \int_{\mathcal{X}} C(x,T(x))\ d\mu (x), \quad T_{\#}\mu = \nu\right\}
@@ -116,10 +126,10 @@ Cette application va représenter le coût d'affecter $x$ en $y$. Cela nous amè
 }
 \vspace{0.3cm}
 
-L'existence du transport optimal n'est absolument pas trivial, suivons la présentation du livre de Santambrogio  \cite{santambrogio2015optimal} pour démontrer l'existence d'un transport optimal.
+L'existence du transport optimal n'est absolument pas trivial, suivons la présentation du livre de Santambrogio  \cite{santambrogio2015optimal} pour démontrer l'existence d'une application de transport optimal.
 
 \subsection{Plan de Transport Optimal}
-Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. Oublions cd problème pour un temps, et regardons une forme généralisée donnée par Kantorovitch. \\
+Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. Oublions ce problème pour un temps, et regardons une forme généralisée donnée par Kantorovitch. \\
 
 \fbox{
   \parbox{\textwidth}{
@@ -139,27 +149,29 @@ Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. 
 }
 \vspace{0.3cm}
 
-La valeur de $\gamma (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus général qu'un transport classique. A partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers de l'application $T$. Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\gamma$ et que cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
+La valeur de $\gamma (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus généraux qu'un transport classique. En effet, à partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers d'une application de transport $T$.\\
+Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\gamma$, cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.5\linewidth]{img/transport_plan.jpg}
-\caption{Illustration de la notion de plan de transport}
+\includegraphics[width=0.5\linewidth]{img/transport_plan2.jpg}
+\caption{Illustration de la notion de plan de transport\label{fig:plantransp}}
 \end{figure}
+La figure \ref{fig:plantransp} illustre la notion de plan de transport. Le dégradé de couleur montre que la mesure $\pi$ peut envoyer un $x\in\mathcal{X}$ sur plusieurs points de $\mathcal{Y}$ dans différentes proportions. \\
 
-Les minimiseurs de ce problèmes sont appelés plans de transport optimal entre $\mu$ et $\nu$. Ce problème est bien une généralisation du problème \eqref{eq:MP}, puisque si $\gamma = (Id,T)$ pour une certaine fonction mesurable $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$. Alors l'application $T$ serait un transport optimal entre $\mu$ et $\nu$. \\
+Les minimiseurs de ce problèmes sont appelés plans de transport optimal entre $\mu$ et $\nu$. Ce problème est bien une généralisation du problème \eqref{eq:MP}, puisque si $\pi = (Id,T)$ pour une certaine fonction mesurable $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$. Alors l'application $T$ serait un transport optimal entre $\mu$ et $\nu$. \\
 
 Nous allons montrer l'existence de solutions pour ce problème relaxé \eqref{eq:KP} à l'aide du calcul des variations.Les outils principaux de la méthode du calcul des variations sont rappelés à l'annexe \ref{sec:variations}. 
 \begin{theoreme}{}
 Soit $\mathcal{X}$ et $\mathcal{Y}$ des espaces métriques compacts. Supposons que le coût $C\ :\ \mathcal{X}\times\mathcal{Y}\rightarrow [0,+\infty]$ soit continue. Alors le problème \eqref{eq:KP} admet une solution.
 \end{theoreme}
 \begin{preuve}
-Il s'agit de montrer que l'ensemble $\Pi (\mu,\nu)$ est compact et que l'application $\gamma\rightarrow K(\gamma )$ est continue, puis d'appliquer le théorème de Weierstrass \eqref{thm:weierstrass}. \\
+Il s'agit de montrer que l'ensemble $\Pi (\mu,\nu)$ est compact et que l'application $\pi\rightarrow K(\pi )$ est continue, puis d'appliquer le théorème de Weierstrass \eqref{thm:weierstrass}. \\
 Nous choisissons la notion de convergence donnée par la convergence faible des mesures de probabilités (voir \eqref{thm:prokhorov} par dualité avec $C_b(\mathcal{X}\times\mathcal{Y})$ ce qui ici est a même chose que $C(\mathcal{X}\times\mathcal{Y})$ ou $C_0(\mathcal{X}\times\mathcal{Y})$ car $\mathcal{X}$ et $\mathcal{Y}$ sont compacts). Cela nous donne la continuité de $K$ puisque $C\in C(\mathcal{X}\times\mathcal{Y})$. \\
 
-Soit une suite $\gamma_n\in\Pi (\mu,\nu )$. Ce sont des mesures de probabilités, donc de masse $1$ et sont donc bornée dans le dual de $C(\mathcal{X}\times\mathcal{Y})$. Ainsi, la compacité faible-* dans les espaces duaux, garanti l'existence d'une sus suite $\gamma_{n_k} \rightharpoonup \gamma$ convergeant vers une probabilité $\gamma$. 
-Vérifions que $\gamma \in \Pi (\mu,\nu )$. \\
-Fixons $\phi\in C(\mathcal{X})$, comme $\int\phi d\gamma_{n_k} =\int \phi d\mu $,par passage à la limite, on a : $\int\phi d\gamma =\int\phi d\mu$. De même on montre que la seconde contrainte de marginale \eqref{eq:contrKP} est vérifiée. \\
+Soit une suite $\pi_n\in\Pi (\mu,\nu )$. Ce sont des mesures de probabilités, donc de masse $1$ et sont donc bornée dans le dual de $C(\mathcal{X}\times\mathcal{Y})$. Ainsi, la compacité faible-* dans les espaces duaux, garanti l'existence d'une sus suite $\pi_{n_k} \rightharpoonup \pi$ convergeant vers une probabilité $\pi$. 
+Vérifions que $\pi \in \Pi (\mu,\nu )$. \\
+Fixons $\phi\in C(\mathcal{X})$, comme $\int\phi d\pi_{n_k} =\int \phi d\mu $,par passage à la limite, on a : $\int\phi d\pi =\int\phi d\mu$. De même on montre que la seconde contrainte de marginale \eqref{eq:contrKP} est vérifiée. \\
 Ainsi, l'espace $\Pi(\mu,\nu)$ est compact et le théorème de Weierstrass s'applique.
 \end{preuve}
 
@@ -187,9 +199,9 @@ Supposons que $\mathcal{X}$ et $\mathcal{Y}$ sont des espaces métriques complet
 \begin{preuve}
 Cette fois, c'est la compacité de $\Pi(\mu,\nu)$ qui est moins évidente. Nous allons utiliser le théorème de Prokhorov \eqref{thm:prokhorov}. Ce qui revient à montrer que toute suite de $\Pi (\mu,\nu)$ est tendue. \\
 Soient $\epsilon >0$ et deux compact $K_{\mathcal{X}}\subset\mathcal{X}$ et $K_{\mathcal{Y}}\subset \mathcal{Y}$ tels que $\mu (\mathcal{X}\backslash K_{\mathcal{X}})$, $\nu (\mathcal{Y} \backslash K_{\mathcal{Y}}) < \frac{1}{2}\epsilon$. Cela est possible par la réciproque du théorème de Prokhorov, car une mesure seule est toujours tendue. 
-Alors l'ensemble $K_{\mathcal{X}}\times K_{\mathcal{Y}}$ est compact dans $\mathcal{X}\times\mathcal{Y}$, et pour toute suite $\gamma_n\in\Pi (\mu,\nu )$, nous avons 
+Alors l'ensemble $K_{\mathcal{X}}\times K_{\mathcal{Y}}$ est compact dans $\mathcal{X}\times\mathcal{Y}$, et pour toute suite $\pi_n\in\Pi (\mu,\nu )$, nous avons 
 \begin{align*}
-\gamma_n\left((\mathcal{X}\times\mathcal{Y})\backslash (K_{\mathcal{X}}\times K_{\mathcal{Y}}) \right) &\leq \gamma_n((\mathcal{X}\backslash K_{\mathcal{X}})\times \mathcal{Y}) + \gamma_n(\mathcal{X}\times (\mathcal{Y}\backslash K_{\mathcal{Y}}))\\
+\pi_n\left((\mathcal{X}\times\mathcal{Y})\backslash (K_{\mathcal{X}}\times K_{\mathcal{Y}}) \right) &\leq \pi_n((\mathcal{X}\backslash K_{\mathcal{X}})\times \mathcal{Y}) + \pi_n(\mathcal{X}\times (\mathcal{Y}\backslash K_{\mathcal{Y}}))\\
 &\leq \mu (\mathcal{X} \backslash K_{\mathcal{X}}) + \nu (\mathcal{Y}\backslash K_{\mathcal{Y}}) < \epsilon
 \end{align*}
 Ce qui montre la tension et donc la compacité de toute suite de $\Pi (\mu,\nu )$. 
@@ -199,27 +211,27 @@ Ce qui montre la tension et donc la compacité de toute suite de $\Pi (\mu,\nu )
 Maintenant que nous avons démontré l'existence de solution au problème de Kantorovitch, nous souhaiterions savoir sous quelles conditions nous pouvons remonter au problème de Monge. Comme le problème \eqref{eq:KP} est une problème d'optimisation linéaire sous contraintes d'égalité, il est donc naturel d'étudier le problème dual. \\
 
 Toujours suivant la résentation du livre de Santambrogio \cite{santambrogio2015optimal}, cherchons en premier lieu le problème dual formellement. \\
-La contrainte $\gamma\in\Pi(\mu,\nu)$ peut s'exprimer sous la forme : 
+La contrainte $\pi\in\Pi(\mu,\nu)$ peut s'exprimer sous la forme : 
 \begin{align}
-\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})}& \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\gamma(x,y)\label{eq:sup1}\\
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})}& \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)\label{eq:sup1}\\
 &= \left\{\begin{array}{cl}
-0 & \text{si } \gamma \in\Pi(\mu,\nu)\\
+0 & \text{si } \pi \in\Pi(\mu,\nu)\\
 +\infty & \text{sinon}
 \end{array}\right.\nonumber
 \end{align}
 Ainsi nous pouvons supprimer la contrainte dans le problème \eqref{eq:KP} en ajoutant l'expression \eqref{eq:sup1}, puisque si la contrainte est satisfaite, rien n'est ajoutée, si elle ne l'est pas nous obtenons $+\infty$ ce qui sera évité par la minimisation. 
 $$
-\inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\gamma + \sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\gamma(x,y)
+\inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\pi + \sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)
 $$
 Il n'est pas toujours possible d'échanger le $\sup$ et l'$\inf$, mais supposons pour le moment que cela soit possible : 
 \begin{align}
-\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) + \inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}}(C(x,y) - \phi(x)+\psi(y))\ d\gamma(x,y)
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) + \inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}}(C(x,y) - \phi(x)+\psi(y))\ d\pi(x,y)
 \label{eq:infsupexchange}
 \end{align}
 
-Avec ce problème de maximisation sur les variables $(\phi,\psi)$, l'infimum en $\gamma$ peut être réécrit comme une contraintes sur $(\phi,\psi)$ : 
+Avec ce problème de maximisation sur les variables $(\phi,\psi)$, l'infimum en $\pi$ peut être réécrit comme une contraintes sur $(\phi,\psi)$ : 
 \begin{align}
-\inf_{\gamma} \int_{\mathcal{X}\times\mathcal{Y}}(C - \phi\oplus\psi) \ d\gamma = 
+\inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}}(C - \phi\oplus\psi) \ d\pi = 
 \left\{
 \begin{array}{cl}
 0 & \text{si } \phi\oplus\psi\leq C \text{ sur } \mathcal{X}\times\mathcal{Y}\\
@@ -227,7 +239,7 @@ Avec ce problème de maximisation sur les variables $(\phi,\psi)$, l'infimum en 
 \end{array}
 \right.
 \end{align}
-Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi(x)+\psi(y)$. L'égalité précédente est justifiée car, si $\phi\oplus\psi>c$ quelque part alors en utilisant des mesures $\gamma$ concentrée en cet endroit et de masse croissante, l'intégrale tend vers $-\infty$. Ce qui nous amène au problème suivant : \\
+Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi(x)+\psi(y)$. L'égalité précédente est justifiée car, si $\phi\oplus\psi>c$ quelque part alors en utilisant des mesures $\pi$ concentrée en cet endroit et de masse croissante, l'intégrale tend vers $-\infty$. Ce qui nous amène au problème suivant : \\
 
 \fbox{
   \parbox{\textwidth}{
@@ -241,9 +253,9 @@ Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi
 }
 \vspace{0.3cm}
 
-Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq c$ par rapport à $\gamma$ : 
+Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq c$ par rapport à $\pi$ : 
 $$
-\int_{\mathcal{X}} \phi d\mu (x) + \int_{\mathcal{Y}}\psi d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\gamma \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\gamma
+\int_{\mathcal{X}} \phi d\mu (x) + \int_{\mathcal{Y}}\psi d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\pi \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi
 $$
 
 Malheureusement le problème \eqref{eq:DKP} n'admet pas trivialement l'existence de ses maximums, car l'espace des fonctions continues bornées n'est pas compact. Montrons dans un premier temps l'existence de ces maximiseurs, puis montrons que le problème \eqref{eq:DKP} est bien le dual de \eqref{eq:DKP} au sens ou $\max\eqref{eq:DKP} =\min\eqref{eq:KP}$.
@@ -320,26 +332,26 @@ H(p) \leq - \left(\int_{\mathcal{X}}\phi\ d\mu+\int_{\mathcal{Y}}\psi\ d\nu\righ
 $$
 ce qui montre la semi continuité inférieure.
 \end{preuve}
-Calculons à présent la transformée de Legendre\footnote{La définition et certaines propriété de la transformée de Legendre sont exposés à la section \ref{sec:prox}.} de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\gamma\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
+Calculons à présent la transformée de Legendre\footnote{La définition et certaines propriété de la transformée de Legendre sont exposés à la section \ref{sec:prox}.} de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\pi\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
 $$
-H^{\star}(\gamma)= \sup_p \int_{\mathcal{X}\times\mathcal{Y}} p\ d\gamma + \sup \left\{ \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad \phi\oplus\psi\leq C- p \right\}
+H^{\star}(\pi)= \sup_p \int_{\mathcal{X}\times\mathcal{Y}} p\ d\pi + \sup \left\{ \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad \phi\oplus\psi\leq C- p \right\}
 $$
-Ce qui se réécrit sous la forme d'un $\sup$ unique sur $p,\ \phi,\ \psi$. Remarquons que, si $\gamma\notin\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, alors il existe $p_0\leq 0$ tel que $\int p_0\ d\gamma >0$, en prenant $\phi\equiv 0$, $\psi\equiv 0$ et $p=C+np_0$ en faisant tendre $n$ vers $+\infty$ nous obtenons $H^{\star}(\gamma)=+\infty$. D'autre part, si $\gamma\in\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, en prenant le $p$ le plus grand possible i.e. $p=C-\phi-\psi$, nous obtenons 
+Ce qui se réécrit sous la forme d'un $\sup$ unique sur $p,\ \phi,\ \psi$. Remarquons que, si $\pi\notin\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, alors il existe $p_0\leq 0$ tel que $\int p_0\ d\pi >0$, en prenant $\phi\equiv 0$, $\psi\equiv 0$ et $p=C+np_0$ en faisant tendre $n$ vers $+\infty$ nous obtenons $H^{\star}(\pi)=+\infty$. D'autre part, si $\pi\in\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, en prenant le $p$ le plus grand possible i.e. $p=C-\phi-\psi$, nous obtenons 
 $$
-H^{\star}(\gamma)=  \sup_{(\phi,\psi)} \int_{\mathcal{X}\times\mathcal{Y}} p\ d\gamma + \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu - \int_{\mathcal{X}\times\mathcal{Y}} \phi\ d\gamma -\int_{\mathcal{X}\times\mathcal{Y}} \psi\ d\gamma
+H^{\star}(\pi)=  \sup_{(\phi,\psi)} \int_{\mathcal{X}\times\mathcal{Y}} p\ d\pi + \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu - \int_{\mathcal{X}\times\mathcal{Y}} \phi\ d\pi -\int_{\mathcal{X}\times\mathcal{Y}} \psi\ d\pi
 $$
 C'est exactement l'expression obtenue au \eqref{eq:sup1} pour réécrire les contraintes de \eqref{eq:KP}. 
 $$
-H^{\star}(\gamma)=\left\{
+H^{\star}(\pi)=\left\{
 \begin{array}{cl}
-K(\gamma) & \text{si } \gamma \in\Pi(\mu,\nu)\\
+K(\pi) & \text{si } \pi \in\Pi(\mu,\nu)\\
 +\infty & \text{sinon}
 \end{array}
 \right.
 $$
 
-La preuve est presque terminée, $\max\eqref{eq:DKP} = -H(0) = H^{\star\star}(0)$ car $H$ est convexe et semi continue inférieurement\footnote{Ce fait est montré dans la section \ref{sec:prox}}. De plus, $H^{\star\star}(0)=\sup_{\gamma}\langle 
-,\gamma\rangle-H^{\star}(\gamma)=-\inf H^{\star}=-\min\eqref{eq:KP}$.
+La preuve est presque terminée, $\max\eqref{eq:DKP} = -H(0) = H^{\star\star}(0)$ car $H$ est convexe et semi continue inférieurement\footnote{Ce fait est montré dans la section \ref{sec:prox}}. De plus, $H^{\star\star}(0)=\sup_{\pi}\langle 
+,\pi\rangle-H^{\star}(\pi)=-\inf H^{\star}=-\min\eqref{eq:KP}$.
 \end{preuve}
 
 Ainsi, nous voyons que 
@@ -355,46 +367,46 @@ Les fonctions $\phi$ réalisant le maximum de \eqref{eq:existenceDKP}sont appel�
 
 A partir des résultats précédents sur le problèmes \eqref{eq:KP} et son dual \eqref{eq:DKP}, nous allons montrer l'existence du transport optimal dans le cas où, $\mathcal{X}=\mathcal{Y}=\Omega\subset\RR^n$ compact et $C(x,y)=h(x-y)$ pour une certaine fonction strictement convexe $h$. 
 
-Rappelons que pour une mesure $\gamma$, son support est le plus petit ensemble fermé sur lequel $\gamma$ est concentré : 
+Rappelons que pour une mesure $\pi$, son support est le plus petit ensemble fermé sur lequel $\pi$ est concentré : 
 $$
-\supp \gamma = \bigcap \left\{A\ |\ A \text{ fermé },\ \gamma(\mathcal{X}\backslash A) = 0 \right\}
+\supp \pi = \bigcap \left\{A\ |\ A \text{ fermé },\ \pi(\mathcal{X}\backslash A) = 0 \right\}
 $$
-une autre caractérisation du support de $\gamma$ est donnée par 
+une autre caractérisation du support de $\pi$ est donnée par 
 $$
-\supp\gamma = \left\{x\in\mathcal{X}\ |\ \gamma(B(x,r)) >0\ \forall r>0\right\}
+\supp\pi = \left\{x\in\mathcal{X}\ |\ \pi(B(x,r)) >0\ \forall r>0\right\}
 $$
 
-De l'égalité entre le minimum de \eqref{eq:KP} et le maximum de \eqref{eq:DKP} et le fait que le deux soient atteints, considérons un plan de transport optimal $\gamma$ et un potentiel de Kantorovitch $\phi$, 
+De l'égalité entre le minimum de \eqref{eq:KP} et le maximum de \eqref{eq:DKP} et le fait que le deux soient atteints, considérons un plan de transport optimal $\pi$ et un potentiel de Kantorovitch $\phi$, 
 \begin{align}
 \phi(x)+\phi^C(y) &\leq C(x,y) \text{ sur } \Omega\times\Omega \\
-\phi(x)+\phi^C(y) &= C(x,y) \text{ sur }\supp\gamma
+\phi(x)+\phi^C(y) &= C(x,y) \text{ sur }\supp\pi
 \end{align}
 L'égalité vient de l'inégalité (qui est vraie partout) et de 
 \begin{align}
-\int_{\Omega\times\Omega} C\ d\gamma = \int_{\Omega}\phi\ d\mu +  \int_{\Omega} \phi^C\ d\nu = \int_{\Omega\times\Omega} \phi\oplus\phi^c\ d\gamma
+\int_{\Omega\times\Omega} C\ d\pi = \int_{\Omega}\phi\ d\mu +  \int_{\Omega} \phi^C\ d\nu = \int_{\Omega\times\Omega} \phi\oplus\phi^c\ d\pi
 \end{align}
-ce qui implique l'égalité $\gamma$ presque partout. 
+ce qui implique l'égalité $\pi$ presque partout. 
 
 \begin{proposition}
-Si $C\in C^1(\Omega\times\Omega,[0,+\infty]$, $\phi$ un potentiel de Kantorovitch pour le coût $C$ pour le transport de $\mu$ vers $\nu$. Soit $(x_0,y_0)\in\supp\gamma$. Alors, si $\phi$ est différentiable en $x_0$, on a $\nabla\phi(x_0)= \frac{\partial}{\partial x}C(x_0,y_0)$.\\
-En particulier les gradients de deux potentiels de Kantorovitch coïncident en tout point $x0\in\supp\gamma$ où ils sont tout les deux différentiables.
+Si $C\in C^1(\Omega\times\Omega,[0,+\infty]$, $\phi$ un potentiel de Kantorovitch pour le coût $C$ pour le transport de $\mu$ vers $\nu$. Soit $(x_0,y_0)\in\supp\pi$. Alors, si $\phi$ est différentiable en $x_0$, on a $\nabla\phi(x_0)= \frac{\partial}{\partial x}C(x_0,y_0)$.\\
+En particulier les gradients de deux potentiels de Kantorovitch coïncident en tout point $x0\in\supp\pi$ où ils sont tout les deux différentiables.
 \end{proposition}
 \begin{preuve}
-Soit $(x_0,y_0)\in\supp\gamma$ telle que $\phi$ soit différentiable en $x_0$, des calculs précédents, nous déduisons que l'application $x\mapsto\phi(x)-c(x,y_0)$ atteint sont minimum en $x=x_0$. 
+Soit $(x_0,y_0)\in\supp\pi$ telle que $\phi$ soit différentiable en $x_0$, des calculs précédents, nous déduisons que l'application $x\mapsto\phi(x)-c(x,y_0)$ atteint sont minimum en $x=x_0$. 
 Comme $\phi$ et $C(\cdot,y_0)$ sont différentiables, nous obtenons directement le résultat souhaité. 
 \end{preuve}
 
 
 \begin{theoreme}{Existence du transport optimal}
-Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\gamma$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. 
-De plus, $\gamma$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
+Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\pi$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. 
+De plus, $\pi$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
 \begin{align}
 T(x) = x- (\partial h)^{-1}(\nabla\phi(x))
 \end{align}
 \end{theoreme}
 
 \begin{preuve}
-Le théorème précédent nous donne l'existence d'un plan de transport optimal $\gamma$ et d'un potentiel de Kantorovitch $\phi$.\\
+Le théorème précédent nous donne l'existence d'un plan de transport optimal $\pi$ et d'un potentiel de Kantorovitch $\phi$.\\
 
 $\phi$ partage le même module de continuité que $C$, c'est une fonction lipschitzienne sur $\Omega\times\Omega$ puisque $h$ est localement lipschitzienne et bornée sur $\Omega$. Ainsi, $\phi$ est aussi lipschitzienne.\\
 
@@ -404,7 +416,7 @@ x_0-y_0=(\partial h)^{-1}(\nabla\phi(x_0))
 $$
 Comme $\mu$ est absolument continue, $\partial\Omega$ et l'ensemble des points ou $\phi$ n'est pas différentiable sont négligeables (par le théorème de Rademacher). \\
 
-Cela montre que le plan de transport optimal est induit par un transport, que ce transport est donnée par $x\mapsto x -(\partial h)^{-1}(\nabla\phi(x_0))$. Ainsi il est uniquement déterminé, car $\phi$ ne dépend pas de $\gamma$. En conséquence, $\gamma$ est également unique. 
+Cela montre que le plan de transport optimal est induit par un transport, que ce transport est donnée par $x\mapsto x -(\partial h)^{-1}(\nabla\phi(x_0))$. Ainsi il est uniquement déterminé, car $\phi$ ne dépend pas de $\pi$. En conséquence, $\pi$ est également unique. 
 \end{preuve}
 Ainsi, tout les coûts de la forme $C(x,y) =\|x-y\|^p$ avec $p>1$ sont traités. 
 
@@ -880,7 +892,7 @@ Le problème \ref{eq:pbmminimi} admet une unique solution et pour $\forall \gamm
 $$
 \left\{
 \begin{array}{rcl}
-x &= & prox_{\gamma f_2} y \\
+x^{\star} &= & prox_{\gamma f_2} y \\
 prox_{\gamma f_2}y &= & prox_{\gamma f_1}(2prox_{\gamma f_2}y -y)
 \end{array}
 \right.
@@ -888,7 +900,19 @@ $$
 \end{propriete}
 
 \begin{preuve}
-$f_1+f_2$ est une fonction convexe, infinie à l'infini donc l'existence est l'unicité du minimiseur est immédiate.
+Omettons le paramètre $\gamma$ qui ne change rien à la preuve. $f_1+f_2$ est une fonction convexe, infinie à l'infini donc l'existence d'un minimiseur est immédiate.
+\begin{align*}
+x^{\star} =\argmin_x f_1(x) + f_2(x) &\Longleftrightarrow 0\in \partial (f_1+f_2)(x^{\star}) \\
+&\Longleftrightarrow \exists (x_1,x_2)\in \partial(f_1)(x^{\star})\times\partial(f_2)(x^{\star}) \text{ telle que } 0=x_1+x_2
+\end{align*}
+Comme le support de $f_1+f_2$ est non vide, $\exists\ y$ tel que $x^{\star}-y\in \partial(f_1)(x)$ et $y-x^{\star}\in\partial(f_2)(x)$.
+\begin{align*}
+\Longleftrightarrow x^{\star}=prox_{f_2} (y) \text{ et } &(2x^{\star}-y)-x^{\star}\in\partial(f_1)(x^{\star})\\
+&\Longleftrightarrow x^{\star} = prox_{f_1}(2x^{\star}-y)
+\end{align*}
+Ce qui termine la preuve. Cependant, pour la forme algorithmique, développons un peu les calculs : 
+
+
 \end{preuve}
 
 Suivant les idées d'algorithmes de point fixes sur les opérateurs proximaux, nous aintroduisons l'algorithme suivant dit de \emph{Douglas - Rachford}.
@@ -916,6 +940,27 @@ Toute suite $(x_n)$ générée par l'algorithme de Douglas - Rachford converge v
 
 
 \newpage
+
+
+\section{Résolution numérique}
+\label{sec:numerique}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+
 \section{Pbm de transport optimal}
 Soient deux densités $f_0$ et $f_1$ de même masse, suffisamment régulière, sur un domaine $[0,1]^d$.\\
 Un transport de $f_0$ sur $f_1$ est une application $T$ telle que :
