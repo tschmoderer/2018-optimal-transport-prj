@@ -10,13 +10,11 @@ close all
 addpath('toolbox/');
 
 
-N=20; P=N; Q=N;
+N=50; P=N; Q=100;
 
 
 d = [N,P,Q];
-epsilon = 1e-6;
-%exposant of the generalized cost
-alpha= 1; % should be in [0;1];
+alpha = 1; % should be in [0;1];
 
 % helpers
 mynorm = @(a)norm(a(:));
@@ -33,13 +31,16 @@ obstacle=zeros(N,P,Q);
 %%
 % Load the data.
 
-sigma =  .1;
+sigma =  .1; rho = 1e-10;
 f0 = normalize( rho + gaussian(.2,.2,sigma) );
 f1 = normalize( rho + gaussian(.8,.8,sigma) );
+
+f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
+f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
 epsilon=min(f0(:));
 
 clf; imageplot({f0 f1});
-
+ 
 %%
 % Initialization using linear interpolation of the densities.
 

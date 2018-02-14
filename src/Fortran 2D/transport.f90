@@ -1,12 +1,12 @@
 program transport
     implicit none
-    integer, parameter :: N = 30, P = 30, Q = 50, niter = 1000
-    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 0.5
+    integer, parameter :: N = 49, P = 49, Q = 50, niter = 1000
+    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1
     double precision, dimension(P+1,N+1) :: f0, f1
     double precision, dimension(P+1,N+1,Q,3) :: z = 0, w0 = 0, w1 = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i,k,l
-		character(10) :: charI;
+	character(10) :: charI;
 
 	open(1,file='input/f0.dat') 
 	do i = 1,P+1
@@ -23,8 +23,8 @@ program transport
 	f0 = normalise(eps + f0)
 	f1 = normalise(eps + f1)
 	
-    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0)) ! + gauss(0.8d0,0.5d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0)) ! + gauss(0.5d0,0.8d0,0.05d0))
+!    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0)) ! + gauss(0.8d0,0.5d0,0.05d0))
+!    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0)) ! + gauss(0.5d0,0.8d0,0.05d0))
 
     do i = 1,niter
         w1 = w0 + alpha*(proxJ(2*z-w0) - z)
@@ -33,7 +33,7 @@ program transport
 		
         cout(i) = J(z)
        
-        if (modulo(i,10) .EQ. 0) print *, i, cout(i)
+        if (modulo(i,1) .EQ. 0) print *, i, cout(i)
         minF(i) = minval(z(:,:,:,3))
     end do 
     

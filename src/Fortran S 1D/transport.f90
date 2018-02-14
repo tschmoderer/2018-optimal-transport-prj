@@ -238,14 +238,15 @@ program transport
 		double precision, dimension(Q+2,N+2,2) :: U
 		double precision, dimension(Q+1,N+1) :: D
 		U = 0
-		U(1:Q+1,1,1) = -D(:,1)
+		
+		U(1:Q+1,1,1)     = -D(:,1)
 		U(1:Q+1,2:N+1,1) = D(:,1:N) - D(:,2:N+1)
-		U(1:Q+1,N+2,1) = D(:,N+1)
+		U(1:Q+1,N+2,1)   = D(:,N+1)
 		U(:,:,1) = N*U(:,:,1)
 		
-		U(1,1:N+1,2) = -D(1,:) 
+		U(1,1:N+1,2)     = -D(1,:) 
 		U(2:Q+1,1:N+1,2) = D(1:Q,:) - D(2:Q+1,:)
-		U(Q+2,1:N+1,2) = D(Q+1,:) 
+		U(Q+2,1:N+1,2)   = D(Q+1,:) 
 		U(:,:,2) = Q*U(:,:,2)
 	end function divAdj
 
@@ -256,8 +257,10 @@ program transport
 		double precision, dimension(Q+3,N+3) :: Au
 		Au = 0
 		Au(1:Q+1,1:N+1) = div(U)
+		
 		Au(1:Q+1,N+2)   = U(1:Q+1,1,1)   ! frontieres de mbar
 		Au(1:Q+1,N+3)   = U(1:Q+1,N+2,1) 
+		
 		Au(Q+2,1:N+1)   = U(Q+2,1:N+1,2)   ! frontieres de fbar
 		Au(Q+3,1:N+1)   = U(1,1:N+1,2)
 	end function A 
@@ -269,10 +272,12 @@ program transport
 		double precision, dimension(Q+3,N+3) :: R
 		U = 0
 		U(1:Q+2,1:N+2,:) = divAdj(R(1:Q+1,1:N+1)) 
-		U(1:Q+1,1,1) = U(1:Q+1,1,1) + R(1:Q+1,N+2)
-		U(1:Q+1,N+2,1) = U(1:Q+1,N+2,1) + R(1:Q+1,N+3)
-		U(1,1:N+1,2) = U(1,1:N+1,2) + R(Q+3,1:N+1)
-		U(Q+2,1:N+1,2) = U(Q+2,1:N+1,2) + R(Q+2,1:N+1)
+		
+		U(1:Q+1,1,1)     = U(1:Q+1,1,1) + R(1:Q+1,N+2)
+		U(1:Q+1,N+2,1)   = U(1:Q+1,N+2,1) + R(1:Q+1,N+3)
+		
+		U(1,1:N+1,2)     = U(1,1:N+1,2) + R(Q+3,1:N+1)
+		U(Q+2,1:N+1,2)   = U(Q+2,1:N+1,2) + R(Q+2,1:N+1)
 	end function AS
 
 !! Projection sur C

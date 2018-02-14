@@ -3,6 +3,7 @@ src/prototype/Fortran/files/*
 src/prototype/Fortran/results/*
 src/prototype/Fortran/transport
 
+transport
 
 *.mod
 src/protorype/Fortran 1D/results/*.dat
