@@ -1,24 +1,24 @@
 program transport
     implicit none
-    integer, parameter :: N = 20, P = 20, Q = 20, niter = 200
+    integer, parameter :: N = 15, P = 15, Q = 15, niter = 200
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1.0
     double precision, dimension(P+1,N+1) :: f0, f1
-    double precision, dimension(P+1,N+1,Q,3) :: zV = 0, wV0 = 0, wV1 = 0
-    double precision, dimension(P+2,N+2,Q+1,3) :: zU = 0, wU0 = 0, wU1 = 0
-	integer, dimension(P+1,N+1,Q) :: obstacle = 0
+    double precision, dimension(P+1,N+1,Q+1,3) :: zV = 0, wV0 = 0, wV1 = 0
+    double precision, dimension(P+2,N+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0
+	integer, dimension(P+1,N+1,Q+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i, k, l 
   	character(10) :: charI;
   	
   	!! var pour les tests adj
-!  	double precision, dimension(P+2,N+2,Q+1,3) :: U, ISV, dSD, ASrA
+!  	double precision, dimension(P+2,N+2,Q+2,3) :: U, pU, ISV, dSD, ASrA
 !  	double precision, dimension(P+1,N+1,Q,3) :: V, IU
 !  	double precision, dimension(P+1,N+1,Q) :: D, dU
-!    double precision, dimension(P+3,N+3,Q+2) :: Au, rA
+!   double precision, dimension(P+3,N+3,Q+2) :: Au, rA
     
     f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
-    
+
     !! test adjoint 
 !    call random_number(U)
 !    IU  = interp(U)
@@ -41,9 +41,14 @@ program transport
 	
 !	print *, 'Opérateur A adjoint', sum(U*ASrA), sum(Au*rA) 
 
-! call exit()
+!	call random_number(U)
+!	pU = projC(U)
+!	print *, 'avant projection : ', sum(div(U))
+!	print *, 'après projection : ', sum(div(pU))
 
-	   do i = 1,niter
+!	call exit()
+
+do i = 1,niter
 		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
 		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
 		zU  = projCs(wU1,wV1)
@@ -53,29 +58,29 @@ program transport
 		wV0 = wV1
 		
         cout(i) = J(zV)
-       
-        if (modulo(i,10) .EQ. 0) print *, i, cout(i)
         minF(i) = minval(zV(:,:,:,3))
+
+        if (modulo(i,1) .EQ. 0) print *, i, cout(i)
     end do 
     
 	open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "Y ", "T ", "Z "
     do i = 1,P+1 ! y direction
         do k = 1,N+1 ! x direction 
-			do l = 1,Q ! t direction
-           write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*p), (l-1)/(1.0*Q -1),  zV(i,k,l,3)
+			do l = 1,Q+1 ! t direction
+           write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*p), (l-1)/(1.0*Q),  zV(i,k,l,3)
            end do
         end do
     end do
     close(1)
 
-	do l = 1,Q 
+	do l = 1,Q+1 
 		write(charI,'(I5.5)') l
 		open(1,file='results/Transport/'//trim(charI)//'.dat'); 
 		write(1,*) "# ", "X ", "Y ", "T ", "Z "
 		do i = 1,P+1 ! y direction
 			do k = 1,N+1 ! x direction 
-				write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*p),  zV(i,k,l,3)
+				write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*P),  zV(i,k,l,3)
 			end do
 		end do
 		close(1)
@@ -139,7 +144,7 @@ program transport
 !! Cout 
     function J(w) result(c) 
     implicit none
-        double precision, dimension(P+1,N+1,Q,3) :: w
+        double precision, dimension(P+1,N+1,Q+1,3) :: w
         double precision :: c
         c = 0.5*sum(sum(w(:,:,:,1:2)**2)/max(w(:,:,:,3),eps,1e-10)**b)
     end function J 
@@ -147,9 +152,9 @@ program transport
 !! Proximal de J 
     function proxJ(w) result(pw)
     implicit none
-        double precision, dimension(P+1,N+1,Q,3) :: w, pw
-        double precision, dimension(P+1,N+1,Q,2) :: mt
-        double precision, dimension(P+1,N+1,Q) :: ft, x0, x1, poly, dpoly
+        double precision, dimension(P+1,N+1,Q+1,3) :: w, pw
+        double precision, dimension(P+1,N+1,Q+1,2) :: mt
+        double precision, dimension(P+1,N+1,Q+1) :: ft, x0, x1, poly, dpoly
         integer :: k
         
         mt = w(:,:,:,1:2); ft = w(:,:,:,3);
@@ -184,31 +189,31 @@ program transport
 !! Interpolation 
 	function interp(U) result(V)
 	implicit none 
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+1,N+1,Q,3) :: V
-		V(:,:,:,1) = U(1:P+1,1:N+1,1:Q,1) + U(1:P+1,2:N+2,1:Q,1)
-		V(:,:,:,2) = U(1:P+1,1:N+1,1:Q,2) + U(2:P+2,1:N+1,1:Q,2)
-		V(:,:,:,3) = U(1:P+1,1:N+1,1:Q,3) + U(1:P+1,1:N+1,2:Q+1,3)
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+1,N+1,Q+1,3) :: V
+		V(:,:,:,1) = U(1:P+1,1:N+1,1:Q+1,1) + U(1:P+1,2:N+2,1:Q+1,1)
+		V(:,:,:,2) = U(1:P+1,1:N+1,1:Q+1,2) + U(2:P+2,1:N+1,1:Q+1,2)
+		V(:,:,:,3) = U(1:P+1,1:N+1,1:Q+1,3) + U(1:P+1,1:N+1,2:Q+2,3)
 		V = 0.5*V
 	end function interp
 
 !! Interpolation adjoint 
 	function interpAdj(V) result(U)
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+1,N+1,Q,3) :: V
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+1,N+1,Q+1,3) :: V
 		
 		U = 0
-		U(1:P+1,1,1:Q,1)     = V(:,1,:,1)
-		U(1:P+1,2:N+1,1:Q,1) = V(:,2:N+1,:,1) + V(:,1:N,:,1)
-		U(1:P+1,N+2,1:Q,1)   = V(:,N+1,:,1)
+		U(1:P+1,1,1:Q+1,1)     = V(:,1,:,1)
+		U(1:P+1,2:N+1,1:Q+1,1) = V(:,2:N+1,:,1) + V(:,1:N,:,1)
+		U(1:P+1,N+2,1:Q+1,1)   = V(:,N+1,:,1)
 		
-		U(1,1:N+1,1:Q,2)     = V(1,:,:,2)
-		U(2:P+1,1:N+1,1:Q,2) = V(2:P+1,:,:,2) + V(1:P,:,:,2)
-		U(P+2,1:N+1,1:Q,2)   = V(P+1,:,:,2)
+		U(1,1:N+1,1:Q+1,2)     = V(1,:,:,2)
+		U(2:P+1,1:N+1,1:Q+1,2) = V(2:P+1,:,:,2) + V(1:P,:,:,2)
+		U(P+2,1:N+1,1:Q+1,2)   = V(P+1,:,:,2)
 		
-		U(1:P+1,1:N+1,1,3)   = V(:,:,1,3)
-		U(1:P+1,1:N+1,2:Q,3) = V(:,:,2:Q,3) + V(:,:,1:Q-1,3)
-		U(1:P+1,1:N+1,Q+1,3) = V(:,:,Q,3)
+		U(1:P+1,1:N+1,1,3)     = V(:,:,1,3)
+		U(1:P+1,1:N+1,2:Q+1,3) = V(:,:,2:Q+1,3) + V(:,:,1:Q,3)
+		U(1:P+1,1:N+1,Q+2,3)   = V(:,:,Q+1,3)
 				
 		U = 0.5*U 	
 	end function interpAdj
@@ -216,8 +221,8 @@ program transport
 !! Projection sur Cs
 	function projCs(U,V) result(pU)
 	implicit none
-		double precision, dimension(P+2,N+2,Q+1,3) :: U, b, r, dir, Idir, pU
-		double precision, dimension(P+1,N+1,Q,3) :: V
+		double precision, dimension(P+2,N+2,Q+2,3) :: U, b, r, dir, Idir, pU
+		double precision, dimension(P+1,N+1,Q+1,3) :: V
 		double precision :: alpha, rnew, rold
 		integer :: i 
 		b = U + interpAdj(V)
@@ -225,7 +230,7 @@ program transport
 		r = b - pU - interpAdj(interp(pU))
 		dir = r
 		rold = sum(r*r)
-		do i = 1,3*(P+2)*(N+2)*(Q+1)
+		do i = 1,3*(P+2)*(N+2)*(Q+2)
 			Idir = dir + interpAdj(interp(dir))
 			alpha = rold/sum(dir*Idir)
 			pU = pU + alpha*dir
@@ -240,91 +245,91 @@ program transport
 !! Divergence 
 	function div(U) result(D) 
 	implicit none
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+1,N+1,Q) :: D
-		D = (N + 1)*(U(1:P+1,2:N+2,1:Q,1) - U(1:P+1,1:N+1,1:Q,1))
-		D = D + (P + 1)*(U(2:P+2,1:N+1,1:Q,2) - U(1:P+1,1:N+1,1:Q,2))
-		D = D + Q*(U(1:P+1,1:N+1,2:Q+1,3) - U(1:P+1,1:N+1,1:Q,3))
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+1,N+1,Q+1) :: D
+		D = (N)*(U(1:P+1,2:N+2,1:Q+1,1) - U(1:P+1,1:N+1,1:Q+1,1))
+		D = D + (P)*(U(2:P+2,1:N+1,1:Q+1,2) - U(1:P+1,1:N+1,1:Q+1,2))
+		D = D + (Q)*(U(1:P+1,1:N+1,2:Q+2,3) - U(1:P+1,1:N+1,1:Q+1,3))
 	end function div	
 
 !! Adjoint de la divergence 
 	function divAdj(D) result(U)
 	implicit none
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+1,N+1,Q) :: D
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+1,N+1,Q+1) :: D
 		U = 0
 		
-		U(1:P+1,1,1:Q,1)     = -D(:,1,:)
-		U(1:P+1,2:N+1,1:Q,1) = D(:,1:N,:) - D(:,2:N+1,:)
-		U(1:P+1,N+2,1:Q,1)   = D(:,N+1,:)
-		U(:,:,:,1) = (N + 1)*U(:,:,:,1)
+		U(1:P+1,1,1:Q+1,1)     = -D(:,1,:)
+		U(1:P+1,2:N+1,1:Q+1,1) = D(:,1:N,:) - D(:,2:N+1,:)
+		U(1:P+1,N+2,1:Q+1,1)   = D(:,N+1,:)
+		U(:,:,:,1) = (N)*U(:,:,:,1)
 		
-		U(1,1:N+1,1:Q,2)     = -D(1,:,:)
-		U(2:P+1,1:N+1,1:Q,2) = D(1:P,:,:) - D(2:P+1,:,:)
-		U(P+2,1:N+1,1:Q,2)   = D(P+1,:,:)
-		U(:,:,:,2) = (P + 1)*U(:,:,:,2)
+		U(1,1:N+1,1:Q+1,2)     = -D(1,:,:)
+		U(2:P+1,1:N+1,1:Q+1,2) = D(1:P,:,:) - D(2:P+1,:,:)
+		U(P+2,1:N+1,1:Q+1,2)   = D(P+1,:,:)
+		U(:,:,:,2) = (P)*U(:,:,:,2)
 		
 		U(1:P+1,1:N+1,1,3)   = -D(:,:,1)
-		U(1:P+1,1:N+1,2:Q,3) = D(:,:,1:Q-1) - D(:,:,2:Q)
-		U(1:P+1,1:N+1,Q+1,3) = D(:,:,Q)
-		U(:,:,:,3) = Q*U(:,:,:,3)
+		U(1:P+1,1:N+1,2:Q+1,3) = D(:,:,1:Q) - D(:,:,2:Q+1)
+		U(1:P+1,1:N+1,Q+2,3) = D(:,:,Q+1)
+		U(:,:,:,3) = (Q)*U(:,:,:,3)
 	end function divAdj
 
 !! Opérateur A 
 	function A(U) result(Au)
 	implicit none
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+3,N+3,Q+2) :: Au
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+3,N+3,Q+3) :: Au
 		Au = 0
-		Au(1:P+1,1:N+1,1:Q) = div(U)
+		Au(1:P+1,1:N+1,1:Q+1) = div(U)
 
-		Au(1:P+1,N+2,1:Q)   = U(1:P+1,1,1:Q,1) ! frontiere de mbar1
-		Au(1:P+1,N+3,1:Q)   = U(1:P+1,N+2,1:Q,1)
+		Au(1:P+1,N+2,1:Q+1)   = U(1:P+1,1,1:Q+1,1) ! frontiere de mbar1
+		Au(1:P+1,N+3,1:Q+1)   = U(1:P+1,N+2,1:Q+1,1)
 		
-		Au(P+2,1:N+1,1:Q)   = U(1,1:N+1,1:Q,2) ! frontiere de mbar2
-		Au(P+3,1:N+1,1:Q)   = U(P+2,1:N+1,1:Q,2)
+		Au(P+2,1:N+1,1:Q+1)   = U(1,1:N+1,1:Q+1,2) ! frontiere de mbar2
+		Au(P+3,1:N+1,1:Q+1)   = U(P+2,1:N+1,1:Q+1,2)
 		
-		Au(1:P+1,1:N+1,Q+1) = U(1:P+1,1:N+1,1,3) ! frontieres de fbar
-		Au(1:P+1,1:N+1,Q+2) = U(1:P+1,1:N+1,Q+1,3)
+		Au(1:P+1,1:N+1,Q+2)   = U(1:P+1,1:N+1,1,3) ! frontieres de fbar
+		Au(1:P+1,1:N+1,Q+3)   = U(1:P+1,1:N+1,Q+2,3)
 	end function A 		
 	
 !! Adjoint de A 
 	function AS(R) result(U) 
 	implicit none 
-		double precision, dimension(P+2,N+2,Q+1,3) :: U
-		double precision, dimension(P+3,N+3,Q+2) :: R
+		double precision, dimension(P+2,N+2,Q+2,3) :: U
+		double precision, dimension(P+3,N+3,Q+3) :: R
 		U = 0
 		
-		U(1:P+2,1:N+2,1:Q+1,:) = divAdj(R(1:P+1,1:N+1,1:Q)) 
+		U(1:P+2,1:N+2,1:Q+2,:) = divAdj(R(1:P+1,1:N+1,1:Q+1)) 
 		
-		U(1:P+1,1,1:Q,1)     = U(1:P+1,1,1:Q,1) + R(1:P+1,N+2,1:Q)
-		U(1:P+1,N+2,1:Q,1)   = U(1:P+1,N+2,1:Q,1) + R(1:P+1,N+3,1:Q)
+		U(1:P+1,1,1:Q+1,1)     = U(1:P+1,1,1:Q+1,1) + R(1:P+1,N+2,1:Q+1)
+		U(1:P+1,N+2,1:Q+1,1)   = U(1:P+1,N+2,1:Q+1,1) + R(1:P+1,N+3,1:Q+1)
 		
-		U(1,1:N+1,1:Q,2)     = U(1,1:N+1,1:Q,2) + R(P+2,1:N+1,1:Q) 
-		U(P+2,1:N+1,1:Q,2)   = U(P+2,1:N+1,1:Q,2) + R(P+3,1:N+1,1:Q) 
+		U(1,1:N+1,1:Q+1,2)     = U(1,1:N+1,1:Q+1,2) + R(P+2,1:N+1,1:Q+1) 
+		U(P+2,1:N+1,1:Q+1,2)   = U(P+2,1:N+1,1:Q+1,2) + R(P+3,1:N+1,1:Q+1) 
 		
-		U(1:P+1,1:N+1,1,3)   = U(1:P+1,1:N+1,1,3) + R(1:P+1,1:N+1,Q+1)
-		U(1:P+1,1:N+1,Q+1,3) = U(1:P+1,1:N+1,Q+1,3) + R(1:P+1,1:N+1,Q+2)
+		U(1:P+1,1:N+1,1,3)     = U(1:P+1,1:N+1,1,3) + R(1:P+1,1:N+1,Q+2)
+		U(1:P+1,1:N+1,Q+2,3)   = U(1:P+1,1:N+1,Q+2,3) + R(1:P+1,1:N+1,Q+3)
 	end function AS
 
 !! Projection sur C
 	function projC(U) result(pU) 
 	implicit none 
-		double precision, dimension(P+2,N+2,Q+1,3) :: U, pU
-		double precision, dimension(P+3,N+3,Q+2) :: y, x, b, r, dir, Adir
+		double precision, dimension(P+2,N+2,Q+2,3) :: U, pU
+		double precision, dimension(P+3,N+3,Q+3) :: y, x, b, r, dir, Adir
 		double precision :: alpha, rnew, rold
 		integer :: i 
 		
 		y = 0
-		y(1:P+1,1:N+1,Q+1) = f0
-		y(1:P+1,1:N+1,Q+2) = f1
+		y(1:P+1,1:N+1,Q+2) = f0
+		y(1:P+1,1:N+1,Q+3) = f1
 		
 		x = 0
 		b = y - A(U)
 		r = b - A(AS(x))
 		dir = r
 		rold = sum(r*r)
-		do i = 1,(Q+3)*(N+3)
+		do i = 1,(P+3)*(N+3)*(Q+3) ! attention ici 
 			Adir = A(AS(dir))
 			alpha = rold/sum(dir*Adir)
 			x = x + alpha*dir
