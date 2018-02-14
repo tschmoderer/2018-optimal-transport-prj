@@ -34,6 +34,8 @@ for i = 1:niter
     cout(i) = J(zV);
     minF(i) = min(min(zV(:,:,2)));
     if (mod(i,10) == 0) 
-        fprintf('Iteration : %d, cout : %f\n',i, cout(i));
+        fprintf('Iteration : %3d, cout : %f\n',i, cout(i));
     end  
 end
+
+surf(zV(:,:,2))
