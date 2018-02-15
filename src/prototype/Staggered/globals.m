@@ -2,6 +2,7 @@
 global eps; 
 
 global N;
+global P;
 global Q;
 
 global f0;
