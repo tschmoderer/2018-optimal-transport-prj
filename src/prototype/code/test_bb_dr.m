@@ -10,7 +10,7 @@ close all
 addpath('toolbox/');
 
 
-N=50; P=N; Q=100;
+N=100; P=100; Q=100;
 
 
 d = [N,P,Q];
@@ -31,15 +31,20 @@ obstacle=zeros(N,P,Q);
 %%
 % Load the data.
 
-sigma =  .1; rho = 1e-10;
+sigma =  .05; rho = 1e-10;
 f0 = normalize( rho + gaussian(.2,.2,sigma) );
 f1 = normalize( rho + gaussian(.8,.8,sigma) );
 
-f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
-f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
+% f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
+% f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
+
+% f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
+% f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
+
+
 epsilon=min(f0(:));
 
-clf; imageplot({f0 f1});
+clf; imageplot({f0 f1}); 
  
 %%
 % Initialization using linear interpolation of the densities.
@@ -105,6 +110,10 @@ for i=1:niter
     Xu = Xu + mu*( Zu - Xu );
     Xv = Xv + mu*( Zv - Xv );
     
+    contour(Xv(:,:,floor(Q/2),3));
+    title(['Iteration : ',num2str(i)]);
+    drawnow
+    
     % record energy
     Jlist(i)  = J(interp(div_proj(Xu)));
     Constr(i) = mynorm(div(Xu));
@@ -145,5 +154,27 @@ plot(Constr); axis tight;
 title('div=0 violation');
 %disp(num2str(Constr(end)));
 
+figure; 
+for i = 1:25
+    subplot(5,5,i), imagesc(Xu.M{3}(:,:,i)), axis off;
+end
+
+figure; 
+for i = 26:50
+    subplot(5,5,i-25), imagesc(Xu.M{3}(:,:,i)), axis off;
+end
+
+figure; 
+for i = 51:75
+    subplot(5,5,i-50), imagesc(Xu.M{3}(:,:,i)), axis off;
+end
+
+figure; 
+for i = 76:100
+    subplot(5,5,i-75), imagesc(Xu.M{3}(:,:,i)), axis off;
+end
 
 
+for i = 1:Q+1 
+   dlmwrite(['results/000',sprintf('%01d',i),'.dat'],flipud(Xu.M{3}(:,:,i)),'delimiter',' '); 
+end

@@ -1,9 +1,9 @@
 
 global eps; 
 
-global N;
-global P;
-global Q;
+global N; % direction x
+global P; % direction y
+global Q; % direction t
 
 global f0;
 global f1;

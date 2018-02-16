@@ -1,15 +1,15 @@
 function pU = projC(U)
     globals;
-    y = zeros(P+3,N+3,Q+3);
-    y(1:P+1,1:N+1,Q+2) = f0;
-    y(1:P+1,1:N+1,Q+3) = f1;
+    y = zeros(N+3,P+3,Q+3);
+    y(1:N+1,1:P+1,Q+2) = f0;
+    y(1:N+1,1:P+1,Q+3) = f1;
 
-    x = zeros(P+3,N+3,Q+3);
+    x = zeros(N+3,P+3,Q+3);
     b = y - A(U);
     r = b - A(AS(x));
     p = r;
     rold = sum(r(:).*r(:));
-    for i = 1:(Q+3)*(N+3)*(P+3)
+    for i = 1:(N+3)*(P+3)*(Q+3)
         Ap = A(AS(p));
         alpha = rold/sum(p(:).*Ap(:));
         x = x + alpha*p;

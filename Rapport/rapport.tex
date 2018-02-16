@@ -5,6 +5,7 @@
 \usepackage[toc,page]{appendix}
 \renewcommand\appendixtocname{Annexes}
 \newcommand{\supp}{\text{supp }}
+\newcommand{\prox}{\text{Prox}}
 
 \setlength{\parindent}{0pt}
 \newcommand\titre{Transport Optimal}
@@ -48,6 +49,7 @@ language=Matlab,
 
 
 \begin{document}
+
 \thispagestyle{empty}
 \maketitle
 \tableofcontents
@@ -77,6 +79,7 @@ Le plan de rapport est le suivant, nous commencerons par présenté les notions 
 
 }
 \newpage
+
 
 \section{Problème de Transport Optimal}
 Dans cette section, nous nous attachons à décrire le problème de transport optimal. Nous donnerons des preuves de l'existence de solution à ce problème. Nous finirons par donner la formulation du problème par Benamou et Brenier, que nous nous attacherons de résoudre numériquement dans la partie \ref{sec:numerique}. 
@@ -133,24 +136,24 @@ Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. 
 
 \fbox{
   \parbox{\textwidth}{
-  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver la mesure $\gamma$ réalisant le 
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver la mesure $\pi$ réalisant le 
 	\begin{equation}
 	\tag{KP}
-	\inf\left\{ K(\gamma ) := \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\gamma (x,y), \quad \gamma \in\Pi(\mu,\nu )\right\}
+	\inf\left\{ K(\pi ) := \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\pi (x,y), \quad \pi \in\Pi(\mu,\nu )\right\}
 	\label{eq:KP}
 	\end{equation}
 	Où, $\Pi(\mu,\nu)$ est l'ensemble des plans de transports : 
 	\begin{empheq}[left={ \Pi(\mu,\nu) = \empheqlbrace}]{align}
-	  &  \gamma \text{ une probabilité sur }\mathcal{X}\times\mathcal{Y}\nonumber \\
-      &  \forall A\in\mathcal{B}(\mathcal{X}),\quad \gamma (A\times\mathcal{Y}) = \mu(A) \label{eq:contrKP}\\
-      &  \forall B\in\mathcal{B}(\mathcal{Y}),\quad \gamma (\mathcal{X}\times B) = \nu(B)  \nonumber,
+	  &  \pi \text{ une probabilité sur }\mathcal{X}\times\mathcal{Y}\nonumber \\
+      &  \forall A\in\mathcal{B}(\mathcal{X}),\quad \pi (A\times\mathcal{Y}) = \mu(A) \label{eq:contrKP}\\
+      &  \forall B\in\mathcal{B}(\mathcal{Y}),\quad \pi (\mathcal{X}\times B) = \nu(B)  \nonumber,
 	\end{empheq}
   }
 }
 \vspace{0.3cm}
 
-La valeur de $\gamma (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus généraux qu'un transport classique. En effet, à partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers d'une application de transport $T$.\\
-Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\gamma$, cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
+La valeur de $\pi (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus généraux qu'un transport classique. En effet, à partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers d'une application de transport $T$.\\
+Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\pi$, cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
 
 \begin{figure}[!h]
 \centering
@@ -194,6 +197,7 @@ Et donc, le théorème de Weierstrass \eqref{thm:weierstrass} s'applique.
 \end{preuve}
 
 \begin{proposition}
+\label{prop:existKP3}
 Supposons que $\mathcal{X}$ et $\mathcal{Y}$ sont des espaces métriques complets et séparables (i.e. polonais). Supposons toujours que le coût $C$ est semi-continue inférieurement et bornée par dessous. Alors le problème \eqref{eq:KP} admet une solution. 
 \end{proposition}
 \begin{preuve}
@@ -246,20 +250,20 @@ Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi
   Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions continues, bornée $\phi$ et $\psi$ réalisant le 
 	\begin{equation}
 	\tag{DKP}
-	\sup\left\{\int_{\mathcal{X}} \phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\mu, \quad  (\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y}) \ \phi\oplus\psi \leq C \right\}
+	\sup\left\{\int_{\mathcal{X}} \phi\ d\nu + \int_{\mathcal{Y}}\psi\ d\mu, \quad  (\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y}) \ \phi\oplus\psi \leq C \right\}
 	\label{eq:DKP}
 	\end{equation}
   }
 }
 \vspace{0.3cm}
 
-Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq c$ par rapport à $\pi$ : 
+Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq C$ par rapport à $\pi$ : 
 $$
-\int_{\mathcal{X}} \phi d\mu (x) + \int_{\mathcal{Y}}\psi d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\pi \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi
+\int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\ d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\pi \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi
 $$
 
 Malheureusement le problème \eqref{eq:DKP} n'admet pas trivialement l'existence de ses maximums, car l'espace des fonctions continues bornées n'est pas compact. Montrons dans un premier temps l'existence de ces maximiseurs, puis montrons que le problème \eqref{eq:DKP} est bien le dual de \eqref{eq:DKP} au sens ou $\max\eqref{eq:DKP} =\min\eqref{eq:KP}$.
-\newpage
+
 
 \begin{definition}{C et $\bar{C}$-transformée, C et $\bar{C}$-concavité}
 Soit une fonction $\chi\ :\ \mathcal{X}\rightarrow [-\infty,+\infty]$. La C-transformée (ou parfois, C - conjuguée) de $\chi$ est définie par $\chi^C\ : \ \mathcal{Y}\rightarrow[-\infty,+\infty]$ : 
@@ -304,6 +308,19 @@ $$
 $$
 Ici la convergence simple aurait suffit. Cela montre que $(\phi,\psi)$ est une paire admissible pour \eqref{eq:DKP} et optimale.
 \end{preuve}
+Avant de montrer que les problèmes \eqref{eq:DKP} et \eqref{eq:KP} sont bien duaux, introduisons un ouils, la transformée de Legendre Flenchel et donnons quelques propriétés. 
+\begin{definition}{Transformée de Legendre Flenchel}
+Pour toute fonction $f\ :\ \RR^n\rightarrow \RR\cup\{+\infty\}$ sa transformée de Legendre Flenchel est définie par :
+\begin{align}
+f^{\star}(y)=\sup_x \langle x,y\rangle -f(x)
+\end{align}
+\end{definition}
+\begin{propriete}
+\begin{enumerate}
+\item Une fonction $f$ est convexe et semi continue inférieurement si et seulement si il existe une fonction $g$ telle que $f=g^{\star}$.
+\item Une fonction $f\ :\ \RR^n\rightarrow \RR\cup\{+\infty\}$ est convexe et semi continue inférieurement si et seulement si $f^{\star\star}=f$.
+\end{enumerate}
+\end{propriete}
 Montrons à présent que \eqref{eq:DKP} est bien le problème dual associé à \eqref{eq:KP}. 
 \begin{theoreme}{}
 Les problèmes \eqref{eq:KP} et \eqref{eq:DKP} sont bien duaux l'un de l'autre :
@@ -398,6 +415,7 @@ Comme $\phi$ et $C(\cdot,y_0)$ sont différentiables, nous obtenons directement 
 
 
 \begin{theoreme}{Existence du transport optimal}
+\label{thm:existtrasp}
 Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\pi$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. 
 De plus, $\pi$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
 \begin{align}
@@ -422,20 +440,93 @@ Ainsi, tout les coûts de la forme $C(x,y) =\|x-y\|^p$ avec $p>1$ sont traités.
 
 
 \subsection{Le cas quadratique sur $\RR^n$}
+Comme souvent le cas quadratique possède quelques propriétés supplémentaires qu'il convient d'exposer. Mettons nous dans $\RR^n $ avec le coût $C(x,y)=\frac{1}{1}\|x-y\|^2$.\\
+Premièrement, si nous sommes sur un ensemble compact, nous pouvons préciser le théorème \eqref{thm:existtrasp}. Il existe une application de transport optimal qui s'exprime comme 
+$$
+T(x) = x -\nabla\phi(x) = \nabla\left(\frac{x^2}{2}-\phi(x)\right) = \nabla u(x)
+$$
+Pour une certaine fonction convexe $\phi$. Adaptons le résultat précédent aux domaines non bornés. Considérons pour cela une variante du problème \eqref{eq:DKP} : \\
+
+\fbox{
+  \parbox{\textwidth}{
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions continues, bornée $\phi$ et $\psi$ réalisant le 
+	\begin{equation}
+	\tag{DKP - var}
+	\sup\left\{\int_{\RR^n} \phi\ d\mu + \int_{\RR^n}\psi\ d\nu, \quad  (\phi,\psi)\in L^1(\RR^n,\mu)\times L^1(\RR^n,\nu) \ \phi\oplus\psi \leq C \right\}
+	\label{eq:DKPvar}
+	\end{equation}
+  }
+}
+\vspace{0.3cm}
+Introduisons un lemme technique établissant un lien entre la $C$ - concavité et la transformée de Legendre Flenchel dans le cas du coût quadratique. 
+
+\begin{lemme}
+Soit une fonction $\chi\ :\ \RR^n \rightarrow \RR\cup\{+\infty\}$. Posons, $\fonction{u_{\chi}}{\RR^n}{\RR\cup\{+\infty\}}{x}{\frac{1}{2}\|x\|^2-\chi(x)} $. Alors, $u_{\chi^C} = (u_{\chi})^{\star}$. En particulier, une fonction $\chi$ est $C$ - concave si et seulement si $x\mapsto\frac{1}{2}\|x\|^2-\chi(x)$ est convexe et semi continue inférieurement. 
+\end{lemme}
+\begin{preuve}
+Pour le premier point, calculons 
+$$
+u_{\chi^C}(x) =\frac{1}{2}\|x\|^2 - \chi^C(x)=\sup_y \frac{1}{2}\|x\|^2  - \frac{1}{2}\|x - y\|^2 + \chi(y) = \sup_y \langle x,y\rangle - \left( \frac{1}{2}\|y\|^2 - \chi(y)\right) 
+$$
+De plus, comme les fonctions $C$ - concaves sont caractérisés par le fait qu'elles sont des $C$ - transformée et des fonctions convexes semi continues inférieurement (comme le $\sup$ de fonctions affines). Ce qui montre le second point.
+\end{preuve}
+Nous pouvons à présent énoncer le résultat de dualité. 
+\begin{theoreme}{}
+Soient $\mu$ et $\nu$ des probabilités sur $\RR^n$ et $C(x,y)=\frac{1}{2}\|x-y\|^2$. Supposons que : 
+\begin{enumerate}
+\item $\int\|x\|^2dx$, $\int\|y\|^2dy<+\infty$,
+\item $\mu$ ne donne pas de masse aux hypersurfaces de classe $C^2$.
+\end{enumerate}
+Alors \eqref{eq:DKPvar} admet une solution $(\phi,\psi)$ et les fonctions $x\mapsto\frac{1}{2}\|x\|^2-\phi(x)$ et $y\mapsto\frac{1}{2}\|y\|^2-\psi(y)$ sont conjuguées l'une de l'autre pour la transformation de Legendre Flenchel.\\
+De plus $\sup\eqref{eq:DKPvar}=\inf\eqref{eq:KP}$. 
+\end{theoreme}
+Comme nous l'avions fait pour \eqref{eq:DKP}, remarquons que $\sup\eqref{eq:DKPvar}\leq \min\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi\leq C$ par rapport à $\pi$ : 
+$$
+\int_{\RR^n}\phi\ d\mu + \int_{\RR^n}\psi\ d\nu = \int_{\RR^n\times\RR^n} \phi\oplus\psi\ d\pi \leq\int_{\RR^n\times\RR^n} C d\pi 
+$$
 
 
+\begin{preuve}
+La continuité de $C$ et les propriété de complétude et de séparabilité de $\RR^n$ nous garantissent l'existence du $\min\eqref{eq:KP}$ par la proposition \eqref{prop:existKP3}. Soit $\pi$ la mesure réalisant ce minimum. \\
+
+Il existe alors une paire $(\phi,\psi)$ avec $\phi$ est $C$ - concave et telle que $\phi(x)+\phi^C(y) = C(x,y)$ pour $(x,y)$ dans le support du plan de transport optimal.\\
+
+Alors, nous déduisons que $x\mapsto\frac{1}{2}\|x\|^2-\phi(x)$ et $y\mapsto\frac{1}{2}\|y\|^2-\psi(y)$ sont convexes, conjuguées l'une de l'autre. En particulier, $\frac{1}{2}\|x\|^2-\phi(x)$ est bornée inférieurement par une fonction linéaire, et don $\phi$ est bornée supérieurement par un polynôme du second degré. Cela montre que $\phi_+\in L^1(\mu)$ par hypothèse sur $\mu$, de même, nous montrons que $\psi_+\in L^1(\nu)$. \\
+Intégrons à présent $\phi\oplus\psi$ par rapport à $\pi$. 
+$$
+\int_{\RR^n}\phi\ d\mu + \int_{\RR^n}\psi\ d\nu = \int_{\RR^n\times\RR^n}\phi\oplus\psi\ d\pi = \int_{\RR^n\times\RR^n}C\ d\pi \geq 0
+$$
+Ce qui prouve que $\int_{\RR^n}\phi\ d\mu,\ \int_{\RR^n}\psi\ d\nu > -\infty$ et donc $\phi\in L^1(\mu)$ et $\psi \in L^1(\nu)$.\\
+
+Ainsi, nous pouvons utilise $(\phi,\phi^C)$ comme paire admissible pour \eqref{eq:DKPvar}. 
+$$
+\eqref{eq:DKPvar} \geq \int_{\RR^n}\phi\ d\mu + \int_{\RR^n}\phi^C\ d\nu = \int_{\RR^n\times\RR^n}C\ d\pi = \eqref{eq:KP}
+$$
+par l'optimalité de $\pi$. \\
+Ainsi, $\max\eqref{eq:DKPvar} = \min\eqref{eq:KP}$. 
+\end{preuve}
 
 
+\begin{theoreme}{}
+Soient $\mu$ et $\nu$ des probabilités sur $\RR^n$ et $C(x,y)=\frac{1}{2}\|x-y\|^2$. Supposons que : 
+\begin{enumerate}
+\item $\int\|x\|^2dx$, $\int\|y\|^2dy<+\infty$
+\item $\mu$ ne donne pas de masse aux hypersurfaces de classe $C^2$.
+\end{enumerate}
+alors il existe une unique application de transport optimal $T$, donnée par $T=\nabla u$ pour une fonction convexe $u$.
+\end{theoreme}
 
-
-
+\begin{preuve}
+Il existe un plan de transport optimal $\pi$, et par le théorème précédent, une paire $(\phi,\psi)\in L^1(\mu)\times L^1(\nu)$ optimale. \\
+Comme $\phi\in L^1(\mu)$, nous en déduisons que $u$ est finie $\mu$ presque partout et comme $u$ est convexe, $\supp\pi\subset \{u<+\infty\}$, un ensemble convexe. Remarquons que $\partial \{u<+\infty\}$ s'exprime comme le graphe d'une fonction concave, c'est donc une hypersurface de classe $C^2$, qui est $\mu$ négligeable par hypothèse. Dans l'intérieur de $\partial \{u<+\infty\}$, $u$ est différentiable $\mu$ presque partout par hypothèse sur $\mu$ et $u$ convexes. \\
+Comme $\phi$ est différentiable $\mu$ presque partout, la mesure $\pi$ est concentrée sur le graphe de $x\mapsto x-\nabla\phi(x)=\nabla u(x)$.
+\end{preuve}
 
 
 
  
 
 \newpage
-
 
 
 Introduisons petit à petit des hypothèses simplificatrices mais pas aberrantes. Supposons que les mesures aient une densité : $\mu = f_0 dx$ et $\nu = f_1 dx$. La relation \eqref{eq:trspmesures} devient alors : 
@@ -470,23 +561,9 @@ Trouver $T\in\mathcal{T}(f_0,f_1)$ qui réalise le
 \end{enumerate}
 }
 
-\begin{theoreme}{Existence et unicité du transport optimal}
 
-\end{theoreme}
-\begin{preuve}
 
-\end{preuve}
 
-\begin{theoreme}{}
-Dans le cas du coût quadratique, il existe une unique application de transport optimal qui s'écrit comme le gradient d'une fonction convexe. 
-\begin{align}
-T(x) = \nabla \Psi(x)
-\label{eq:opttrspGrdient}
-\end{align}
-\end{theoreme}
-\begin{preuve}
-
-\end{preuve}
 A partir de l'équation de la jacobienne \eqref{eq:jacobienne}, $\Psi$ est solution de l'équation de \emph{Monge - Ampère} 
 \begin{align}
 f_1(\nabla\Psi(x)) = \frac{f_0(x)}{det\ H\Psi(x)}
@@ -941,24 +1018,75 @@ Toute suite $(x_n)$ générée par l'algorithme de Douglas - Rachford converge v
 
 \newpage
 
-
-\section{Résolution numérique}
+\section{Méthode numérique}
 \label{sec:numerique}
+Dans cette section, nous présentons différentes manières d'approcher numériquement la solution du problème \eqref{eq:MP}. La méthode consiste principalement à trouver une manière efficace de calculer les contraintes. \\
+
+La présentation de cette section part de l'algorithme de Douglas - Rachtford. \\
+
+Dans cette section nous nous plaçons dans un domaine spatial de dimension 1. La méthode présentée s'étend sans grande difficultés en dimensions supérieures. 
+
+
+\subsection{Sur des grilles centrées}
+Le problème continu {\Huge Insérer ref} est approximé par 
+\begin{align}
+\min_{w\in\mathcal{G}} J(w) + \iota_C(w)
+\end{align}
+Où, $\mathcal{G}$ est la grille de discrétisation du carré espace temps. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\linewidth]{img/grille_centree.png}
+\caption{•}
+\end{figure}
+
+$J$ est la version discrète de la fonctionnelle
+$$
+é
+$$
+
+
+L'équation de conservation des contrainte \eqref{eq:contraintes}, suggère une discrétisation différences finies du domaine. 
 
 
 
+\subsection{Avec des grilles décentrées}
+\section{Implémentation}
 
+\section{Exemples}
 
-
-
-
-
-
-
-
-
-
-
+\subsection{Opérateur proximal de $J$}
+La fonctionnelle $J$ est simple dans le sens où son opérateur proximal peut être calculé dans une forme fermée. 
+\begin{proposition}
+\begin{align*}
+\forall w\in\mathcal{G},\ \prox_{\gamma J}(w) = \left( \prox_{\gamma J}(w_k)\right)_{k\in\mathcal{G}}
+\end{align*}
+Où, pour tout $w_k=(m_k,f_k)\in\RR^n\times\RR$, 
+$$
+\prox_{\gamma J}(m_k,f_k) =\left\{
+\begin{array}{cl}
+\left(\frac{f^{\star}_k m_k}{f^{\star}_k+\gamma} ,f^{\star}_k\right) & \text{ si } f^{\star}_k >0\\
+(0,0) & \text{ sinon }
+\end{array}\right.
+$$
+et $f^{\star}_k$ est la plus grande racine réelle du polynôme de degré 3 : 
+\begin{align}
+P(X) = (X-f_k)(X+\gamma)^2 -\frac{\gamma}{2}\|m_k\|^2=0
+\end{align}
+\end{proposition}
+\begin{preuve}
+Posons $(m,f)=\prox_{\gamma J}(m_k,f_k)$. Si $f>0$, comme $J$ est $C^1$ et strictement convexe sur $\RR^n\times\RR^{+,\star}$, nécessairement, $(m,f)$ est l'unique solution de $\nabla J(m,f)=0$, ce qui donne 
+$$
+\left\{
+\begin{array}{cc}
+\gamma \frac{m}{f}+m-m_k &= 0\\
+-\gamma \frac{\|m\|^2}{f^2} + f-f_k &= 0
+\end{array}
+\right.
+$$
+En réarrangeant ces equations, nous obtenons bien que $P(f) = 0$ et $m=\frac{f m}{f+\gamma}$. Ce qui montre au passage que si $P$ possède au moins une racine réelle strictement positive $f^{\star}_k$, alors elle est nécessairement unique $f^{\star}_k =f $. \\
+Si ce n'est pas le cas, alors nous avons nécessairement $f= 0$ et par définition de $J$, $m=0$.
+\end{preuve}
 \newpage
 
 \section{Pbm de transport optimal}
@@ -1006,6 +1134,7 @@ G_s^t = \{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{P})|0\leq i\leq N,\ -1\leq j\leq P\}
 $$
 
 On note $E_s=\RR^{G_s^x}\times\RR^{G_s^t}$ l'espace des variables décentrées, et $U=(\bar{m_{ij}}\quad 1\leq i\leq N,\ 0\leq j\leq P,\bar{f_{ij}},\quad 0\leq i\leq N,\ -1\leq j\leq P$
+
 
 
 \section{Opérateurs}
@@ -1154,9 +1283,19 @@ z^l=(U^l,V^l)\rightarrow (U^{\star},V^{\star}) \qquad V^{\star}=(m^{\star},f^{\s
 $$
 
 
+
+
+
+\newpage
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
 \newpage
+
+
+
+
+
+
 \begin{appendices}
 \section{Calcul des variations}
 \label{sec:variations}
