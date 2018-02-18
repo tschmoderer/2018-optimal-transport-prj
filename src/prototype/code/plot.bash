@@ -8,7 +8,8 @@ for file in $files; do
 
 	gnuplot <<- EOF 
 		set term png
-		
+		set palette gray
+		set autoscale cbfix
 		unset colorbox
 		unset tics
 		

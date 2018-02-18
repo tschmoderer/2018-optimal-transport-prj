@@ -35,12 +35,16 @@ sigma =  .05; rho = 1e-10;
 f0 = normalize( rho + gaussian(.2,.2,sigma) );
 f1 = normalize( rho + gaussian(.8,.8,sigma) );
 
-% f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
-% f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
+f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
+f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
 
 f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
-f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
+%f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
 
+f1 = flipud(f0);
+
+%f0 = normalize(rho + double(imread('panda2.png'))); 
+%f1 = normalize(rho + double(imread('clone.png'))); 
 
 epsilon=min(f0(:));
 
@@ -154,25 +158,25 @@ plot(Constr); axis tight;
 title('div=0 violation');
 %disp(num2str(Constr(end)));
 
-figure; 
-for i = 1:25
-    subplot(5,5,i), imagesc(Xu.M{3}(:,:,i)), axis off;
-end
-
-figure; 
-for i = 26:50
-    subplot(5,5,i-25), imagesc(Xu.M{3}(:,:,i)), axis off;
-end
-
-figure; 
-for i = 51:75
-    subplot(5,5,i-50), imagesc(Xu.M{3}(:,:,i)), axis off;
-end
-
-figure; 
-for i = 76:100
-    subplot(5,5,i-75), imagesc(Xu.M{3}(:,:,i)), axis off;
-end
+% figure; 
+% for i = 1:25
+%     subplot(5,5,i), imagesc(Xu.M{3}(:,:,i)), axis off;
+% end
+% 
+% figure; 
+% for i = 26:50
+%     subplot(5,5,i-25), imagesc(Xu.M{3}(:,:,i)), axis off;
+% end
+% 
+% figure; 
+% for i = 51:75
+%     subplot(5,5,i-50), imagesc(Xu.M{3}(:,:,i)), axis off;
+% end
+% 
+% figure; 
+% for i = 76:100
+%     subplot(5,5,i-75), imagesc(Xu.M{3}(:,:,i)), axis off;
+% end
 
 
 for i = 1:Q+1 
