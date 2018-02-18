@@ -349,13 +349,15 @@ H(p) \leq - \left(\int_{\mathcal{X}}\phi\ d\mu+\int_{\mathcal{Y}}\psi\ d\nu\righ
 $$
 ce qui montre la semi continuité inférieure.
 \end{preuve}
-Calculons à présent la transformée de Legendre Flenchel de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\pi\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
+Calculons à présent la transformée de Legendre Flenchel de H.\\
+$H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\pi\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
 $$
 H^{\star}(\pi)= \sup_p \int_{\mathcal{X}\times\mathcal{Y}} p\ d\pi + \sup \left\{ \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad \phi\oplus\psi\leq C- p \right\}
 $$
-Ce qui se réécrit sous la forme d'un $\sup$ unique sur $p,\ \phi,\ \psi$. Remarquons que, si $\pi\notin\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, alors il existe $p_0\leq 0$ tel que $\int p_0\ d\pi >0$, en prenant $\phi\equiv 0$, $\psi\equiv 0$ et $p=C+np_0$ en faisant tendre $n$ vers $+\infty$ nous obtenons $H^{\star}(\pi)=+\infty$. D'autre part, si $\pi\in\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, en prenant le $p$ le plus grand possible i.e. $p=C-\phi-\psi$, nous obtenons 
+Ce qui se réécrit sous la forme d'un $\sup$ unique sur $p,\ \phi,\ \psi$. Remarquons que, si $\pi\notin\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, alors il existe $p_0\leq 0$ tel que $\int p_0\ d\pi >0$, en prenant $\phi\equiv 0$, $\psi\equiv 0$ et $p=C+np_0$ en faisant tendre $n$ vers $+\infty$ nous obtenons $H^{\star}(\pi)=+\infty$.\\
+D'autre part, si $\pi\in\mathcal{M}_+(\mathcal{X}\times\mathcal{Y})$, en prenant le $p$ le plus grand possible i.e. $p=C-\phi-\psi$, nous obtenons 
 $$
-H^{\star}(\pi)=  \sup_{(\phi,\psi)} \int_{\mathcal{X}\times\mathcal{Y}} p\ d\pi + \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu - \int_{\mathcal{X}\times\mathcal{Y}} \phi\ d\pi -\int_{\mathcal{X}\times\mathcal{Y}} \psi\ d\pi
+H^{\star}(\pi)=  \sup_{(\phi,\psi)} \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi + \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu - \int_{\mathcal{X}\times\mathcal{Y}} \phi\ d\pi -\int_{\mathcal{X}\times\mathcal{Y}} \psi\ d\pi
 $$
 C'est exactement l'expression obtenue au \eqref{eq:sup1} pour réécrire les contraintes de \eqref{eq:KP}. 
 $$
@@ -367,8 +369,7 @@ K(\pi) & \text{si } \pi \in\Pi(\mu,\nu)\\
 \right.
 $$
 
-La preuve est presque terminée, $\max\eqref{eq:DKP} = -H(0) = H^{\star\star}(0)$ car $H$ est convexe et semi continue inférieurement\footnote{Ce fait est montré dans la section \ref{sec:prox}}. De plus, $H^{\star\star}(0)=\sup_{\pi}\langle 
-,\pi\rangle-H^{\star}(\pi)=-\inf H^{\star}=-\min\eqref{eq:KP}$.
+La preuve est presque terminée, $\max\eqref{eq:DKP} = -H(0) =- H^{\star\star}(0)$ car $H$ est convexe et semi continue inférieurement. De plus, $H^{\star\star}(0)=\sup_{\pi}\langle 0,\pi\rangle-H^{\star}(\pi)=-\inf H^{\star}=-\min\eqref{eq:KP}$.
 \end{preuve}
 
 Ainsi, nous voyons que 
@@ -377,7 +378,7 @@ $$
 $$
 Ce qui montre que la valeur du minimum de \eqref{eq:KP} est une fonction convexe de $\mu$ et $\nu$, comme supremum de fonctionnelle linéaire. 
 \begin{definition}{Potentiel de Kantorovitch}
-Les fonctions $\phi$ réalisant le maximum de \eqref{eq:existenceDKP}sont appelés potentiels de Kantorovitch pour le transport de $\mu$ sur $\nu$.
+Les fonctions $\phi$ réalisant le maximum de \eqref{eq:existenceDKP} sont appelés potentiels de Kantorovitch pour le transport de $\mu$ sur $\nu$.
 \end{definition}
 
 \subsection{Existence du transport optimal}
@@ -388,10 +389,6 @@ Rappelons que pour une mesure $\pi$, son support est le plus petit ensemble ferm
 $$
 \supp \pi = \bigcap \left\{A\ |\ A \text{ fermé },\ \pi(\mathcal{X}\backslash A) = 0 \right\}
 $$
-une autre caractérisation du support de $\pi$ est donnée par 
-$$
-\supp\pi = \left\{x\in\mathcal{X}\ |\ \pi(B(x,r)) >0\ \forall r>0\right\}
-$$
 
 De l'égalité entre le minimum de \eqref{eq:KP} et le maximum de \eqref{eq:DKP} et le fait que le deux soient atteints, considérons un plan de transport optimal $\pi$ et un potentiel de Kantorovitch $\phi$, 
 \begin{align}
@@ -400,7 +397,8 @@ De l'égalité entre le minimum de \eqref{eq:KP} et le maximum de \eqref{eq:DKP}
 \end{align}
 L'égalité vient de l'inégalité (qui est vraie partout) et de 
 \begin{align}
-\int_{\Omega\times\Omega} C\ d\pi = \int_{\Omega}\phi\ d\mu +  \int_{\Omega} \phi^C\ d\nu = \int_{\Omega\times\Omega} \phi\oplus\phi^c\ d\pi
+\min\eqref{eq:KP} &= \max \eqref{eq:DKP}\nonumber\\
+\int_{\Omega\times\Omega} C\ d\pi &= \int_{\Omega}\phi\ d\mu +  \int_{\Omega} \phi^C\ d\nu = \int_{\Omega\times\Omega} \phi\oplus\phi^c\ d\pi
 \end{align}
 ce qui implique l'égalité $\pi$ presque partout. 
 
