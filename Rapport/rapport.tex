@@ -82,18 +82,18 @@ Le plan de rapport est le suivant, nous commencerons par présenté les notions 
 
 
 \section{Problème de Transport Optimal}
-Dans cette section, nous nous attachons à décrire le problème de transport optimal. Nous donnerons des preuves de l'existence de solution à ce problème. Nous finirons par donner la formulation du problème par Benamou et Brenier, que nous nous attacherons de résoudre numériquement dans la partie \ref{sec:numerique}. 
+Dans cette section, nous nous attachons à décrire le problème de transport optimal. Nous donnerons des preuves de l'existence de solutions à ce problème. Nous finirons par donner la formulation du problème par Benamou et Brenier, que nous nous attacherons de résoudre numériquement dans la partie \ref{sec:numerique}. 
 
 \subsection{Formulation du problème de Transport Optimal}
-Intuitivement, le problème de transport optimal consiste à trouver une méthode pour déplacer un tas de matériaux d'un endroit à un autre, de façon à minimiser un coût, lié au transport des matériaux par exemple. 
+Intuitivement, le problème de transport optimal consiste à trouver une méthode pour déplacer un tas de matériaux d'un endroit à un autre, de façon à minimiser un coût, lié au transport de ces matériaux par exemple. C'est l'approche initiale de Monge. 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=\linewidth]{img/tractopelle.png}
 \caption{\label{fig:tractopelle}Le transport optimal dans sa version vulgarisée}
 \end{figure}\\
-Dans des termes plus formels et modernes, les tas de sables représentent des ensembles mesurables dans des espaces métriques, le tractopelle est l'application de transport et le coût est la "distance" entre un ensemble de départ et d'arrivée. 
+Dans des termes plus formels et modernes, les tas de sables représentent des ensembles mesurables dans des espaces métriques, le tractopelle est l'application de transport et le coût est la "distance" entre un ensemble de départ et un ensemble d'arrivée. 
 \begin{definition}{Transport}
-Soient deux mesures de probabilité $\mu$ sur $(\mathcal{X},\mathcal{B}(\mathcal{X}))$ et $\nu$ sur $(\mathcal{Y},\mathcal{B}(\mathcal{Y}))$ munis de leur tribu borélienne. Un transport est une application $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$ qui envoie la mesure $\mu$ sur $\nu$. C'est à dire : 
+Soient deux mesures de probabilité $\mu$ sur $(\mathcal{X},\mathcal{B}(\mathcal{X}))$ et $\nu$ sur $(\mathcal{Y},\mathcal{B}(\mathcal{Y}))$ munis de leur tribu borélienne. Un \textbf{transport} est une application $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$ qui envoie la mesure $\mu$ sur la mesure $\nu$. C'est à dire : 
 \begin{align}
 \forall B\in\mathcal{B}(\mathcal{Y}),\quad \mu(T^{-1}(B))=\nu(B)
 \label{eq:trspmesures}
@@ -101,15 +101,15 @@ Soient deux mesures de probabilité $\mu$ sur $(\mathcal{X},\mathcal{B}(\mathcal
 Cela signifie que $\nu$ est la mesure image de $\mu$ par l'application $T$.\\
 Nous noterons $T_{\#}\mu=\nu$, une application $T$ vérifiant \eqref{eq:trspmesures}.
 \end{definition}
-Pour présager du théorème de Benamou et Brenier, remarquons que la relation \eqref{eq:trspmesures} traduit une relation de conservation de masse. La figure \ref{fig:illustrans} illustre cette relation dans le cas où les mesures possèdent des densités.
+Pour présager du théorème de Benamou et Brenier, remarquons que la relation \eqref{eq:trspmesures} traduit la conservation de la masse par l'application $T$. La figure \ref{fig:illustrans} illustre cette relation dans le cas où les mesures possèdent des densités. Pour cela, définissons une application permettant de quantifier cette notion de coût de transport. 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.8\linewidth]{img/transport.jpg}
+\includegraphics[width=0.7\linewidth]{img/transport.jpg}
 \caption{\label{fig:illustrans}Illustration de l'application de transport}
 \end{figure}\\
 Bien sur, l'application de transport n'est pas unique, il nous faut une manière de sélectionner un transport qui serait "meilleur" que les autres. 
 \newpage
-\begin{definition}{Coût}
+\begin{definition}{}
 Le coût est une application 
 $$
 \fonction{C}{\mathcal{X}\times\mathcal{Y}}{[0,+\infty]}{(x,y)}{C(x,y)}
@@ -119,7 +119,7 @@ Cette application représente le coût d'affecter $x$ en $y$. Ces deux définiti
 
 \fbox{
   \parbox{\textwidth}{
-  Étant donné deux mesures de probabilités $\mu$ sur $\mathcal{X}$ et $\nu$ sur $\mathcal{Y}$ et un coût $C$, trouver une application de transport $T$ réalisant le 
+  Étant données deux mesures de probabilités $\mu$ sur $\mathcal{X}$, $\nu$ sur $\mathcal{Y}$ et une application coût $C$, trouver une application de transport $T$ réalisant le 
 	\begin{equation}
 	\tag{MP}
 	\inf\left\{M(T) := \int_{\mathcal{X}} C(x,T(x))\ d\mu (x), \quad T_{\#}\mu = \nu\right\}
@@ -129,7 +129,7 @@ Cette application représente le coût d'affecter $x$ en $y$. Ces deux définiti
 }
 \vspace{0.3cm}
 
-L'existence du transport optimal n'est absolument pas trivial, suivons la présentation du livre de Santambrogio  \cite{santambrogio2015optimal} pour démontrer l'existence d'une application de transport optimal.
+L'existence du transport optimal n'est absolument pas trivial, nous suivrons la présentation du livre de Santambrogio  \cite{santambrogio2015optimal} pour démontrer l'existence d'une application de transport optimal.
 
 \subsection{Plan de Transport Optimal}
 Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. Oublions ce problème pour un temps, et regardons une forme généralisée donnée par Kantorovitch. \\
@@ -152,53 +152,52 @@ Le problème \eqref{eq:MP} est difficile à résoudre du fait de la contrainte. 
 }
 \vspace{0.3cm}
 
-La valeur de $\pi (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus généraux qu'un transport classique. En effet, à partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers d'une application de transport $T$.\\
-Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\pi$, cela signifie que nous restreignons notre attention sur aux transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
+La valeur de $\pi (A\times B)$ décrit la quantité de matière transportée de $A$ en $B$. Cette description permet des déplacements plus généraux qu'un transport classique. En effet, à partir d'un point $x$, les particules peuvent être transportées en plusieurs destinations. Si c'est le cas, alors cela ne peut pas être décrit au travers d'une application de transport $T$, car localement il n'y a pas conservation de la masse.\\
+Remarquons que les contraintes \eqref{eq:contrKP} sont des contraintes de marginales sur la mesure de probabilité $\pi$, cela signifie que nous restreignons notre attention aux plans de transports qui déplacent des particules distribuées selon $\mu$ sur des particules distribuées selon $\nu$.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.5\linewidth]{img/transport_plan2.jpg}
+\includegraphics[width=0.6\linewidth]{img/transport_plan2.jpg}
 \caption{Illustration de la notion de plan de transport\label{fig:plantransp}}
 \end{figure}
-La figure \ref{fig:plantransp} illustre la notion de plan de transport. Le dégradé de couleur montre que la mesure $\pi$ peut envoyer un $x\in\mathcal{X}$ sur plusieurs points de $\mathcal{Y}$ dans différentes proportions. \\
+La figure \ref{fig:plantransp} illustre la notion de plan de transport. Le dégradé de couleur montre que la mesure $\pi$ peut envoyer un point $x\in\mathcal{X}$ sur plusieurs points de $\mathcal{Y}$ dans différentes proportions. \\
 
-Les minimiseurs de ce problèmes sont appelés plans de transport optimal entre $\mu$ et $\nu$. Ce problème est bien une généralisation du problème \eqref{eq:MP}, puisque si $\pi = (Id,T)$ pour une certaine fonction mesurable $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$. Alors l'application $T$ serait un transport optimal entre $\mu$ et $\nu$. \\
+Les minimiseurs de ce problèmes sont appelés plans de transport optimal entre $\mu$ et $\nu$. Ce problème est bien une généralisation de \eqref{eq:MP}, puisque si $\pi = (Id,T)$ pour une certaine fonction mesurable $T\ :\ \mathcal{X}\rightarrow\mathcal{Y}$. Alors l'application $T$ serait un transport optimal entre $\mu$ et $\nu$. \\
 
-Nous allons montrer l'existence de solutions pour ce problème relaxé \eqref{eq:KP} à l'aide du calcul des variations.Les outils principaux de la méthode du calcul des variations sont rappelés à l'annexe \ref{sec:variations}. 
+Nous allons montrer l'existence de solutions pour le problème relaxé \eqref{eq:KP} à l'aide du calcul des variations. Les outils principaux de cette méthode sont rappelés à l'annexe \ref{sec:variations}. 
 \begin{theoreme}{}
 Soit $\mathcal{X}$ et $\mathcal{Y}$ des espaces métriques compacts. Supposons que le coût $C\ :\ \mathcal{X}\times\mathcal{Y}\rightarrow [0,+\infty]$ soit continue. Alors le problème \eqref{eq:KP} admet une solution.
 \end{theoreme}
 \begin{preuve}
 Il s'agit de montrer que l'ensemble $\Pi (\mu,\nu)$ est compact et que l'application $\pi\rightarrow K(\pi )$ est continue, puis d'appliquer le théorème de Weierstrass \eqref{thm:weierstrass}. \\
-Nous choisissons la notion de convergence donnée par la convergence faible des mesures de probabilités (voir \eqref{thm:prokhorov} par dualité avec $C_b(\mathcal{X}\times\mathcal{Y})$ ce qui ici est a même chose que $C(\mathcal{X}\times\mathcal{Y})$ ou $C_0(\mathcal{X}\times\mathcal{Y})$ car $\mathcal{X}$ et $\mathcal{Y}$ sont compacts). Cela nous donne la continuité de $K$ puisque $C\in C(\mathcal{X}\times\mathcal{Y})$. \\
+Nous choisissons la notion de convergence donnée par la convergence faible des mesures de probabilités (voir \eqref{thm:prokhorov} pour la dualité avec $C_b(\mathcal{X}\times\mathcal{Y})$ ce qui ici est a même chose que $C(\mathcal{X}\times\mathcal{Y})$ ou $C_0(\mathcal{X}\times\mathcal{Y})$ car $\mathcal{X}$ et $\mathcal{Y}$ sont compacts). Cela nous donne la continuité de $K$ puisque $C\in C(\mathcal{X}\times\mathcal{Y})$. \\
 
-Soit une suite $\pi_n\in\Pi (\mu,\nu )$. Ce sont des mesures de probabilités, donc de masse $1$ et sont donc bornée dans le dual de $C(\mathcal{X}\times\mathcal{Y})$. Ainsi, la compacité faible-* dans les espaces duaux, garanti l'existence d'une sus suite $\pi_{n_k} \rightharpoonup \pi$ convergeant vers une probabilité $\pi$. 
+Soit une suite $\pi_n\in\Pi (\mu,\nu )$. Ce sont des mesures de probabilités, donc de masse $1$ et sont donc bornée dans le dual de $C(\mathcal{X}\times\mathcal{Y})$. Ainsi, la compacité faible - * dans les espaces duaux, garanti l'existence d'une sous suite $\pi_{n_k}$ convergeant faiblement vers une probabilité $\pi$. 
 Vérifions que $\pi \in \Pi (\mu,\nu )$. \\
-Fixons $\phi\in C(\mathcal{X})$, comme $\int\phi d\pi_{n_k} =\int \phi d\mu $,par passage à la limite, on a : $\int\phi d\pi =\int\phi d\mu$. De même on montre que la seconde contrainte de marginale \eqref{eq:contrKP} est vérifiée. \\
+Fixons $\phi\in C(\mathcal{X})$, comme $\int\phi\ d\pi_{n_k} =\int \phi\ d\mu $,par passage à la limite, nous avons : $\int\phi\ d\pi =\int\phi\ d\mu$. De même nous montrons que la seconde contrainte de marginale \eqref{eq:contrKP} est vérifiée. \\
 Ainsi, l'espace $\Pi(\mu,\nu)$ est compact et le théorème de Weierstrass s'applique.
 \end{preuve}
 
 Allons vers plus de généralités. 
 
 \begin{proposition}
-Supposons que le coût soit seulement semi continue inférieurement et bornée en dessous. Alors le problème \eqref{eq:KP} admet une solution. 
+Supposons que le coût soit semi continue inférieurement et bornée inférieurement. Alors le problème \eqref{eq:KP} admet une solution. 
 \end{proposition}
 \begin{preuve}
 La seule différence avec le cas précédent est que $K$ n'est plus continue mais semi continue inférieurement pour la convergence faible des mesures de probabilités. Cela vient du lemme suivant appliqué à $f = C$ et $\Omega = \mathcal{X}\times\mathcal{Y}$.
 \begin{lemme}
-Si $f\ :\ \Omega\rightarrow \RR\cup\{\infty\}$ est une fonction semi-continue inférieurement bornée par dessous sur une espace métrique $\Omega$. Alors la fonctionnel $J \ :\ \mathcal{M}_+(\Omega )\rightarrow \RR\cup\{\infty\}$ définie sur les mesures positives par $J(\lambda) =\int f d\lambda$ est semi continue inférieurement pour la convergence faible des mesures. 
+Si $f\ :\ \Omega\rightarrow \RR\cup\{+\infty\}$ est une fonction semi-continue inférieurement, bornée inférieurement sur un espace métrique $\Omega$. Alors la fonctionnel $J \ :\ \mathcal{M}_+(\Omega )\rightarrow \RR\cup\{+\infty\}$ définie sur les mesures de Radon positives par $J(\lambda) =\int f d\lambda$ est semi continue inférieurement pour la convergence faible des mesures. 
 \end{lemme}
 \begin{preuve}
 Soit une suite $(f_k)$ de fonctions continues, bornées convergeant vers $f$ par valeurs croissantes. 
-Soit $J_k(\lambda ) =\int f_k d\lambda$, $J_k\rightarrow J$ par convergence monotone. Nous pouvons alors écrire $J(\lambda )=\sup_k J_k(\lambda )$.
+Soit $J_k(\lambda ) =\int f_k\ d\lambda$, $J_k\rightarrow J$ par convergence monotone. Nous pouvons alors écrire $J(\lambda )=\sup_k J_k(\lambda )$.
 Alors $J$ est semi-continue inférieurement comme le $\sup$ de fonctionnelles continues.
 \end{preuve}
 Et donc, le théorème de Weierstrass \eqref{thm:weierstrass} s'applique.
 \end{preuve}
 
-\begin{proposition}
-\label{prop:existKP3}
-Supposons que $\mathcal{X}$ et $\mathcal{Y}$ sont des espaces métriques complets et séparables (i.e. polonais). Supposons toujours que le coût $C$ est semi-continue inférieurement et bornée par dessous. Alors le problème \eqref{eq:KP} admet une solution. 
+\begin{proposition}\label{prop:existKP3}
+Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient des espaces métriques complets et séparables (i.e. polonais) et que le coût $C$ est semi-continue inférieurement et bornée inférieurement. Alors le problème \eqref{eq:KP} admet une solution. 
 \end{proposition}
 \begin{preuve}
 Cette fois, c'est la compacité de $\Pi(\mu,\nu)$ qui est moins évidente. Nous allons utiliser le théorème de Prokhorov \eqref{thm:prokhorov}. Ce qui revient à montrer que toute suite de $\Pi (\mu,\nu)$ est tendue. \\
@@ -211,13 +210,13 @@ Alors l'ensemble $K_{\mathcal{X}}\times K_{\mathcal{Y}}$ est compact dans $\math
 Ce qui montre la tension et donc la compacité de toute suite de $\Pi (\mu,\nu )$. 
 \end{preuve}
 
-\subsection{Problème dual de plan de Transport Optimal}
-Maintenant que nous avons démontré l'existence de solution au problème de Kantorovitch, nous souhaiterions savoir sous quelles conditions nous pouvons remonter au problème de Monge. Comme le problème \eqref{eq:KP} est une problème d'optimisation linéaire sous contraintes d'égalité, il est donc naturel d'étudier le problème dual. \\
+\subsection{Problème dual au plan de Transport Optimal}
+Maintenant que nous avons démontré l'existence de solution au problème de Kantorovitch, nous souhaiterions savoir sous quelles conditions nous pouvons remonter au problème de Monge. Comme le problème \eqref{eq:KP} est un problème d'optimisation linéaire sous contraintes d'égalité, il est donc naturel d'étudier le problème dual. \\
 
 Toujours suivant la résentation du livre de Santambrogio \cite{santambrogio2015optimal}, cherchons en premier lieu le problème dual formellement. \\
 La contrainte $\pi\in\Pi(\mu,\nu)$ peut s'exprimer sous la forme : 
 \begin{align}
-\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})}& \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)\label{eq:sup1}\\
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})}& \int_{\mathcal{X}} \phi(x)\ d\mu (x) + \int_{\mathcal{Y}}\psi(y)\  d\nu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)\label{eq:sup1}\\
 &= \left\{\begin{array}{cl}
 0 & \text{si } \pi \in\Pi(\mu,\nu)\\
 +\infty & \text{sinon}
@@ -225,11 +224,11 @@ La contrainte $\pi\in\Pi(\mu,\nu)$ peut s'exprimer sous la forme :
 \end{align}
 Ainsi nous pouvons supprimer la contrainte dans le problème \eqref{eq:KP} en ajoutant l'expression \eqref{eq:sup1}, puisque si la contrainte est satisfaite, rien n'est ajoutée, si elle ne l'est pas nous obtenons $+\infty$ ce qui sera évité par la minimisation. 
 $$
-\inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}} C(x,y)\ d\pi + \sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)
+\inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi + \sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu + \int_{\mathcal{Y}}\psi\  d\nu - \int_{\mathcal{X}\times\mathcal{Y}}\phi(x)+\psi(y)\ d\pi(x,y)
 $$
 Il n'est pas toujours possible d'échanger le $\sup$ et l'$\inf$, mais supposons pour le moment que cela soit possible : 
 \begin{align}
-\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\  d\mu(y) + \inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}}(C(x,y) - \phi(x)+\psi(y))\ d\pi(x,y)
+\sup_{(\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y})} \int_{\mathcal{X}} \phi\ d\mu + \int_{\mathcal{Y}}\psi\  d\nu + \inf_{\pi} \int_{\mathcal{X}\times\mathcal{Y}}(C(x,y) - \phi(x)+\psi(y))\ d\pi(x,y)
 \label{eq:infsupexchange}
 \end{align}
 
@@ -243,26 +242,26 @@ Avec ce problème de maximisation sur les variables $(\phi,\psi)$, l'infimum en 
 \end{array}
 \right.
 \end{align}
-Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi(x)+\psi(y)$. L'égalité précédente est justifiée car, si $\phi\oplus\psi>c$ quelque part alors en utilisant des mesures $\pi$ concentrée en cet endroit et de masse croissante, l'intégrale tend vers $-\infty$. Ce qui nous amène au problème suivant : \\
+Où la fonction, $\phi\oplus\psi$ est définie par $(\phi\oplus\psi)(x,y) = \phi(x)+\psi(y)$. L'égalité précédente est justifiée car, si $\phi\oplus\psi>C$ quelque part alors en utilisant des mesures $\pi$ concentrée en cet endroit et de masse croissante, l'intégrale tend vers $-\infty$. Ce qui nous amène au problème suivant : \\
 
 \fbox{
   \parbox{\textwidth}{
   Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions continues, bornée $\phi$ et $\psi$ réalisant le 
 	\begin{equation}
 	\tag{DKP}
-	\sup\left\{\int_{\mathcal{X}} \phi\ d\nu + \int_{\mathcal{Y}}\psi\ d\mu, \quad  (\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y}) \ \phi\oplus\psi \leq C \right\}
+	\sup\left\{\int_{\mathcal{X}} \phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad  (\phi,\psi)\in C_b(\mathcal{X})\times C_b(\mathcal{Y}),\quad \phi\oplus\psi \leq C \right\}
 	\label{eq:DKP}
 	\end{equation}
   }
 }
 \vspace{0.3cm}
 
-Remarquons que le $\sup\eqref{eq:DKP} \leq \inf\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq C$ par rapport à $\pi$ : 
+Remarquons que le $\sup\eqref{eq:DKP} \leq \min\eqref{eq:KP}$, en intégrant la condition $\phi\oplus\psi \leq C$ par rapport à $\pi$ : 
 $$
-\int_{\mathcal{X}} \phi\ d\mu (x) + \int_{\mathcal{Y}}\psi\ d\mu(y) = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\pi \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi
+\int_{\mathcal{X}} \phi\ d\mu  + \int_{\mathcal{Y}}\psi\ d\nu = \int_{\mathcal{X}\times\mathcal{Y}} \phi\oplus\psi\ d\pi \leq \int_{\mathcal{X}\times\mathcal{Y}} C\ d\pi
 $$
 
-Malheureusement le problème \eqref{eq:DKP} n'admet pas trivialement l'existence de ses maximums, car l'espace des fonctions continues bornées n'est pas compact. Montrons dans un premier temps l'existence de ces maximiseurs, puis montrons que le problème \eqref{eq:DKP} est bien le dual de \eqref{eq:DKP} au sens ou $\max\eqref{eq:DKP} =\min\eqref{eq:KP}$.
+Malheureusement le problème \eqref{eq:DKP} n'admet pas trivialement l'existence de ses maximums, car l'espace des fonctions continues bornées n'est pas compact. Nous montrerons dans un premier temps l'existence de ces maximums, puis montrerons que le problème \eqref{eq:DKP} est bien le dual de \eqref{eq:DKP} au sens ou $\max\eqref{eq:DKP} =\min\eqref{eq:KP}$.
 
 
 \begin{definition}{C et $\bar{C}$-transformée, C et $\bar{C}$-concavité}
@@ -272,12 +271,11 @@ $$
 $$
 De même, la $\bar{C}$-transformée est définie pour une fonction $\tau\ :\ \mathcal{Y}\rightarrow [-\infty,+\infty]$ par 
 $$
-\tau^{\bar{C}} = \inf_{y\in\mathcal{Y}} C(x,y) -\tau(y)
+\tau^{\bar{C}}(x) = \inf_{y\in\mathcal{Y}} C(x,y) -\tau(y)
 $$
-De plus, nous dirons qu'une fonction $\psi$ définie sur $\mathcal{Y}$ est $\bar{C}$-concave si il existe $\chi\ :\ \mathcal{X}\rightarrow [-\infty,+\infty]$ telle que $\psi = \chi^C$. Respectivement, une fonction $\phi$ définie sur $\mathcal{X}$ est dite $C$-concave si il existe $\tau\ :\ \mathcal{Y}\rightarrow [-\infty,+\infty]$ telle que $\phi=\tau^{\bar{C}}$. \\
+De plus, nous dirons qu'une fonction $\psi$ définie sur $\mathcal{Y}$ est $\bar{C}$-concave s'il existe $\chi\ :\ \mathcal{X}\rightarrow [-\infty,+\infty]$ telle que $\psi = \chi^C$. Respectivement, une fonction $\phi$ définie sur $\mathcal{X}$ est dite $C$-concave si il existe $\tau\ :\ \mathcal{Y}\rightarrow [-\infty,+\infty]$ telle que $\phi=\tau^{\bar{C}}$. \\
 Nous noterons $C$-conc($\mathcal{X}$) et $\bar{C}$-conc($\mathcal{Y}$) les ensembles des fonctions $C$ et $\bar{C}$-concaves. 
 \end{definition}
-Remarquons que lorsque $\mathcal{X}=\mathcal{Y}$ et que $C$ est symétrique, il n'y a aucune distinction entre la transformation $C$ et $\bar{C}$, cette notation lourde sera alors abandonnée. \\
 
 Dans notre cas, $C$ est continue sur un ensemble compact, et est donc uniformément continue. C'est à dire qu'il existe une fonction continue croissante $\omega\ :\ \RR^+\rightarrow\RR^+$ et $\omega(0)=0$ (module de continuité) telle que 
 $$
@@ -285,9 +283,10 @@ $$
 $$
 En reprenant la définition de $\chi^C(y) = \inf_x g_x(y)$ avec $g_x(y) = C(x,y)-\chi(x)$ qui vérifie $|g_x(y)-g_x(y')|\leq\omega(d(y,y'))$. Ce qui montre que $\chi^C$ et $C$ partagent le même module de continuité. \\
 
-Ensuite remarquons qu'étant une paire $(\phi,\psi)$ du problème \eqref{eq:DKP}, elle peut toujours être remplacée par la paire $(\phi,\phi^C)$ puis par $(\phi^{C\bar{C}},\phi^C)$, car les contraintes sont préservées et les intégrales augmentées. 
-Nous pourrions espérer itérons ce processus, mais pour toute fonction $\phi$, nous avons $\phi^{C\bar{C}C} = \phi$. Cependant les considérations précédentes nous amènes le théorèmes d'existence suivant. 
+Ensuite remarquons qu'étant donnée une paire $(\phi,\psi)$ du problème \eqref{eq:DKP}, elle peut toujours être remplacée par la paire $(\phi,\phi^C)$ puis par $(\phi^{C\bar{C}},\phi^C)$, car les contraintes sont préservées et les intégrales augmentées. 
+Nous pourrions espérer itérer ce processus, mais pour toute fonction $\phi$, nous avons $\phi^{C\bar{C}C} = \phi$. Cependant les considérations précédentes nous amènent le théorèmes d'existence suivant. 
 \begin{theoreme}{}
+\label{thm:existDKP}
 Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient compact et que $C$ est continue. Alors il existe une solution $(\phi,\psi)$ au problème \eqref{eq:DKP}, de la forme $\phi\in C$-conc($\mathcal{X}$), $\psi\in \bar{C}$-conc($\mathcal{Y}$) et $\psi=\phi^C$. En particulier, 
 \begin{align}
 \max\eqref{eq:DKP} = \max_{\phi\in C\text{-conc}(\mathcal{X})}\int_{\mathcal{X}}\phi\ d\mu +\int_{\mathcal{Y}} \phi^C\ d\nu
@@ -295,10 +294,10 @@ Supposons que $\mathcal{X}$ et $\mathcal{Y}$ soient compact et que $C$ est conti
 \end{align}
 \end{theoreme}
 \begin{preuve}
-Prenons une suite maximisante $(\phi_n,\psi_n)$ et améliorons là par la $C$ et la $\bar{C}$-transformée. Par les considérations précédentes, nous pouvons supposer une borne uniforme sur la continuité de ces fonctions (le même module de continuité que $C$). Gardons la notation $(\phi,\psi)$  pour désigner cette suite améliorée. \\
-Vérifions qu'elle est équibornée pour appliquer le théorème d'Ascoli Arzélà \eqref{thm:ascoli}. Remarquons qu'ajouter une constante à $\phi$ et la retirer à $\psi$ ne change pas la valeur de la fonctionnelle et n'affecte pas les contraintes. Ainsi, comme $\phi_n$ est continue sur un ensemble compact, elle est donc bornée, quitte à ajouter le minimum, nous pouvons supposer que $\min \phi_n=0$, nous avons aussi que $\max \phi_n \leq \omega (d(\mathcal{X}))$, car les oscillations d'une fonctions sont toujours plus faible que son module de continuité appliqué à la plus grande distance possible dans l'ensemble.
+Prenons une suite maximisante $(\phi_n,\psi_n)$ et améliorons là par la $C$ et la $\bar{C}$-transformée. Par les considérations précédentes, nous pouvons supposer une borne uniforme sur la continuité de ces fonctions (le même module de continuité que $C$). Gardons la notation $(\phi_n,\psi_n)$  pour désigner cette suite améliorée. \\
+Vérifions que cette suite est équibornée pour appliquer le théorème d'Ascoli Arzélà \eqref{thm:ascoli}. Remarquons qu'ajouter une constante à $\phi$ et la retirer à $\psi$ ne change pas la valeur de la fonctionnelle et n'affecte pas les contraintes. Ainsi, comme $\phi_n$ est continue sur un ensemble compact, elle est donc bornée, quitte à ajouter le minimum, nous pouvons supposer que $\min \phi_n=0$, nous avons aussi que $\max \phi_n \leq \omega (d(\mathcal{X}))$, car les oscillations d'une fonctions sont toujours plus faible que son module de continuité appliqué à la plus grande distance possible dans l'ensemble.\\
 Comme nous avons choisis $\psi_n=\phi_n^C$, nous avons également, $\psi_n(y)=\inf_xC(x,y)-\phi_n(x)\in[\min C- \omega (d(\mathcal{X})),\max C]$. Ce qui nous donne des bornes uniformes sur $(\phi_n,\psi_n)$ et nous permet d'appliquer le théorème d'Ascoli - Arzelà.\\
-A une sous suite près, $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\phi$ avec convergence uniforme, de ce fait : 
+A une sous suite près, $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\psi$ avec convergence uniforme, de ce fait : 
 \begin{align}
 \int_{\mathcal{X}}\phi_n\ d\mu + \int_{\mathcal{Y}}\psi_n\ d\nu \rightarrow \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu
 \end{align}
@@ -306,35 +305,35 @@ De plus,
 $$
 \phi_n(x)+\psi_n(y)\leq C(x,y) \Rightarrow \phi(x)+\psi(y)\leq C(x,y)
 $$
-Ici la convergence simple aurait suffit. Cela montre que $(\phi,\psi)$ est une paire admissible pour \eqref{eq:DKP} et optimale.
+Ici la convergence simple aurait suffit. Cela montre que $(\phi,\psi)$ est une paire admissible pour \eqref{eq:DKP} et donc optimale.
 \end{preuve}
-Avant de montrer que les problèmes \eqref{eq:DKP} et \eqref{eq:KP} sont bien duaux, introduisons un ouils, la transformée de Legendre Flenchel et donnons quelques propriétés. 
+Avant de montrer que les problèmes \eqref{eq:DKP} et \eqref{eq:KP} sont bien duaux, introduisons un outils, la transformée de Legendre Flenchel et donnons quelques propriétés. 
 \begin{definition}{Transformée de Legendre Flenchel}
-Pour toute fonction $f\ :\ \RR^n\rightarrow \RR\cup\{+\infty\}$ sa transformée de Legendre Flenchel est définie par :
+Pour toute fonction $f\ :\ E\rightarrow \RR\cup\{+\infty\}$ sa transformée de Legendre Flenchel est définie par :
 \begin{align}
-f^{\star}(y)=\sup_x \langle x,y\rangle -f(x)
+\fonction{f^{\star}}{E^{\star}}{ \RR\cup\{+\infty\}}{y}{\sup_{x\in E}\langle x,y\rangle -f(x)}
 \end{align}
 \end{definition}
 \begin{propriete}
 \begin{enumerate}
 \item Une fonction $f$ est convexe et semi continue inférieurement si et seulement si il existe une fonction $g$ telle que $f=g^{\star}$.
-\item Une fonction $f\ :\ \RR^n\rightarrow \RR\cup\{+\infty\}$ est convexe et semi continue inférieurement si et seulement si $f^{\star\star}=f$.
+\item Une fonction $f\ :\ E\rightarrow \RR\cup\{+\infty\}$ est convexe et semi continue inférieurement si et seulement si $f^{\star\star}=f$.
 \end{enumerate}
 \end{propriete}
 Montrons à présent que \eqref{eq:DKP} est bien le problème dual associé à \eqref{eq:KP}. 
 \begin{theoreme}{}
+\label{thh:dualite}
 Les problèmes \eqref{eq:KP} et \eqref{eq:DKP} sont bien duaux l'un de l'autre :
 \begin{align}
 \min\eqref{eq:KP} = \max\eqref{eq:DKP}
 \end{align}
 \end{theoreme}
 \begin{preuve}
-Par simplicité, prenons le cas $\mathcal{X}$ et $\mathcal{Y}$ compacts, et $C$ continue.\\
 Pour tout $p\in C(\mathcal{X}\times\mathcal{Y})$, posons 
 $$
-H(p) = -\max\left\{\int_{\mathcal{X}} \phi\ d\mu +\int_{\mathcal{Y}} \psi\ d\nu, \quad \phi\oplus\phi\leq C-p\right\}
+H(p) = -\max\left\{\int_{\mathcal{X}} \phi\ d\mu +\int_{\mathcal{Y}} \psi\ d\nu, \quad \phi\oplus\psi\leq C-p\right\}
 $$
-C'est l'opposée de la valeur de \eqref{eq:DKP} pour le coût $C-p$. Par la proposition, nous avons que, $H(p)$ est bien atteint et le module de continuité de la paire optimale $(\phi,\psi)$ est le même que celui de $C-p$. 
+C'est l'opposée de la valeur de \eqref{eq:DKP} pour le coût $C-p$. Par le théorème \ref{thm:existDKP}, nous avons que, $H(p)$ est bien atteint et que le module de continuité de la paire optimale $(\phi,\psi)$ est le même que celui de $C-p$. 
 \begin{lemme}
 La fonction $H\ :\ C(\mathcal{X}\times\mathcal{Y})\rightarrow\RR$ est convexe et semi continue inférieurement pour la convergence uniforme.
 \end{lemme}
@@ -343,13 +342,14 @@ Pour la convexité, prenons $p_0$ et $p_1$ associé avec leur paire optimale $(\
 $$
 H(p_t)\leq-\left(\int_{\mathcal{X}}\phi_t\ d\mu+\int_{\mathcal{Y}}\psi_t d\nu\right) = (1-t)H(p_0)+tH(p_1)
 $$
-Ce qui montre la convexité. Pour la semi continuité, prenons $p_n\rightarrow p$. A une sous suite près, $p_n$ réalise la $\liminf$ de $H(p_n)$. De la convergence uniforme, la suite $p_n$ est équicontinue et bornée (réciproque de théorème d'Ascoli - Arzelà \eqref{thm:ascoli}). Ainsi, les paires optimales correspondante s$(_phi_n,\psi_n)$ sont aussi équicontinues et bornées. A une sous suite près, supposons que $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\psi$ uniformément. Comme $\phi_n\oplus\psi_n\leq C-p$, nous avons $\phi\oplus\psi\leq C-p$, ainsi :
+Ce qui montre la convexité.\\
+Pour la semi continuité, prenons une suite $(p_n)$ convergeant uniformément vers $p$. A une sous suite près, $p_n$ réalise la $\liminf$ de $H(p_n)$. De la convergence uniforme, la suite $p_n$ est équicontinue et bornée (réciproque de théorème d'Ascoli - Arzelà \eqref{thm:ascoli}). Ainsi, les paires optimales correspondantes $(\phi_n,\psi_n)$ sont aussi équicontinues et bornées. A une sous suite près, supposons que $\phi_n\rightarrow\phi$ et $\psi_n\rightarrow\psi$ uniformément. Comme $\phi_n\oplus\psi_n\leq C-p$, nous avons $\phi\oplus\psi\leq C-p$, ainsi :
 $$
 H(p) \leq - \left(\int_{\mathcal{X}}\phi\ d\mu+\int_{\mathcal{Y}}\psi\ d\nu\right) = \lim_n H(p_n)=\liminf_n H(p_n)
 $$
 ce qui montre la semi continuité inférieure.
 \end{preuve}
-Calculons à présent la transformée de Legendre\footnote{La définition et certaines propriété de la transformée de Legendre sont exposés à la section \ref{sec:prox}.} de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\pi\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
+Calculons à présent la transformée de Legendre Flenchel de H. $H^{\star}\ :\ \mathcal{M}(\mathcal{X}\times\mathcal{Y})\rightarrow\RR\cup\{+\infty\}$. Pour tout $\pi\in\mathcal{M}(\mathcal{X}\times\mathcal{Y})$, nous avons 
 $$
 H^{\star}(\pi)= \sup_p \int_{\mathcal{X}\times\mathcal{Y}} p\ d\pi + \sup \left\{ \int_{\mathcal{X}}\phi\ d\mu + \int_{\mathcal{Y}}\psi\ d\nu, \quad \phi\oplus\psi\leq C- p \right\}
 $$

@@ -10,7 +10,7 @@ close all
 addpath('toolbox/');
 
 
-N=100; P=100; Q=100;
+N=128; P=128; Q=100;
 
 
 d = [N,P,Q];
@@ -38,8 +38,8 @@ f1 = normalize( rho + gaussian(.8,.8,sigma) );
 % f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
 % f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
 
-% f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
-% f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
+f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
+f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
 
 
 epsilon=min(f0(:));
@@ -110,9 +110,9 @@ for i=1:niter
     Xu = Xu + mu*( Zu - Xu );
     Xv = Xv + mu*( Zv - Xv );
     
-    contour(Xv(:,:,floor(Q/2),3));
-    title(['Iteration : ',num2str(i)]);
-    drawnow
+%     contour(Xv(:,:,floor(Q/2),3));
+%     title(['Iteration : ',num2str(i)]);
+%     drawnow
     
     % record energy
     Jlist(i)  = J(interp(div_proj(Xu)));
@@ -176,5 +176,5 @@ end
 
 
 for i = 1:Q+1 
-   dlmwrite(['results/000',sprintf('%01d',i),'.dat'],flipud(Xu.M{3}(:,:,i)),'delimiter',' '); 
+   dlmwrite(['results/',sprintf('%05d',i),'.dat'],flipud(Xu.M{3}(:,:,i)),'delimiter',' '); 
 end
