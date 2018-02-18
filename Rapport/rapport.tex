@@ -322,7 +322,7 @@ Pour toute fonction $f\ :\ E\rightarrow \RR\cup\{+\infty\}$ sa transformée de L
 \end{propriete}
 Montrons à présent que \eqref{eq:DKP} est bien le problème dual associé à \eqref{eq:KP}. 
 \begin{theoreme}{}
-\label{thh:dualite}
+\label{thm:dualite}
 Les problèmes \eqref{eq:KP} et \eqref{eq:DKP} sont bien duaux l'un de l'autre :
 \begin{align}
 \min\eqref{eq:KP} = \max\eqref{eq:DKP}
@@ -403,26 +403,26 @@ L'égalité vient de l'inégalité (qui est vraie partout) et de
 ce qui implique l'égalité $\pi$ presque partout. 
 
 \begin{proposition}
-Si $C\in C^1(\Omega\times\Omega,[0,+\infty]$, $\phi$ un potentiel de Kantorovitch pour le coût $C$ pour le transport de $\mu$ vers $\nu$. Soit $(x_0,y_0)\in\supp\pi$. Alors, si $\phi$ est différentiable en $x_0$, on a $\nabla\phi(x_0)= \frac{\partial}{\partial x}C(x_0,y_0)$.\\
-En particulier les gradients de deux potentiels de Kantorovitch coïncident en tout point $x0\in\supp\pi$ où ils sont tout les deux différentiables.
+Si $C\in C^1(\Omega\times\Omega,[0,+\infty])$, $\phi$ un potentiel de Kantorovitch pour le coût $C$ pour le transport de $\mu$ vers $\nu$. Soit $(x_0,y_0)\in\supp\pi$. Alors, si $\phi$ est différentiable en $x_0$, nous avons $\nabla\phi(x_0)= \frac{\partial C}{\partial x}(x_0,y_0)$.\\
+En particulier les gradients de deux potentiels de Kantorovitch coïncident en tout point $x_0\in\supp\pi$ où ils sont tout les deux différentiables.
 \end{proposition}
 \begin{preuve}
-Soit $(x_0,y_0)\in\supp\pi$ telle que $\phi$ soit différentiable en $x_0$, des calculs précédents, nous déduisons que l'application $x\mapsto\phi(x)-c(x,y_0)$ atteint sont minimum en $x=x_0$. 
+Soit $(x_0,y_0)\in\supp\pi$ telle que $\phi$ soit différentiable en $x_0$, des calculs précédents, nous déduisons que l'application $x\mapsto\phi(x)-C(x,y_0)$ atteint sont minimum en $x=x_0$. 
 Comme $\phi$ et $C(\cdot,y_0)$ sont différentiables, nous obtenons directement le résultat souhaité. 
 \end{preuve}
 
 
 \begin{theoreme}{Existence du transport optimal}
 \label{thm:existtrasp}
-Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\pi$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. 
-De plus, $\pi$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
+Soient $\mu$ et $\nu$ des mesures de probabilités sur une domaine compact $\Omega$ de $\RR^n$, alors il existe un plan de transport optimal $\pi$ pour le coût $C(x,t) = h(x-y)$, avec $h$ strictement convexe. \\
+De plus, $\pi$ est unique, de la forme $(Id,T)_{\#}\mu$ si $\mu$ est absolument continue et $\partial\Omega$ est $\mu$ - négligeable. Enfin, il existe un potentiel de Kantorovitch $\phi$ qui est lié à $T$ par :
 \begin{align}
 T(x) = x- (\partial h)^{-1}(\nabla\phi(x))
 \end{align}
 \end{theoreme}
 
 \begin{preuve}
-Le théorème précédent nous donne l'existence d'un plan de transport optimal $\pi$ et d'un potentiel de Kantorovitch $\phi$.\\
+Le théorème \ref{thm:dualite} nous donne l'existence d'un plan de transport optimal $\pi$ et d'un potentiel de Kantorovitch $\phi$.\\
 
 $\phi$ partage le même module de continuité que $C$, c'est une fonction lipschitzienne sur $\Omega\times\Omega$ puisque $h$ est localement lipschitzienne et bornée sur $\Omega$. Ainsi, $\phi$ est aussi lipschitzienne.\\
 
@@ -447,10 +447,10 @@ Pour une certaine fonction convexe $\phi$. Adaptons le résultat précédent aux
 
 \fbox{
   \parbox{\textwidth}{
-  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions continues, bornée $\phi$ et $\psi$ réalisant le 
+  Étant donné deux mesures de probabilités $\mu$ et $\nu$ et un coût $C$, trouver deux fonctions $\phi$ et $\psi$ réalisant le 
 	\begin{equation}
 	\tag{DKP - var}
-	\sup\left\{\int_{\RR^n} \phi\ d\mu + \int_{\RR^n}\psi\ d\nu, \quad  (\phi,\psi)\in L^1(\RR^n,\mu)\times L^1(\RR^n,\nu) \ \phi\oplus\psi \leq C \right\}
+	\sup\left\{\int_{\RR^n} \phi\ d\mu + \int_{\RR^n}\psi\ d\nu, \quad  (\phi,\psi)\in L^1(\RR^n,\mu)\times L^1(\RR^n,\nu),\quad \phi\oplus\psi \leq C \right\}
 	\label{eq:DKPvar}
 	\end{equation}
   }
@@ -516,7 +516,8 @@ alors il existe une unique application de transport optimal $T$, donnée par $T=
 
 \begin{preuve}
 Il existe un plan de transport optimal $\pi$, et par le théorème précédent, une paire $(\phi,\psi)\in L^1(\mu)\times L^1(\nu)$ optimale. \\
-Comme $\phi\in L^1(\mu)$, nous en déduisons que $u$ est finie $\mu$ presque partout et comme $u$ est convexe, $\supp\pi\subset \{u<+\infty\}$, un ensemble convexe. Remarquons que $\partial \{u<+\infty\}$ s'exprime comme le graphe d'une fonction concave, c'est donc une hypersurface de classe $C^2$, qui est $\mu$ négligeable par hypothèse. Dans l'intérieur de $\partial \{u<+\infty\}$, $u$ est différentiable $\mu$ presque partout par hypothèse sur $\mu$ et $u$ convexes. \\
+Comme $\phi\in L^1(\mu)$, nous en déduisons que $u$ est finie $\mu$ presque partout et comme $u$ est convexe, $\supp\pi\subset \{u<+\infty\}$, un ensemble convexe.\\
+Remarquons que $\partial \{u<+\infty\}$ s'exprime comme le graphe d'une fonction concave, c'est donc une hypersurface de classe $C^2$, qui est $\mu$ négligeable par hypothèse. Dans l'intérieur de $\partial \{u<+\infty\}$, $u$ est différentiable $\mu$ presque partout par hypothèse sur $\mu$ et $u$ convexes. \\
 Comme $\phi$ est différentiable $\mu$ presque partout, la mesure $\pi$ est concentrée sur le graphe de $x\mapsto x-\nabla\phi(x)=\nabla u(x)$.
 \end{preuve}
 
@@ -527,51 +528,46 @@ Comme $\phi$ est différentiable $\mu$ presque partout, la mesure $\pi$ est conc
 \newpage
 
 
-Introduisons petit à petit des hypothèses simplificatrices mais pas aberrantes. Supposons que les mesures aient une densité : $\mu = f_0 dx$ et $\nu = f_1 dx$. La relation \eqref{eq:trspmesures} devient alors : 
+Maintenant que nous avons montré l'existence du transport optimal, introduisons petit à petit des hypothèses simplificatrices mais pas aberrantes dans le contexte de la résolution numérique. Mettons nous dans $\RR^n$ et supposons que les mesures aient une densité : $\mu = f_0\ dx$ et $\nu = f_1\ dx$. La relation \eqref{eq:trspmesures} devient alors : 
 \begin{align*}
 \forall B \in\mathcal{B}(\RR^n),\quad \int_B f_1(y)dy&=\int_{T^{-1}(B)} f_0(x) dx \\
 &= \int_B \sum_{x\in T^{-1}(y)} \left(\frac{f_0(x)}{|det\ \nabla T(x)|}\right)dy\\
 \end{align*}
 C'est à dire $f_1(y) = \sum_{x\in T^{-1}(y)} \left(\frac{f_0(x)}{|det\ \nabla T(x)|}\right)$.\\
-Supposons de plus que le transport est injectif et lisse, i.e. $x\in T^{-1}(y) \leftrightarrow y=T(x)$. Nous obtenons alors l'équation dite de Jacobienne : 
-\begin{align}
+Supposons de plus que le transport est injectif et lisse, i.e. $x\in T^{-1}(y) \Leftrightarrow y=T(x)$. Nous obtenons alors l'équation dite de Jacobienne :
+ 
+\begin{equation}
+\tag{J}
 f_1(T(x)) = \frac{f_0(x)}{|det\ \nabla T(x)|}
 \label{eq:jacobienne}
-\end{align}
+\end{equation}
+
 
 Notons $\mathcal{T}(f_0,f_1)$ l'ensemble des applications qui vérifient \eqref{eq:jacobienne}.
+\begin{definition}{Métrique de Wasserstein}
+Pour les coûts de transport de la forme $C(x,y) = \|x - y\|^p$, nous pouvons définir une métrique entre $f_0$ et $f_1$ par
+\begin{align*}
+W(f_0,f_1)^p=\min_{T\in\mathcal{T}(f_0,f_1)} \int \|x-T(x)\|f_0(x)\ dx
+\end{align*} 
 
-
-
-Nous pouvons alors donner la définition qui donne le titre à ce projet. 
-\begin{definition}{Problème de transport optimal}
-Soient, $f_0$ et $f_1$ deux densités de probabilité et un coût $C$. Le problème de transport optimal est alors le suivant.\\
-Trouver $T\in\mathcal{T}(f_0,f_1)$ qui réalise le 
-\begin{align}
-\min_{T\in\mathcal{T}(f_0,f_1)} \int C(x,T(x)) f_0(x)dx
-\label{eq:trspOpt}
-\end{align}
 \end{definition}
 
-\remarques{\begin{enumerate}
-\item Un ensemble de coût est particulièrement intéressant, ce sont ceux qui s'écrivent sous la forme $C(x,y) = \|x-y\|^p$. Et plus précisément dans notre problème $p=2$. Nous verrons que le problème de transport optimal possède alors de jolies propriétés. 
-\item La valeur de \eqref{eq:trspOpt} est alors appelée distance $L^2$ de Wasserstein entre $f_0$ et $f_1$, et est notée $d(f_0,f_1)$.
-\end{enumerate}
-}
 
-
-
-
-A partir de l'équation de la jacobienne \eqref{eq:jacobienne}, $\Psi$ est solution de l'équation de \emph{Monge - Ampère} 
-\begin{align}
-f_1(\nabla\Psi(x)) = \frac{f_0(x)}{det\ H\Psi(x)}
+Dans le cas quadratique, $T$ s'écrit comme le gradient d'une fonction convexe, qui satisfait alors l'équation dite de Monge Ampère : 
+\begin{equation}
+\tag{MA}
+f_1(\nabla u(x)) = \frac{f_0(x)}{det\ H u(x)}
 \label{eq:mongemapere}
-\end{align}
+\end{equation}
+
+
+
+
 
 
 \subsection{Formulation de J.D. Benamou et Y. Brenier}
 Pour le moment, le coût ne dépend que des densités initiales et finale, cependant il semble pertinent de chercher à connaître ce qu'il se passe pendant le transport, cela nous amènera à prendre en compte la notion d'obstacles. 
-Dans leur article de 1999 \cite{benamoubrenier}, J.D. Benamou et Y. Brenier ont donné une autre formulation au problème de transport optimal en réintroduisant le temps comme variable. Ils obtiennent alors une interprétation très simple du problème de transport optimal en terme de mécanique des fluides. 
+Dans leur article de 1999, J.D. Benamou et Y. Brenier \cite{benamoubrenier}, ont donné une autre formulation au problème de transport optimal en réintroduisant le temps comme variable. Ils obtiennent alors une interprétation très simple du problème de transport optimal en terme de mécanique des fluides. 
 
 \begin{theoreme}{Benamou, Brenier}
 Soient $f_0$ et $f_1$ deux densités de probabilité assez régulières. Alors, 
@@ -591,17 +587,9 @@ C_v=\left\{(f,v)\ |\ \frac{\partial f}{\partial t} + \text{div}_x (fv) =0,\ f(0,
 \end{theoreme}
 \begin{preuve}
 Nous redonnons la preuve donnée par Benamou et Brenier en complétant les points qui nous semble obscurs.\\
+Supposons $f_0$ et $f_1$ bornées et à support compact de $\RR^n$. Considérons $(f,v)$, suffisamment régulières, vérifiant \eqref{eq:contraintes}. Cette preuve repose sur l'utilisation des variables lagrangiennes $X(t,x)$ qui décrivent le comportement d'un fluide en "suivant" les particules. 
 
 
-\begin{minipage}{0.5\linewidth}
-La preuve repose sur l'utilisation des variables lagrangiennes $X(t,x)$ qui décrivent le comportement d'un fluide en "suivant" les particules. 
-Supposons $f_0$ et $f_1$ bornées et à support compact de $\RR^n$. Considérons $(f,v)$, suffisamment régulières, vérifiant \eqref{eq:contraintes}.
-\end{minipage}\hfill
-\begin{minipage}{0.55\linewidth}
-\begin{center}
-\includegraphics[scale=0.3]{img/lagrange.png}
-\end{center}
-\end{minipage}
 
 
 En termes formels, cela donne, 
@@ -611,17 +599,17 @@ X(0,x)=x\quad\frac{\partial X}{\partial t}(t,x) = v(t,X(t,x))
 \end{align}
 Ainsi, pour toute fonction test $\phi$ :
 \begin{align}
-\int \phi(t,x)f(t,x) dxdt &=\int \phi(t,X(t,x))f_0(x)dxdt \label{eq:coordlagrangienn}\\ 
-\int \phi(t,x)f(t,x)v(t,x) dxdt &= \int \frac{\partial X}{\partial t}(t,x)\phi(t,X(t,x))f_0(x)dxdt 
+\int \phi(t,x)f(t,x)\ dxdt &=\int \phi(t,X(t,x))f_0(x)\ dxdt \label{eq:coordlagrangienn}\\ 
+\int \phi(t,x)f(t,x)v(t,x)\ dxdt &= \int \frac{\partial X}{\partial t}(t,x)\phi(t,X(t,x))f_0(x)\ dxdt 
 \end{align}
 la première égalité vient du changement de variable $x=X(t,x)$, or, $f(t,X(t,x))$ décrit la densité de la particule de fluide déplacée le long du champ de vitesse $v$ à l'instant t, c'est donc la densité initiale en $x$, $f_0(x)$. \\
 
-Remarquons que \eqref{eq:coordlagrangienn} et la condition $f(0,\cdot)=f_0,\ f(1,\cdot) = f_1$ impliquent que $T(x)=X(1,x)$ est un transport valide. En effet, pour tout borélien $B$, $\int_{T(x)\in B}f_0(x) dx = \int_{X(1,x)\in B}f_0(x) dx$ Ce qui signifie, qu'au temps $1$, la particule $x$ est dans le borélien $B$, comme la densité au temps $1$ est donnée par $f_1$ on a bien : $\int_{X(1,x)\in B}f_0(x) dx = \int_B f_1(x)dx$.
+Remarquons que \eqref{eq:coordlagrangienn} et la condition $f(0,\cdot)=f_0,\ f(1,\cdot) = f_1$ impliquent que $T(x)=X(1,x)$ est un transport valide. En effet, pour tout borélien $B$, $\int_{T(x)\in B}f_0(x)\ dx = \int_{X(1,x)\in B}f_0(x)\ dx$ Ce qui signifie, qu'au temps $1$, la particule $x$ est dans le borélien $B$, comme la densité au temps $1$ est donnée par $f_1$ nous avons bien : $\int_{X(1,x)\in B}f_0(x)\ dx = \int_B f_1(x)\ dx$.
 
 
 Puis remarquons, en prenant comme fonction test $\phi(t,x) = \|v(t,x)\|^2$ dans \eqref{eq:coordlagrangienn}, que: 
 $$
-\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt = \int_{\RR^n}\int_0^1 f_0(x)\|v(t,X(t,x))\|^2dxdt
+\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2\ dxdt = \int_{\RR^n}\int_0^1 f_0(x)\|v(t,X(t,x))\|^2\ dxdt
 $$
 Nous obtenons, 
 \begin{align*}
@@ -633,18 +621,18 @@ Nous obtenons,
 &\leq \int_{\RR^n} f_0(x)\left\| X(1,x)-x \right\|^2dx  \quad \text{par } \eqref{eq:defcoordlag}\\
 \end{align*}
 
-Nous reconnaissons ici la forme qui apparaît dans la distance $L^2$ de Wasserstein, pour le transport $T(x) = X(1,x)$. Prenons $\nabla\Psi(x)$ le transport optimal, nous avons alors :  
+Nous reconnaissons ici la forme qui apparaît dans la distance $L^2$ de Wasserstein, pour le transport $T(x) = X(1,x)$. Prenons $\nabla u(x)$ le transport optimal, nous avons alors :  
 $$
-\leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx
+\leq \int_{\RR^n} f_0(x)\left\| \nabla u(x)-x \right\|^2dx
 $$
 Finalement, nous avons montré que : 
 $$
-\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt \leq \int_{\RR^n} f_0(x)\left\| \nabla\Psi(x)-x \right\|^2dx = d(f_0,f_1)^2
+\int_{\RR^n}\int_0^1 f(t,x)\|v(t,x)\|^2dxdt \leq \int_{\RR^n} f_0(x)\left\| \nabla u(x)-x \right\|^2dx = d(f_0,f_1)^2
 $$
-Il reste un trouver un couple $(f,v)$ tel que nous ayons l'égalité et la preuve sera complète. Choisissons $X(t,x) = x+t(\nabla\Psi(x)-x)$, ce qui correspond à la paire (f,v) vérifiant pour toute fonction test $\phi$ : 
+Il reste un trouver un couple $(f,v)$ tel que nous ayons l'égalité et la preuve sera complète. Choisissons $X(t,x) = x+t(\nabla u(x)-x)$, ce qui correspond à la paire (f,v) vérifiant pour toute fonction test $\phi$ : 
 \begin{align*}
-\int_{\RR^n} \int_0^1 \phi(t,x)f(t,x)dtdx &=\int_{\RR^n} \int_0^1 \phi(t, x+t(\nabla\Psi(x)-x)) f_0(x)dxdt \\
-\int_{\RR^n} \int_0^1 \phi (t,x)f(t,x)v(t,x) dtdx &= \int_{\RR^n} \int_0^1 \left(\nabla\Psi (x) - x\right) \phi(t, x+t(\nabla\Psi(x)-x)) f_0(x)  dtdx
+\int_{\RR^n} \int_0^1 \phi(t,x)f(t,x)\ dtdx &=\int_{\RR^n} \int_0^1 \phi(t, x+t(\nabla u(x)-x)) f_0(x)\ dxdt \\
+\int_{\RR^n} \int_0^1 \phi (t,x)f(t,x)v(t,x)\ dtdx &= \int_{\RR^n} \int_0^1 \left(\nabla u (x) - x\right) \phi(t, x+t(\nabla u(x)-x)) f_0(x)\ dtdx
 \end{align*}
 
 
@@ -652,34 +640,14 @@ Et en reprenant le raisonnement de la première étape, nous obtenons
 \begin{align*}
 \int_{\RR^n} \int_0^1 f(t,x)\|v(t,x)\|^2dtdx &= \int_{\RR^n} \int_0^1 f_0(x)\|v(t,X(t,x)\|^2\\
 &= \int_{\RR^n} \int_0^1 f_0(x) \|\frac{\partial X(t,x)}{\partial t}(t,x)\|^2 dtdx \\
-&= \int_{\RR^n} f_0(x) \|\nabla \Psi(x) -x\|^2dx \\
+&= \int_{\RR^n} f_0(x) \|\nabla u(x) -x\|^2dx \\
 \end{align*}
 Ce qui achève la preuve. 
 \end{preuve}
 
-La première équation dans l'ensemble des contraintes correspond à une équation de continuité. Tandis que les conditions sur les bords temporels imposent l'attache au problème initial. 
-
-\subsection{Une autre utilité au transport optimal}
-Dans les années 1990, la théorie du transport optimal et devenu un outil de démonstration puissant et élégant pour démontere de nombreuses inégalités géométriques et fonctionnelles. \\
-L'exemple le plus simple est fourni par \emph{l'inégalité isopérimétrique}, solution du problème de Didon \cite{Didon}. 
-Ce problème, peut s'"noncer ainsi : de toutes les courbes fermées de longueur donnée, celle qui entoure l'aire al plus grande est le cercle. Ce problème ce généralise, en diemnsion $n$.
-\begin{theoreme}{Problème de Didon}
-Dans l'espace euclidien $\RR^n$ muni de la mesure de Lebesgue $\lambda_n$, pour tout compact $K$, 
-$$
-\frac{(\lambda_{n-1} B)^n}{(\lambda_n B) ^n} \leq \frac{(\lambda_{n-1} K)^n}{(\lambda_n K) ^n}
-$$
-Avec $B$, la boule unité. 
-\end{theoreme}
+{\Huge à partir de la il est possible de recouvrer l'application de transport optimal}
 
 
-En particulier en dimension $n=3$ 
-\begin{preuve}
-Considérons les fonctions de densité uniforme et d'untégrale 1, du'ne part sur le domaine de volume $V$ et d'autre part sur une boule unité, donc de volume $\frac{4\pi}{3}$. Cela induit l'éxistence d'un potentiel $\phi$ permettant le transport de la première vers la second, solution de l'équation de Monge - Ampère en tout point $x$ du volume $V$ : 
-$$
-\frac{1}{V}=det(I + H\phi (x))\frac{1}{B}
-$$
-
-\end{preuve}
 
 
 \subsection{Conclusion}
@@ -697,7 +665,7 @@ Avant d'enatmmer la résolution numérique du problème de transport optimal, no
 \label{sec:prox}
 L'opérateur proximal d'une fonction convexe généralise la notion de projection sur un ensemble convexe. Cette notion fût introduite pour répondre aux problèmes de minimisation de fonctions non nécessairement différentiables. 
 
-Suivant la présentation de \emph{P.L. Combettes \emph{et} JC. Pesquet} \cite{combettes} nous présentons une série de résultats sur les opérateurs proximaux, en complétant quelques preuves.
+Suivant la présentation de \emph{P.L. Combettes \emph{et} J.C. Pesquet} \cite{combettes} nous présentons une série de résultats sur les opérateurs proximaux, en complétant quelques preuves.
 \paragraph{Notation :}Le domaine d'une fonction $f:\ \RR^n\longrightarrow\ ]-\infty,+\infty]$ est $\mathcal{D}(f) = \{ x\in\RR^n\ |\ f(x) < +\infty \} $. Notons $\Gamma_0(\RR^n)$ l'ensemble des fonctions convexes semi-continues inférieurement à valeurs dans $]-\infty,+\infty]$ telles que $\mathcal{D}(f) \neq \emptyset$. 
 
 \begin{definition}{Sous - différentiel}
@@ -717,17 +685,17 @@ $$
 $$
 Considérons deux cas, 
 \begin{enumerate}
-\item $\mathrm{x>0}$, le cas $x<0$ est identique. Soit une direction $u$ appartient au sous différentiel de $f$ en x, alors $\forall y\in \RR$ : 
+\item $\mathrm{x>0}$ (le cas $x<0$ est identique). Soit une direction $u$ appartient au sous différentiel de $f$ en x, alors $\forall y\in \RR$ : 
 \begin{align*}
 u(y-x) + f(x) \leq f(y)\\
-u(y-x) + x \leq f(y)\\
+u(y-x) + x \leq |y|\\
 \end{align*}
-En particulier, pour $y = 0$ on obtient $x(1-u) \leq 0$, ainsi $u\geq 1$. Et donc en prenant $y > x$ (en particulier, $y>0$) on obtient $u(y-x) + x \geq y$ ce qui est contraire à notre définition sauf si $u=1$. 
+En particulier, pour $y = 0$ nous obtenons $x(1-u) \leq 0$, ainsi $u\geq 1$. Et donc en prenant $y > x$ (en particulier, $y>0$) nous obtenons $u(y-x) + x \geq y$ ce qui est contraire à notre définition sauf si $u=1$. 
 \item $\mathrm{x=0}$ Soit $u\in \partial f(0)$, alors $u$ doit vérifier pour tout $y\in \RR$,
 \begin{align*}
 uy\leq |y|
 \end{align*}
-En prenant $y>0$ on obtient que $u\leq 1$ et en prenant $y<0$, on a $u\geq -1$.
+En prenant $y>0$ nous obtenons que $u\leq 1$ et en prenant $y<0$, nous avons $u\geq -1$.
 \end{enumerate}
 En somme, 
 $$
@@ -743,7 +711,7 @@ $$
 Ce qui correspond bien à l'interprétation géométrique donnée et à la figure \ref{fig:subgradient}.
 \begin{figure}[!h]
 \centering
-\includegraphics[scale=0.7]{img/sub_gradient.png}
+\includegraphics[scale=0.6]{img/sub_gradient.png}
 \caption{\label{fig:subgradient}Illustration du sous - différentiel de $|x|$ en $0$}
 \end{figure}
 }
@@ -769,7 +737,7 @@ $$
 \end{array}
 \right.
 $$
-Comme $f$ est différentiable dans son domaine, on peut écrire, 
+Comme $f$ est différentiable dans son domaine, nous pouvons écrire, 
 $$
 f(x\pm k_n)=f(x) \pm \langle \nabla f(x), k_n\rangle
 $$
@@ -803,13 +771,14 @@ $$
 En particulier en prenant $u\in \alpha\partial f_1(x) +\beta \partial f_2(x) $, au sens donné dans la propriété, cette inégalité est vérifiée. 
 
 \paragraph{$\alpha\partial f_1(x) +\beta \partial f_2(x) \supset
-\partial (\alpha f_1 +\beta f_2)(x)$ :}Soit $u\in\partial (\alpha f_1 +\beta f_2)(x)$, par contradiction, supposons que  $u\ni \alpha\partial f_1(x) +\beta \partial f_2(x)$, c'est à dire : 
+\partial (\alpha f_1 +\beta f_2)(x)$ :}Soit $u\in\partial (\alpha f_1 +\beta f_2)(x)$, par contradiction, supposons que  $u\notin \alpha\partial f_1(x) +\beta \partial f_2(x)$, c'est à dire : 
 $$
 \forall (u_1,u_2)\in \partial f_1(x) \times \partial f_2(x),\quad u\neq \alpha u_1+\beta u_2
 $$
 {\Huge EMPTY}
 \end{preuve}
-
+\exemple{Calculons le sous différentielle de $f(x)+\frac{1}{2}\|x-y\|^2$, pour une certaine fonction $f\in\Gamma_0(\RR^n)$ et $y\in_RR^n$ fixé. 
+}
 
 La notion de sous - différentiel est centrale car il permet de caractériser les minimiseurs d'une fonctions (même non différentiable).
 \begin{theoreme}{}
@@ -820,26 +789,22 @@ $$
 \end{theoreme}
 \begin{preuve}
 \vspace{-1cm}
-\paragraph{$\Rightarrow$} Soit $x^{\star}$ le minimum global de $f$ alors $\forall y\in \RR^n$ :
+Soit $x^{\star}$ le minimum global de $f$, 
+
 \begin{align*}
-f(x^{\star}) &\leq f(y)\\
-\langle 0,y-x\rangle +f(x^{\star}) &\leq f(y)\\
+\Longleftrightarrow \quad & \forall y\in\RR^n\quad  f(x^{\star})                        \leq f(y)\\
+\Longleftrightarrow \quad &                  \langle 0,y-x\rangle +f(x^{\star})  \leq f(y)\\
+\Longleftrightarrow \quad &                   0\in \partial f(x^{\star})       
 \end{align*}
-Et donc $0\in \partial f(x^{\star})$. 
-\paragraph{$\Leftarrow$} Si $0\in \partial f(x^{\star})$ alors $\forall y\in \RR^n$ :
-\begin{align*}
-\langle 0,y-x^{\star}\rangle + f(x^{\star}) &\leq f(y)\\
-f(x^{\star}) \leq f(y) 
-\end{align*}
-et $x^{\star}$ est un minimum global de $f$. 
+
 \end{preuve}
 
-L'opérateur proximal est un outil important dans l'optimisation de fonctions convexes non différentiables. C'est une application minimisant une fonction fortement convexe dépendant de la fonction originale $f$. En trouvant un compormis entre trouver le minimum de la fonction non différentaible $f$ et en forçant une proximité avec l'argument, nous approchons le minimum de $f$. 
+L'opérateur proximal est un outil important dans l'optimisation de fonctions convexes non différentiables. C'est une application minimisant une fonction fortement convexe dépendant de la fonction originale $f$. En trouvant un compromis entre atteindre le minimum de la fonction non différentiable $f$ et en forçant une proximité avec l'argument, nous approchons le minimum de $f$. 
 
 \begin{definition}{Opérateur proximal}
-Soit $f\in\Gamma_0(\RR^n)$. L'opérateur proximal de $f$ est noté $prox_f$ et il est défini pour tout $x\in\RR^n$ par : 
+Soit $f\in\Gamma_0(\RR^n)$. L'opérateur proximal de $f$ est noté $\prox_f$ et il est défini pour tout $x\in\RR^n$ par : 
 $$
-prox_f(x) = \argmin_{y\in\RR^n} f(y) +\frac{1}{2}\|x-y\|^2
+\prox_f(x) = \argmin_{y\in\RR^n} f(y) +\frac{1}{2}\|x-y\|^2
 $$
 \end{definition}
 \exemple{Prenons, l'indicatrice d'un ensemble convexe non vide $C$ : 
@@ -859,7 +824,7 @@ prox_{\mathrm{i}_C}(x) &= \arg \min_{y\in\RR^n} \mathrm{i}_C(y) + \frac{1}{2}\|x
 \end{align*}
 Où, $\mathrm{P}_C$ désigne la projection orthogonale sur $C$. 
 }\\
-Sur la figure \ref{fig:proximal} (tirée de \cite{parikh2014proximal}), nous avons en \textbf{gras} la frontière de la fonction $f$, les lignes fines sont les lignes de niveaux de $f$. Évaluer $prox_f$ sur les points bleus les associent aux points rouges correspondant. Les trois points dans le domaine restent dans le domaine et se déplacent vers le minimum, et les deux à l'extérieur du domaine se placent que la frontière de celui-ci en direction du minimum. 
+Sur la figure \ref{fig:proximal} (tirée de \cite{parikh2014proximal}), nous avons en \textbf{gras} la frontière de la fonction $f$, les lignes fines sont les lignes de niveaux de $f$. Nous évaluons $\prox_f$ sur les points bleus les associent aux points rouges correspondant. Les trois points dans le domaine restent dans le domaine et se déplacent vers le minimum, et les deux à l'extérieur du domaine se placent sur la frontière de celui-ci en direction du minimum. 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.7]{img/proximal.png}
@@ -867,17 +832,18 @@ Sur la figure \ref{fig:proximal} (tirée de \cite{parikh2014proximal}), nous avo
 \end{figure}
 Un scalaire $\gamma >0 $ peut être introduit dans cette définition $prox_{\gamma f}$, ce paramètre contrôle le poids apporté à la minimisation de $f$. Un $\gamma$ grand, forcera de se rapprocher fortement du minimum de $f$, alors qu'un $\gamma$ petit favorisera les points proches de $x$. Le résultat important est le suivant. 
 \begin{propriete}
-Soit une fonction $f$ convexe semi continue inférieurement. Alors, $prox_f(x)$ existe et est unique pour tout $x\in\RR^n$. De plus, il est caractérisé par : 
+Soit une fonction $f\in\Gamma_0(\RR^n)$. Alors, $\prox_f(x)$ existe et est unique pour tout $x\in\RR^n$.\\
+De plus, il est caractérisé par : 
 $$
-\forall (x,p)\in \RR^n\times\RR^n\quad p=prox_fx\quad\Longleftrightarrow\quad x-p\in\partial f(p)
+\forall (x,p)\in \RR^n\times\RR^n\quad p=\prox_fx\quad\Longleftrightarrow\quad x-p\in\partial f(p)
 $$
 En particulier, si $f$ est différentiable alors : 
 $$
-\forall (x,p)\in \RR^n\times\RR^n\quad p=prox_fx\quad \Longleftrightarrow \quad x-p=\nabla f(p)
+\forall (x,p)\in \RR^n\times\RR^n\quad p=\prox_fx\quad \Longleftrightarrow \quad x-p=\nabla f(p)
 $$
 \end{propriete}
 \begin{preuve}
-$\forall x \in \RR^n$, la fonction $g\ :\ y \rightarrow f(y) +\frac{1}{2}\|x-y\|^2$ est strictement convexe et dans $\Gamma_0(\RR^n)$ (i.e. identiquement égale à $+\infty$). Ce qui montre que le minimum de $g$ est toujours atteint. 
+$\forall x \in \RR^n$, la fonction $g\ :\ y \rightarrow f(y) +\frac{1}{2}\|x-y\|^2$ est strictement convexe et dans $\Gamma_0(\RR^n)$ (i.e. non identiquement égale à $+\infty$). Ce qui montre que le minimum de $g$ est toujours atteint et est unique. 
 
 
 \paragraph{$\Leftarrow$} Supposons que $x-p\in\partial f(p)$. Alors, pour tout $y\in\RR^n$, nous avons 
@@ -904,21 +870,25 @@ De plus,
 \begin{propriete}
 Le point $x^{\star}$ minimise $f$ si et seulement si 
 $$
-x^{\star} = prox_f(x^{\star})
+x^{\star} = \prox_f(x^{\star})
 $$
 \end{propriete} 
 \begin{preuve}
 \vspace{-1cm}
-\paragraph{$\Rightarrow$} Supposons que $x^{\star}$ minimise $f$ alors, comme $\|x^{\star}-y\|^2 > 0$ si $y\neq x^{\star}$. Nous avons $prox_f(x^{\star}) = x^{\star}$.
-\paragraph{$\Leftarrow$} Utilisons la caractérisation de minimisation donnée par le sous - différentiel. Le point $\tilde{x}$ minimise $f(x) +\frac{1}{2}\|x-v\|^2$, c'est à dire $\tilde{x} = prox_f(v)$, si et seulement si 
+\paragraph{$\Rightarrow$} Supposons que $x^{\star}$ minimise $f$ alors, $\forall y\in\RR^2$,
 $$
-0\in \partial f(\tilde{x}) + (\tilde{x}-v)
+f(x^{\star}) +\frac{1}{2}\|x^{\star}-x^{\star}\|^2\leq f(y)+\frac{1}{2}\|x^{\star}-y\|^2
 $$
-Ou la somme est entendu au sens de la somme entre un ensemble et un singleton. \\
-En prenant $x^{\star} = v=\tilde{x}$, nous obtenons $0\in\partial f(x^{\star})$. Et donc $x^{\star}$ minimise $f$.
+Donc, $\prox_f(x^{\star}) = x^{\star}$.
+\paragraph{$\Leftarrow$} Utilisons la caractérisation de minimisation donnée par le sous - différentiel. Le point $\tilde{x}$ minimise $f(x) +\frac{1}{2}\|x-y\|^2$, c'est à dire $\tilde{x} = \prox_f(y)$, si et seulement si 
+$$
+0\in \partial f(\tilde{x}) + (\tilde{x}-y)
+$$
+Ou la somme est entendu au sens de la somme entre un ensemble et un singleton, comme dans l'exemple précédent. \\
+En prenant $x^{\star} = y=\tilde{x}$, nous obtenons $0\in\partial f(x^{\star})$. Et donc $x^{\star}$ minimise $f$.
 \end{preuve}
 
-Cela suggère des algorithmes de point fixes. Cela fonctionnerait si $prox_f$ était une contraction (i.e. c-lipschitzienne, $0<c<1$). Ce n'est pas le cas, cependant nous avons une propriété de non expansivité qui est suffisante pour une itération de point fixe : 
+Cela suggère des algorithmes de point fixes. Cela fonctionnerait si $\prox_f$ était une contraction (i.e. c - lipschitzienne, $0<c<1$). Ce n'est pas le cas, cependant nous avons une propriété de non expansivité qui est suffisante pour une itération de point fixe : 
 $$
 \|prox_f(x)-prox_f(y)\|^2\leq \langle prox_f(x)-prox_f(y),x-y\rangle
 $$
@@ -928,7 +898,7 @@ Une application $N:\ \RR^n\rightarrow \RR^n$ est dite non expansive si
 $$
 \forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\| \leq \|x-y\|
 $$
-C'est à dire que $N$ est 1-lipschitzienne. Nous avons la caractérisation suivante : 
+C'est à dire que $N$ est 1-lipschitzienne. Nous avons la caractérisation suivante, $N$ est non expansive si et seulement si 
 $$
 \forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\|^2 \leq  \langle N(x)-N(y),x-y\rangle
 $$
@@ -963,12 +933,12 @@ Trouver $x\in\RR^n$ qui réalise le
 }
 
 \begin{propriete}
-Le problème \ref{eq:pbmminimi} admet une unique solution et pour $\forall \gamma >0$, elle est caractérisée par :
+Le problème \ref{eq:pbmminimi} admet une solution et pour tout $\gamma >0$, elle est caractérisée par :
 $$
 \left\{
 \begin{array}{rcl}
-x^{\star} &= & prox_{\gamma f_2} y \\
-prox_{\gamma f_2}y &= & prox_{\gamma f_1}(2prox_{\gamma f_2}y -y)
+x^{\star} &= & \prox_{\gamma f_2} y \\
+\prox_{\gamma f_2}y &= & \prox_{\gamma f_1}(2\prox_{\gamma f_2}y -y)
 \end{array}
 \right.
 $$
@@ -996,9 +966,9 @@ Suivant les idées d'algorithmes de point fixes sur les opérateurs proximaux, n
 \begin{algorithmic}
 \STATE Soit $\epsilon \in ]0,1[,\ \gamma >0,\ y_0\in \RR^n$
 \FOR{$n=0,\ 1,\ \ldots$}
-\STATE $x_n = prox_{\gamma f_2} y_n$
+\STATE $x_n = \prox_{\gamma f_2} y_n$
 \STATE $\lambda_n \in [\epsilon,2-\epsilon]$
-\STATE $y_{n+1} = y_n + \lambda_n(prox_{\gamma f_1} (2x_n-y_n)-x_n)$
+\STATE $y_{n+1} = y_n + \lambda_n(\prox_{\gamma f_1} (2x_n-y_n)-x_n)$
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
