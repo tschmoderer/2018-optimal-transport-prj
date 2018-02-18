@@ -3,9 +3,9 @@ program transport
     integer, parameter :: N = 15, P = 15, Q = 20, niter = 200
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1
     double precision, dimension(P+1,N+1) :: f0, f1
-    double precision, dimension(P+1,N+1,Q+1,3) :: zV = 0, wV0 = 0, wV1 = 0
-    double precision, dimension(P+2,N+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0
-	integer, dimension(P+1,N+1,Q+1) :: obstacle = 0
+    double precision, dimension(P+1,N+1,Q+1,3) :: zV = 0., wV0 = 0., wV1 = 0.
+    double precision, dimension(P+2,N+2,Q+2,3) :: zU = 0., wU0 = 0., wU1 = 0.
+		integer, dimension(P+1,N+1,Q+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF
     integer :: i, k, l 
   	character(10) :: charI;
@@ -109,39 +109,41 @@ do i = 1,niter
     end do
     close(1)
 
-	open(8,file='results/plot.gnu'); 
-	write(8,*) 'set dgrid3d ', P+1, ',', N+1
-	write(8,*) 'set zr [', minval(minF) , ':', maxval(zU(:,:,:,3)), ']'
-	close(8);
+		open(8,file='results/plot.gnu'); 
+		write(8,*) 'set dgrid3d ', P+1, ',', N+1
+		write(8,*) 'set zr [', minval(minF) , ':', maxval(zU(:,:,:,3)), ']'
+		close(8);
 
     contains
 
 !! Gauss
-    function gauss(muX,muY,sigma) result(f) 
+    function gauss(muX,muY,sigma) result(f)
 		implicit none
-        double precision :: muX, muY, sigma, x, y
+        double precision, intent(in) :: muX, muY, sigma
         double precision, dimension(P+1,N+1) :: f
+        double precision :: x, y
         integer :: i,j
         do i = 1,P+1
-			do j = 1,N+1
-				x = (j-1)/(1.0*N)
-				y = (i-1)/(1.0*P)
-				f(i,j) = exp(-0.5*((x-muX)**2 + (y-muY)**2)/sigma**2)
-            end do
+					do j = 1,N+1
+						x = (j-1)/(1.0*N)
+						y = (i-1)/(1.0*P)
+						f(i,j) = exp(-0.5*((x-muX)**2 + (y-muY)**2)/sigma**2)
+          end do
         end do 
     end function gauss
 	
 !! Normalise
     function normalise(f) result(nf) 
-	implicit none
-	    double precision, dimension(P+1,N+1) :: f, nf
+			implicit none
+	    	double precision, dimension(P+1,N+1), intent(in) :: f
+	    	double precision, dimension(P+1,N+1) :: nf
         nf = f/sum(f)
     end function
 
 !! Cout 
     function J(V) result(c) 
     implicit none
-        double precision, dimension(P+1,N+1,Q+1,3) :: V
+        double precision, dimension(P+1,N+1,Q+1,3), intent(in) :: V
         double precision :: c
         c = 0.5*sum(sum(V(:,:,:,1:2)**2)/max(V(:,:,:,3),eps,1e-10)**b)
     end function J 
@@ -149,7 +151,8 @@ do i = 1,niter
 !! Proximal de J 
     function proxJ(V) result(pV)
     implicit none
-        double precision, dimension(P+1,N+1,Q+1,3) :: V, pV
+        double precision, dimension(P+1,N+1,Q+1,3), intent(in) :: V
+        double precision, dimension(P+1,N+1,Q+1,3) :: pV
         double precision, dimension(P+1,N+1,Q+1,2) :: mt
         double precision, dimension(P+1,N+1,Q+1) :: ft, x0, x1, poly, dpoly
         integer :: k
@@ -160,26 +163,26 @@ do i = 1,niter
         do while (maxval(dabs(x0-x1)) .GT. 1e-10  .AND. k .LT. 1500)
             x0 = x1
             if (b .EQ. 1) then ! Cas transport
-				poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-				dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
-			else if (b .EQ. 0) then ! Interpolation L2
-				x1 = ft
-				exit
-			else 
-				poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-				dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
-			end if
+							poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+							dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
+						else if (b .EQ. 0) then ! Interpolation L2
+							x1 = ft
+							exit
+						else 
+							poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+							dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
+					end if
 			
-			where (x0 .GT. eps) x1 = x0 - poly/dpoly
-			where (x0 .LT. eps) x1 = eps		
+						where (x0 .GT. eps) x1 = x0 - poly/dpoly
+						where (x0 .LT. eps) x1 = eps		
 			
             k = k+1
         end do
 
         where ((x1 .LT. eps) .OR. (obstacle .GT. 0)) x1 = eps
 
-        pV(:,:,:,1) = (x1**b)*mt(:,:,:,1)/(x1**b+g) 
-        pV(:,:,:,2) = (x1**b)*mt(:,:,:,2)/(x1**b+g) 
+        pV(:,:,:,1) = (x1**b)*mt(:,:,:,1)/(x1**b + g) 
+        pV(:,:,:,2) = (x1**b)*mt(:,:,:,2)/(x1**b + g) 
         pV(:,:,:,3) = x1
     end function proxJ
     
@@ -221,8 +224,9 @@ do i = 1,niter
 !! Projection sur Cs
 	function projCs(U,V) result(pU)
 	implicit none
-		double precision, dimension(P+2,N+2,Q+2,3) :: U, b, r, dir, Idir, pU
-		double precision, dimension(P+1,N+1,Q+1,3) :: V
+		double precision, dimension(P+2,N+2,Q+2,3), intent(in) :: U
+		double precision, dimension(P+1,N+1,Q+1,3), intent(in) :: V
+		double precision, dimension(P+2,N+2,Q+2,3) :: b, r, dir, Idir, pU
 		double precision :: alpha, rnew, rold
 		integer :: i 
 		b = U + interpAdj(V)
@@ -315,7 +319,8 @@ do i = 1,niter
 !! Projection sur C
 	function projC(U) result(pU) 
 	implicit none 
-		double precision, dimension(P+2,N+2,Q+2,3) :: U, pU
+		double precision, dimension(P+2,N+2,Q+2,3), intent(in) :: U
+		double precision, dimension(P+2,N+2,Q+2,3) :: pU
 		double precision, dimension(P+3,N+3,Q+3) :: y, x, b, r, dir, Adir
 		double precision :: alpha, rnew, rold
 		integer :: i 
@@ -343,6 +348,6 @@ do i = 1,niter
 		pU = U + AS(x)
 		
 !		print *, 'Erreur avant projection : ', sum((A(U)  - y)**2)/sum(y**2)
-!	    print *, 'Erreur après projection : ', sum((A(pU) - y)**2)/sum(y**2)
+!    print *, 'Erreur après projection : ', sum((A(pU) - y)**2)/sum(y**2)
 	end function projC
 end program transport

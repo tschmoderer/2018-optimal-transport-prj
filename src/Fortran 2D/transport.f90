@@ -23,8 +23,8 @@ program transport
 	f0 = normalise(eps + f0)
 	f1 = normalise(eps + f1)
 	
-!    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0)) ! + gauss(0.8d0,0.5d0,0.05d0))
-!    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0)) ! + gauss(0.5d0,0.8d0,0.05d0))
+  f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0)) ! + gauss(0.8d0,0.5d0,0.05d0))
+  f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0) + gauss(0.5d0,0.8d0,0.05d0))
 
     do i = 1,niter
         w1 = w0 + alpha*(proxJ(2*z-w0) - z)
