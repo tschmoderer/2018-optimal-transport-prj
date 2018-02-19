@@ -320,6 +320,20 @@ Pour toute fonction $f\ :\ E\rightarrow \RR\cup\{+\infty\}$ sa transformée de L
 \item Une fonction $f\ :\ E\rightarrow \RR\cup\{+\infty\}$ est convexe et semi continue inférieurement si et seulement si $f^{\star\star}=f$.
 \end{enumerate}
 \end{propriete}
+\begin{preuve}
+\begin{enumerate}
+\item $\Longleftarrow$ : Il est clair que $=\sup_x \langle x,\cdot \rangle -g(x)$ est dans $\Gamma_0$. \\
+$\Longrightarrow$ : Supposons que c'est faux, c'est à dire, $\exists \bar{x}\in\mathcal{D}(f)$ telle que $f(\bar{x})>\bar{z}:=\sup\left\{\langle x_i,\bar{x}\rangle - g_i,\ i\in I\right\}$, où $I$ représentent les indices des fonctions qui minorent $f$. Alors le point, $\begin{pmatrix}
+\bar{x}\\
+\bar{z}
+\end{pmatrix}\notin \text{epi}(f)$. On peut alors trouver un hyperplan séparant $\begin{pmatrix}
+\bar{x}\\
+\bar{z}
+\end{pmatrix}$ et $\text{epi}(f)$ pour obtenir une minorante de $f$ contredisant la définition de $\bar{z}$.
+\item $\Longleftarrow$ : c'est le point précédent.\\
+ $\Longrightarrow$ : 
+\end{enumerate}
+\end{preuve}
 Montrons à présent que \eqref{eq:DKP} est bien le problème dual associé à \eqref{eq:KP}. 
 \begin{theoreme}{}
 \label{thm:dualite}
@@ -861,9 +875,9 @@ Ainsi,
 \frac{1}{2} \|x-p\|^2 + \frac{1}{2}\|y-p \|^2 -\frac{1}{2}\|x-y\|^2 + f(p) &\leq f(y) \\
 \frac{1}{2} \|x-p\|^2 + f(p) &\leq f(y) + \frac{1}{2}\|x-y\|^2\\
 \end{align*}
-Donc $p=prox_f(x)$.
-\paragraph{$\Rightarrow$} Soit $(x,p)\in \RR^n\times\RR^n$ telle que $p=prox_f(x)$. Alors $\forall y\in\RR^n$,
-{\Huge je me demande si c'est pas eja prouvé}
+Donc $p=\prox_f(x)$.
+\paragraph{$\Rightarrow$} Soit $(x,p)\in \RR^n\times\RR^n$ telle que $p=\prox_f(x)$. Cela signifie que $p$ minimise l'application $y\mapsto f(y)+\frac{1}{2}\|x-y\|^2$, par la caractérisation du minimum par le sous différentiel, $0\in\partial \left(f(\cdot)+\frac{1}{2}\|x-\cdot\|^2 \right)(p)$. Par la règle de la somme des sous différentielles et l'exemple, $\exists u\in\partial f$ telle que $0=u+(p-x)$. \\
+Ainsi, $u=x-p\in\partial f(p)$. 
 \end{preuve}
  
 De plus, 
@@ -952,12 +966,9 @@ x^{\star} =\argmin_x f_1(x) + f_2(x) &\Longleftrightarrow 0\in \partial (f_1+f_2
 \end{align*}
 Comme le support de $f_1+f_2$ est non vide, $\exists\ y$ tel que $x^{\star}-y\in \partial(f_1)(x)$ et $y-x^{\star}\in\partial(f_2)(x)$.
 \begin{align*}
-\Longleftrightarrow x^{\star}=prox_{f_2} (y) \text{ et } &(2x^{\star}-y)-x^{\star}\in\partial(f_1)(x^{\star})\\
+&\Longleftrightarrow x^{\star}=prox_{f_2} (y) \text{ et } (2x^{\star}-y)-x^{\star}\in\partial(f_1)(x^{\star})\\
 &\Longleftrightarrow x^{\star} = prox_{f_1}(2x^{\star}-y)
 \end{align*}
-Ce qui termine la preuve. Cependant, pour la forme algorithmique, développons un peu les calculs : 
-
-
 \end{preuve}
 
 Suivant les idées d'algorithmes de point fixes sur les opérateurs proximaux, nous aintroduisons l'algorithme suivant dit de \emph{Douglas - Rachford}.
@@ -977,7 +988,21 @@ Suivant les idées d'algorithmes de point fixes sur les opérateurs proximaux, n
 Toute suite $(x_n)$ générée par l'algorithme de Douglas - Rachford converge vers une solution du problème \ref{eq:pbmminimi}.
 \end{propriete}
 
+\begin{preuve}
+L'itération sur $y_n$ peut se réécrire comme une opération de point fixe, $y_{n+1}=F(y_n)$, avec $F:y\mapsto y+\prox_{\gamma f_1}(2\prox_{\gamma f_2}(y)-y)-\prox_{\gamma f_2}(y)$. Or, 
+\begin{align*}
+\Longleftrightarrow\quad x=\prox_{\gamma f_2}(y) &,\quad y = F(y) \\
+\Longleftrightarrow\quad x=\prox_{\gamma f_2}(y) &,\quad x = \prox_{\gamma f_1}(2x-y) \\
+\Longleftrightarrow\quad y+x\in\partial f_2(x)   &, \quad x-y\in\partial f_1(x)
+\end{align*}
+Alors, si $y=F(y)$, cela implique que $x=prox_{\gamma f_2}(y)$ vérifie 
+$$
+0=(y-x)+(x-y)\in \partial\gamma(f_1+f_2)(x)
+$$
+Réciproquement, si $z\in\partial \gamma f_1(x)$ et $-z\in\partial \gamma f_2(x)$, alors $y=x-z$ est un point fixe de $F$.\\
 
+Le paramètre $\lambda_n$, relaxe l'équation de point fixe : $y_{n+1}=y_n + \lambda_n(F(y_n)-y_n)$. 
+\end{preuve}
 
 
 
