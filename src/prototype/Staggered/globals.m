@@ -7,3 +7,5 @@ global Q; % direction t
 
 global f0;
 global f1;
+
+global y;

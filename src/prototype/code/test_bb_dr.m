@@ -42,14 +42,14 @@ f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg'))));
 %f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
 
 f1 = flipud(f0);
-
+f1 = normalize(1 - f0);
 %f0 = normalize(rho + double(imread('panda2.png'))); 
 %f1 = normalize(rho + double(imread('clone.png'))); 
 
 epsilon=min(f0(:));
 
 clf; imageplot({f0 f1}); 
- 
+ pause
 %%
 % Initialization using linear interpolation of the densities.
 
