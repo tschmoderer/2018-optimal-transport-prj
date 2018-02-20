@@ -7,7 +7,6 @@
  set title "Transport Optimal"
  set xlabel "x"
  set ylabel "t"
- set palette gray
  set view 0,0
- set dgrid3d          101 ,         101
+ set dgrid3d           52 ,          52
  splot "results/transport.dat" with lines
