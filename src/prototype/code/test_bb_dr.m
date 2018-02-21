@@ -10,7 +10,7 @@ close all
 addpath('toolbox/');
 
 
-N=128; P=128; Q=100;
+N=50; P=50; Q=50;
 
 
 d = [N,P,Q];
@@ -35,14 +35,14 @@ sigma =  .05; rho = 1e-10;
 f0 = normalize( rho + gaussian(.2,.2,sigma) );
 f1 = normalize( rho + gaussian(.8,.8,sigma) );
 
-f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
-f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
+%f0 = normalize(rho + double(rgb2gray(imread('panda.png')))); 
+%f1 = normalize(rho + double(rgb2gray(imread('pingouin.png')))); 
 
-f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
+%f0 = normalize(rho + double(rgb2gray(imread('eiffel.jpg')))); 
 %f1 = normalize(rho + double(rgb2gray(imread('triomphe.jpg')))); 
 
-f1 = flipud(f0);
-f1 = normalize(1 - f0);
+%f1 = flipud(f0);
+%f1 = normalize(1 - f0);
 %f0 = normalize(rho + double(imread('panda2.png'))); 
 %f1 = normalize(rho + double(imread('clone.png'))); 
 
@@ -84,9 +84,9 @@ K = length(Prox);
 % k=2: div=0
 % k=3: V=interp(U)
 
-mu = 1.98; % should be in ]0,2[
-gamma = 1./230.; % should be >0
-niter = 1000;
+mu = 1.; % should be in ]0,2[
+gamma = 1.; % should be >0
+niter = 2000;
 Jlist = []; Constr = [];MinVal = [];
 
 

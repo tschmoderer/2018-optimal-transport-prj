@@ -1,6 +1,6 @@
 program transport
     implicit none
-    integer, parameter :: N = 100, Q = 100, niter = 5000
+    integer, parameter :: N = 50, Q = 50, niter = 2000
     double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1.0
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1) :: f0, f1
@@ -14,11 +14,13 @@ program transport
 	
 	
 	!! Initialisation
-    f0 = normalise(eps + gauss(0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.3d0,0.05d0) + gauss(0.8d0,0.05d0))
+    f0 = normalise(eps + gauss(0.5d0,0.05d0))
+    f1 = normalise(eps + gauss(0.5d0,0.05d0))! + gauss(0.8d0,0.05d0))
     
-    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
-    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
+!    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
+!    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
+    
+    obstacle(23:27,15:27) = 1
     
     do i = 1,Q+2
 		t = (i-1)/(1.*(Q+1))
@@ -174,8 +176,8 @@ program transport
             k = k+1
         end do
 
-        where (x1 .LT. eps) x1 = eps
-        where (obstacle .GT. 0) x1 = eps
+        where ((x1 .LT. eps) .OR.  (obstacle .GT. 0)) x1 = eps
+
         pw(:,:,2) = x1
         pw(:,:,1) = (x1**b)*mt/(x1**b+g) 
     end function proxJ
