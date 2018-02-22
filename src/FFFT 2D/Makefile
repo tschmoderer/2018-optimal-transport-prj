@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS  = -g -Wall -Wno-tabs
+FFLAGS  = -g -pg -Wall -Wno-tabs
 EXEC = ftransport
 
 .DEFAULT_GOAL = all

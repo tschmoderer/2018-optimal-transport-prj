@@ -1,6 +1,6 @@
 program transport
     implicit none
-    integer, parameter :: N = 99, P = 99, Q = 99, niter = 1000000
+    integer, parameter :: N = 31, P = 31, Q = 31, niter = 1000
     double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.0
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
@@ -12,39 +12,17 @@ program transport
     integer :: i, k, l 
   	character(10) :: charI;
 	 
-    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
+!    open(1,file='fourati.dat')
+!    open(2,file='knippel.dat')
+!    do i = 1,N+1
+!		read(1,*) f0(i,:)
+!		read(2,*) f1(i,:)
+!    end do
+!    close(1)
+!    close(2)    
     
-    open(1,file='fourati.dat')
-    open(2,file='knippel.dat')
-    do i = 1,N+1
-		read(1,*) f0(i,:)
-		read(2,*) f1(i,:)
-    end do
-    close(1)
-    close(2)
-    
-     open(1,file='results/f0.dat');
-    write(1,*) "# ", "X ", "Y "
-    do i = 1,P+1
-		do k = 1,N+1
-			write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*N), f0(i,k)
-        end do
-    end do
-    close(1)
-
-    open(1,file='results/f1.dat');
-    write(1,*) "# ", "X ", "Y "
-    do i = 1,P+1
-		do k = 1,N+1
-			write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*N), f1(i,k)
-        end do
-    end do
-    close(1)
-    
-    
-    f0 = normalise(eps + f0)
-    f1 = normalise(eps + f1)
+!    f0 = normalise(eps + f0)
+!    f1 = normalise(eps + f1)
     
     f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
@@ -193,35 +171,76 @@ program transport
         double precision, dimension(N+1,P+1,Q+1,3) :: w, pw
         double precision, dimension(N+1,P+1,Q+1,2) :: mt
         double precision, dimension(N+1,P+1,Q+1)   :: ft, x0, x1, poly, dpoly
+        double precision, dimension(N+1,P+1,Q+1)   :: a1, a0, d
         integer :: k
         
         mt = w(:,:,:,1:2); ft = w(:,:,:,3);
-        x0 = 1; x1 = 2; k = 0;
+        
+        if (b .EQ. 0) then ! Interpolation L2
+        			x1 = ft
+        else if (b .EQ. 1) then ! Transport
+        	! résolution polynôme de degré 3 par formule de Cardan
+        	! x^3 + ax^2 + bx + c = 0
+        	! a = 2*g - ft, b = g**2 - 2*g*ft, c = -ft*g**2 -0.5*g*||mt||**2
+        	! forme normale x^3 + a1x + a0
+        	a1 = -(2*g - ft)*(2*g - ft)/(1.*3) + (g**2 - 2*g*ft)
+        	a0 = 2.*(2*g - ft)**3/(1.*27) - (2*g - ft)*(g**2 - 2*g*ft)/(3.) + (-ft*g**2 -0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2))
+        	d  = a0*2 + 4.*a1**3/(27.)
+        	print *, minval(d)
+        	
+        	
+        	
+        		 x0 = 1; x1 = 2; k = 0;
 
-        do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 1500)
-            x0 = x1
-            if (b .EQ. 1) then ! Cas transport
-				poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-				dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
-			else if (b .EQ. 0) then ! Interpolation L2
-				x1 = ft
-				exit
-			else 
-				poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-				dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
-			end if
+		      do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 50)
+		          x0 = x1
+		          if (b .EQ. 1) then ! Cas transport
+								poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+								dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
+						!	else if (b .EQ. 0) then ! Interpolation L2
+							!	x1 = ft
+								!exit
+							else 
+								poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+								dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
+							end if
 			
-			where (x0 .GT. eps) x1 = x0 - poly/dpoly
-			where (x0 .LT. eps) x1 = eps		
+						where (x0 .GT. eps) x1 = x0 - poly/dpoly
+						where (x0 .LT. eps) x1 = eps		
 			
-            k = k+1
-        end do
+		          k = k+1
+		      end do
+        	
+        	
+       	else ! entre les deux
+        		 x0 = 1; x1 = 2; k = 0;
+
+		      do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 50)
+		          x0 = x1
+		          if (b .EQ. 1) then ! Cas transport
+								poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+								dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
+						!	else if (b .EQ. 0) then ! Interpolation L2
+							!	x1 = ft
+								!exit
+							else 
+								poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+								dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
+							end if
+			
+						where (x0 .GT. eps) x1 = x0 - poly/dpoly
+						where (x0 .LT. eps) x1 = eps		
+			
+		          k = k+1
+		      end do
+        	
+        end if   
 
         where (x1 .LT. eps) x1 = eps
         where (obstacle .GT. 0) x1 = eps
-        pw(:,:,:,3) = x1
         pw(:,:,:,1) = (x1**b)*mt(:,:,:,1)/(x1**b+g) 
         pw(:,:,:,2) = (x1**b)*mt(:,:,:,2)/(x1**b+g) 
+        pw(:,:,:,3) = x1
     end function proxJ
     
 !! Interpolation 
