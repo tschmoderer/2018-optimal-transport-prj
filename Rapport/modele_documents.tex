@@ -36,10 +36,10 @@
     urlcolor=cyan           % color of external links
 }
 
-\let\urlorig\url
-\renewcommand{\url}[1]{%
-   \begin{otherlanguage}{english}\urlorig{#1}\end{otherlanguage}%
-}
+%\let\urlorig\url
+%\renewcommand{\url}[1]{%
+%   \begin{otherlanguage}{english}\urlorig{#1}\end{otherlanguage}%
+%}
 
 
 % Bibliographie dans la Table des matières
@@ -334,11 +334,16 @@
 % MISE EN FORME DU TITRE
 \makeatletter
 \renewcommand{\maketitle}{
-%\includegraphics[width=120px]{} %logo insa
+\begin{minipage}[l]{.8\linewidth}
+\includegraphics[width=120px]{img/logo.png} %logo insa
+\end{minipage} \hfill
+\begin{minipage}[r]{.46\linewidth}
+\includegraphics[width=100px]{img/logo_univ.png}
+\end{minipage}
 
-\vspace{3cm}
+\vspace{1cm}
 \begin{center}
-\boxput*(0,1){\colorbox{white}{Rapport de projet}}{
+\boxput*(0,1){\colorbox{white}{Projet de Fin d’Études}}{
 \setlength{\fboxsep}{10pt}
 \framebox[\textwidth]{
 \begin{minipage}{8cm}
@@ -356,11 +361,10 @@ Semestre 9 - \dateDoc
 \end{center}
 
 
-\vspace{2cm}
 %\includegraphics{} %logo du document
 
 
-\vspace{3cm}
+\vfill
 \begin{minipage}[l]{0.4\textwidth}
 \large
 \emph{Auteur :}\\

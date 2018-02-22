@@ -6,13 +6,16 @@
 \renewcommand\appendixtocname{Annexes}
 \newcommand{\supp}{\text{supp }}
 \newcommand{\prox}{\text{Prox}}
+\renewcommand{\div}{\text{div}}
+\newcommand{\proj}{\text{Proj}}
+
 
 \setlength{\parindent}{0pt}
-\newcommand\titre{Transport Optimal}
+\newcommand\titre{Théorie du Transport Optimal\\Étude et Applications}
 \newcommand\auteur{Timothée \textsc{Schmoderer}}
 \newcommand\dateDoc{2017/2018}
 \newcommand\chapitre{Chapitre 2}
-\newcommand\cours{PFE}
+\newcommand\cours{Projet de fin d'études}
 \usepackage{enumitem}
 \everymath{\displaystyle}
 
@@ -26,7 +29,7 @@
 \lhead{\cours}
 \chead{}
 \rhead{\currentname}
-\lfoot{\titre}
+\lfoot{Théorie du Transport Optimal}
 \cfoot{}
 \rfoot{Page \thepage\ /\ \pageref*{LastPage}}  
 
@@ -659,11 +662,31 @@ Et en reprenant le raisonnement de la première étape, nous obtenons
 Ce qui achève la preuve. 
 \end{preuve}
 
-{\Huge à partir de la il est possible de recouvrer l'application de transport optimal}
+Remarquons qu'une fois le champ de vitesse $v$ calculé, il est possible de retrouver l'application de transport optimal et intégrant le flot. Plus précisément, soit $x\in \RR^n$, posons $T_t(x)$ satisfaisant 
+$$
+T_0(x) = x \quad \forall t>0,\ \frac{\partial T_t(x)}{\partial t}=v(T_t(x),t)
+$$
+Suivant l'idée de Benamou et Brenier, posons le changement de variables $(f,v)\mapsto (f,m)$, où $m=fv$ est la quantité de mouvement. Nous obtenons ainsi un problème d'optimisation convexe sous contraintes linéaires pour la paire $(f,m)$. 
 
+\begin{equation}
+\tag{P}
+\min_{(f,m)\in \mathcal{C}} \mathcal{J}(f,m)=\int\int_0^1 J(f(x,t),m(x,t))\ dtdx
+\label{eq:pbm}
+\end{equation}
 
+\begin{align}
+\forall (m,f)\in \RR^n\times\RR, \quad J(m,f) = \left\{\begin{array}{cl}
+\frac{\|m\|^2}{2f} & \text{si } f>0 \\
+0 &\text{si } (m,f) = (0,0)\\
++\infty & \text{sinon} 
+\end{array}\right.
+\end{align}
 
-
+\begin{equation}
+\tag{C}
+\mathcal{C}=\left\{(m,f)\ |\ \frac{\partial f}{\partial t} + \div_x(m)=0\quad f(\cdot,0)=f_0,\ f(\cdot,1)=f_1\right\}
+\label{eq:constraint}
+\end{equation}
 \subsection{Conclusion}
 Dans cette partie, nous avons introduit le problème de transport optimal. Démontrer l'existence et l'unicité du transport. 
 Le problèem se reformule alors. 
@@ -1015,44 +1038,150 @@ Le paramètre $\lambda_n$, relaxe l'équation de point fixe : $y_{n+1}=y_n + \la
 \label{sec:numerique}
 Dans cette section, nous présentons différentes manières d'approcher numériquement la solution du problème \eqref{eq:MP}. La méthode consiste principalement à trouver une manière efficace de calculer les contraintes. \\
 
-La présentation de cette section part de l'algorithme de Douglas - Rachtford. \\
+Nous présentons la méthode implémenté par Papadakis et al. dans \cite{papadakis}. Cette méthode repose sur l'utilisation de grilles décentrées pour obtenir de bonnes approximations des dérivées. Cependant, je tiens à souligner que le déploiement de cette artillerie n'est pas nécessaire à la résolution numérique du problème, par exemple une méthode plus simple est présentée ici\footnote{\url{http://www.numerical-tours.com/matlab/optimaltransp\_2\_benamou\_brenier/}}.\\
 
 Dans cette section nous nous plaçons dans un domaine spatial de dimension 1. La méthode présentée s'étend sans grande difficultés en dimensions supérieures. 
 
-
-\subsection{Sur des grilles centrées}
-Le problème continu {\Huge Insérer ref} est approximé par 
-\begin{align}
-\min_{w\in\mathcal{G}} J(w) + \iota_C(w)
-\end{align}
-Où, $\mathcal{G}$ est la grille de discrétisation du carré espace temps. 
-
+\subsection{Grilles centrées et décalées}
+Mettons sur le carré espace temps unité $[0,1]^2$. Discrétisons l'espace en $N+1$ points et le temps en $Q+1$ points. Discrétisons alors l'espace temps de la façon suivante : 
+$$
+\mathcal{G}_c = \left\{(x_i=\frac{i}{N},t_j=\frac{j}{Q})\ |\ 0\leq i\leq N,\ 0\leq j\leq Q\right\}
+$$
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.8\linewidth]{img/grille_centree.png}
-\caption{•}
+\caption{Grille centrée pour $N=6$ et $Q=3$}
+\label{fig:centered}
 \end{figure}
 
-$J$ est la version discrète de la fonctionnelle
+Notons $\mathcal{E}_c=(\RR^2)^{\mathcal{G}_c}$ l'espace de dimension finie de variables définies sur la grille centrées et posons : 
 $$
-é
+V = (m_{ij},f_{ij})_{0\leq i\leq N}^{0\leq j\leq Q}
+$$
+La discrétisation centrée de $(m,f)$. \\
+
+Comme annoncé en introduction de cette section, nous introduisons à présent des grilles décalées (une dans la direction de l'espace et une autre dans la direction temporelle).  Cela dans le but d'obtenir de bonne approximations des opérateurs de dérivées. 
+
+\begin{align}
+\mathcal{G}_s^x = \left\{(x_i=\frac{i+1/2}{N},t_j=\frac{j}{Q})\ |\ -1\leq i\leq N,\ 0\leq j\leq Q\right\} \\
+\mathcal{G}_s^t = \left\{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{Q})\ |\ 0\leq i\leq N,\ -1\leq j\leq Q\right\}
+\end{align}
+
+\begin{figure}[!h]
+\centering
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=0.9\linewidth]{img/grille_decentree_x.png}
+\caption{Grille décentrée en espace}
+\label{fig:staggeredX}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[width=0.9\linewidth]{img/grille_decentree_t.png}
+\caption{Grille décentrée en temps}
+\label{fig:staggeredT}
+\end{minipage}
+\end{figure}
+
+Ainsi, $\mathbb{G}_s^x$ contient $(N+2)\times(Q+1)$ points et $\mathcal{G}_s^t$ en contient $(N+1)\times(Q+2)$ points. Notons $\mathcal{E}_s=\RR^{\mathbb{G}_s^x}\times\RR^{\mathbb{G}_s^t}$ l'espace des variables sur les grilles décentrées. Et notons 
+$$
+U=(\bar{m},\bar{f})=\left((\bar{m}_{ij})_{-1\leq i\leq N}^{0\leq j\leq Q}, (\bar{f}_{ij})_{0\leq i\leq N}^{-1\leq j\leq Q}\right)
+$$
+Les variables discrétisées. 
+
+\subsection{Opérateurs discrétisés}
+Introduisons plusieurs opérateurs, dans un premier temps, un opérateur d'interposaltion qui nous permet de lier les variables centrées aux variables décentrées. 
+
+\begin{align}
+\fonction{\mathcal{I}}{\mathcal{E}_s}{\mathcal{E}_c}{(\bar{m},\bar{f})}{\left\{
+\begin{array}{ccccc}
+m_{i,j} &=& (\bar{m}_{i-1,j} &+& \bar{m}_{i,j})/2 \\
+f_{i,j} &=& (\bar{f}_{i,j-1} &+& \bar{f}_{i,j})/2 \\
+\end{array}
+\right.
+\quad \forall 0\leq i\leq N,\ \forall 0\leq j\leq Q}
+\end{align}
+
+Et introduisons l'opérateur de divergence spatiale et temporelle : 
+\begin{align}
+\fonction{\div}{\mathcal{E}_s}{\RR^{\mathcal{G}_c}}{U}{\div(U)_{i,j} = N(\bar{m}_{i,j} - \bar{m}_{i-1,j}) + Q(\bar{f}_{i,j} - \bar{f}_{i,j-1})
+}
+\end{align}
+
+Nous définissons enfin un opérateur d'extraction des frontières des variables décentrées. 
+
+\begin{align}
+\fonction{b}{\mathcal{E}_s}{\RR^{Q+1}\times\RR^{Q+1}\times\RR^{N+1}\times\RR^{N+1}}{U}{\left( (\bar{m}_{-1,j},\bar{m}_{N,j})_{j=0}^Q,(\bar{f}_{i,-1},\bar{f}_{i,Q})_{i=0}^N \right)}
+\end{align}
+
+
+Nous imposons les conditions aux bords suivantes :
+$$
+b(U) = b_0\quad b_0=(0,0,f_0,f_1)\in \RR^{Q+1}\times\RR^{Q+1}\times\RR^{N+1}\times\RR^{N+1}
+$$
+Avec, $f_0,\ f_1\in\RR^{N+1}$ les densités initiale et finale discrétisées en espace, et la contrainte spatiale $0\in\RR^{Q+1}$ sur la quantité de mouvement vient de la discrétisation des conditions de Neumann sur le champ de vitesse $v$. \\
+Remarquons qu'en deux ou trois dimensions spatiales, les conditions de Neumann et de Dirichlet ne coïncident plus,  par exemple en 2D, les conditions de Neumann sont équivalentes à forcer la première composantes de $\bar{m}$ à être zéro sur les côtés verticaux et à forcer la seconde composante de $\bar{m}$ à être zéros sur les segments horizontaux. 
+
+\subsection{Problème discrétisé}
+
+Nosu pouvons à présent donner le problème discrétisé, 
+\begin{align}
+\min_{(U,V)\in\mathcal{E}_s\times\mathcal{E}_c} \mathcal{J}(V) + \iota_{\mathcal{C}}(U) + \iota_{\mathcal{C}_s}(U,V)
+\end{align}
+
+Ici, l'indicatrice d'un ensemble convexe est définie de la façon suivante ; $ \iota_{\mathcal{C}}=\left\{\begin{array}{cl}
+0 &\text{si } U\in\mathcal{C} \\
++\infty &\text{sinon }
+\end{array}\right.$. Si nous notons $k=(i,j)\in\mathcal{G}_c$ les indices sur la grilles centrées, alors la fonction objectif discrète $\mathcal{J}$ s'écrit pour une variable $V\in\mathcal{E}_c$  de la manière suivante : 
+$$
+\mathcal{J}(V)=\sum_{k\in\mathcal{G}_c} J(m_k,f_k)
+$$
+Le premier ensembles de contraintes correspond à l'équation de continuité discrétisée et des conditions aux bords : 
+$$
+\mathcal{C}= \left\{ U\in \mathcal{E}_s\ |\ \div(U)=0,\ b(U) = b_0 \right\}
+$$
+Enfin, le dernier terme rajoute une contraintes liant les variables centrées et décentrées : 
+$$
+\mathcal{C}_s=\left\{(U,V)\in\mathcal{E}_s\times\mathcal{E}_c\ |\ V=\mathcal{I}(U)\right\}
 $$
 
 
-L'équation de conservation des contrainte \eqref{eq:contraintes}, suggère une discrétisation différences finies du domaine. 
+Remarquons que la fonctionnelle $\mathcal{J}$ possèdent les propriétés suivantes, lorsque que $f(t,x)\rightarrow +\infty$, $\mathcal{J}\rightarrow 0$ et que si $f(t,x)\rightarrow 0$ alors $\mathcal{J}\rightarrow +\infty$. ainsi, $\mathcal{J}$ n'est pas coercive et son gradient n'est pas lipschitzien. C'est pourquoi, les techniques de minimisation classiques (type descente de gradient) sont inefficaces et que nous allons recourir aux opérateurs proximaux et à l'algorithme de Douglas Rachford présenté dans la section précédente.  \\
+
+
+Reprenons alors le problème \eqref{eq:pbmminimi} et posons, $f_1 =\mathcal{J}(V) + \iota_{\mathcal{C}}(U) $ et $f_2= \iota_{\mathcal{C}_s}(U,V)$. Ces deux fonctions sont simples dans la mesure où leur opérateur proximaux sont de la forme suivante
+\begin{align}
+\prox_{\gamma f_1}(U,V) & = \left(\proj_{\mathcal{C}}(U),\prox_{\gamma \mathcal{J}}(V) \right) \\
+\prox_{\gamma f_2}(U,V) & = \proj_{\mathcal{C}_s}(U,V)
+\end{align}
+C'est opérateurs seront explicité dans la section suivante. \\
+L'algorithme de Douglas-Rachford devient alors :\\
+
+\fbox{
+  \parbox{\textwidth}{
+ 	Soit une suite $(x_n,y_n)\in\left(\mathcal{E}_s\times\mathcal{E}_c\right)^2$. A partir, d'une condition initiale $y_0$, 
+ 	
+ 	\begin{equation}
+ 		\begin{aligned}
+ 			x_n &= \proj_{\mathcal{C}_s}(y_n) \\
+ 		y_{n+1} &= y_n + \lambda_n \left(\prox_{\gamma f_1}(2x_n-y_n)-x_n\right) \\
+ 		\end{aligned}
+ 	\end{equation}
+ 	
+ 	Alors $x_n\rightarrow x^{\star}$ une solution du problème. 
+  }
+}\\
 
 
 
-\subsection{Avec des grilles décentrées}
-\section{Implémentation}
-
-\section{Exemples}
-
-\subsection{Opérateur proximal de $J$}
-La fonctionnelle $J$ est simple dans le sens où son opérateur proximal peut être calculé dans une forme fermée. 
+\subsection{Opérateur proximal de $\mathcal{J}$}
+La fonctionnelle $\mathcal{J}$ est simple dans le sens où son opérateur proximal peut être calculé dans une forme fermée. 
 \begin{proposition}
+\label{prop:proxJ}
+Nous avons
 \begin{align*}
-\forall w\in\mathcal{G},\ \prox_{\gamma J}(w) = \left( \prox_{\gamma J}(w_k)\right)_{k\in\mathcal{G}}
+\forall w\in\mathcal{G},\ \prox_{\gamma \mathcal{J}}(w) = \left( \prox_{\gamma J}(w_k)\right)_{k\in\mathcal{G}}
 \end{align*}
 Où, pour tout $w_k=(m_k,f_k)\in\RR^n\times\RR$, 
 $$
@@ -1080,200 +1209,121 @@ $$
 En réarrangeant ces equations, nous obtenons bien que $P(f) = 0$ et $m=\frac{f m}{f+\gamma}$. Ce qui montre au passage que si $P$ possède au moins une racine réelle strictement positive $f^{\star}_k$, alors elle est nécessairement unique $f^{\star}_k =f $. \\
 Si ce n'est pas le cas, alors nous avons nécessairement $f= 0$ et par définition de $J$, $m=0$.
 \end{preuve}
-\newpage
-
-\section{Pbm de transport optimal}
-Soient deux densités $f_0$ et $f_1$ de même masse, suffisamment régulière, sur un domaine $[0,1]^d$.\\
-Un transport de $f_0$ sur $f_1$ est une application $T$ telle que :
-$$
-f_0(x)=f_1(T(x))|det(\partial T(x))|
-$$
-Le transport optimal est celui qui minimise le coût $\int c(x,T(x)dx$ parmi tous les transports de $f_0$ sur $f_1$. Dans notre problème : $C(x,y) =\|x-y\|^2$. 
-
-\section{Formulation de Benamou et Brenier}
-On montre que la géodésique entre $f_0$ et $f_1$ est : 
-$$
-f(x,t)=f_0((1-t)Id+tT(x))|det((1-t)Id+t\partial T(x))|
-$$
-et que ce chemin minimise le problème suivant : 
-$$
-\min_{(f,v)\in C_v} \int_{[0,1]^d}\int_0^1 f(x,t)\|v(x,t)\|^2dtdx
-$$
-
-Où : $C_v= \{(f,v)|\partial_t f+div_x(v)=0;v(0,.)=0,v(1,.)=0,f(.,0)=f_0,f(.,1)=f_1\}$
-
-On pose $m = fv$ pour obtenir le problème de minimisation 
-$$
-\min_{(f,m)\in C}J(m,f)=\int_{[0,1]^d}\int_0^1 \theta (m,f)dtdx
-$$
-avec $\theta (m,f) = \frac{\|m\|^2}{f} si f>0 \quad 0 si (m,f)=(0,0)\quad \infty sinon$
-
-Rq : on a ramené le pbm de transport optimal à celui de trouver la géodésique entre les deux densités. 
-\section{Méthodes numériques}
-On présente le cas 1D qui nous a accaparé. \\
-Carré espace temps : $[0,1]^2$ que l'on discrétise : 
-$$
-G_c = \{(x_i=\frac{i}{N},t_j=\frac{j}{P})|0\leq i\leq N,\ 0\leq j\leq P\}
-$$
-On notre $E_c =(\RR^2)^{G_c}$ l'espace des variables centrées et $ V=(m_{ij},f_{ij}) \quad 0\leq i\leq N,\ 0\leq j\leq P$ les variables discrétisées. \\
-
-Dans le but de capturer l'équation de continuité, on introduit une grille décentrée : 
-$$
-G_s^x = \{(x_i=\frac{i+1/2}{N},t_j=\frac{j}{P})|-1\leq i\leq N,\ 0\leq j\leq P\}
-$$
-et 
-$$
-G_s^t = \{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{P})|0\leq i\leq N,\ -1\leq j\leq P\}
-$$
-
-On note $E_s=\RR^{G_s^x}\times\RR^{G_s^t}$ l'espace des variables décentrées, et $U=(\bar{m_{ij}}\quad 1\leq i\leq N,\ 0\leq j\leq P,\bar{f_{ij}},\quad 0\leq i\leq N,\ -1\leq j\leq P$
 
 
+\subsection{Projection sur $\mathcal{C}$}
+Comme explicité dans la présentation des opérateurs proximaux, l'opérateur proximal de l'indicatrice d'un ensemble convexe et le projecteur orthogonal sur cet ensemble. Ici, l'ensemble des contraintes $\mathcal{C}$ peut être récrit comme un ensemble affine : 
+\begin{align}
+\mathcal{C}=\left\{U\in\mathcal{E}_s\ |\ AU=y\right\} \quad A=\begin{pmatrix}
+\div \\
+b
+\end{pmatrix},\ y=\begin{pmatrix}
+0 \\
+b_0
+\end{pmatrix}
+\end{align}
+La projection sur cet ensemble s'écrit comme un problème de minimisation strictement convexe : 
+$$
+\proj_{\mathcal{C}}(U) = \min_{W\in\mathcal{C}}\frac{1}{2}\|U-W\|^2
+$$
+Cela peut être résolu par la méthode des multiplicateurs de Lagrange. 
+\begin{align*}
+\text{CNS : } & \left\{ \begin{array}{rl}
+W-U+A^{\star}\lambda &=0\\
+AW&=y
+\end{array}\right.\\
+\Longleftrightarrow\quad & \left\{ \begin{array}{rl}
+AW-AU+AA^{\star}\lambda &=0\\
+AW&=y
+\end{array}\right.\\
+\Longrightarrow\quad & AA^{\star}\lambda = y-AU \\
+\Longleftrightarrow\quad & \lambda = (AA^{\star})^{-1}(y-AU) \\
+\Longrightarrow\quad & W = U - A^{\star} (AA^{\star})^{-1}(y-AU)
+\end{align*}
 
-\section{Opérateurs}
-On introduit plusieurs opérateurs pour lier les variables décentrées et les variables centrées.
-\subsection{Interpolation}
-$$
-I:E_s \rightarrow E_c
-$$
-tq 
-$$
-m_{ij} = = (\bar{m}_{i+1/2,j}+\bar{m}_{i-1/2,j})/2.
-$$
-et
-$$
-f_{ij} = = (\bar{f}_{i,j+1/2}+\bar{f}_{i,j-1/2})/2.
-$$
-Cet opérateur s'interprète matriciellement : 
-$$
-m = \bar{m}I_m
-$$
-et 
-$$
-f = I_f\bar{f}
-$$
+Ainsi, 
+\begin{align}
+\proj_{\mathcal{C}}(U) = U - A^{\star} (AA^{\star})^{-1}(y-AU)
+\end{align}
 
-\subsection{Divergence}
-l'opérateur qui approxime la divergence
-$$
-div : E_s\rightarrow \RR^{G_c}
-$$
-et 
-$$
-div(\bar{m},\bar{f})_{ij} = (\bar{m}_{i+1/2,j}-\bar{m}_{i-1/2,j}) + (\bar{f}_{i,j+1/2}-\bar{f}_{i,j-1/2})
-$$
+La question est alors de calculer efficacement l'opérateur $(AA^{\star})^{-1}$ efficacement. Cela peut être fait essentiellement de deux manières, par une méthode de gradient conjuguées qui convergera dans le pire des cas en $O(\#\mathcal{G}_s^x\times \#\mathcal{G}_s^t)$ itérations.\\
 
-\subsection{Frontières}
-Un opérateur pour extraire les frontières : 
+La seconde méthode est d'appliquée la transformée de Fourier pour résoudre un problème de Poisson. Nous détaillerons cette partie qui a donné beaucoup de fil à retordre lors de l'implémentation. 
 
-$$
-b(\bar{m},\bar{f}) = ((\bar{m}_{-1/2,j},\bar{m}_{N+1/2,j});(\bar{f}_{i,-1/2},\bar{f}_{i,P+1/2}))
-$$
-et on impose les conditions aux frontières suivantes : 
-$$
-b(\bar{m},\bar{f}) = b_0=(0,0,f_0,f_1);
-$$
-
-\subsection{Problème discrétisé}
-
-On a le problème suivant 
-
-$$
-\min_{U=(\bar{m},\bar{f})\in E_s} \theta(I(\bar{m},\bar{f})) + \iota_C(U)
-$$
-avec l'ensemble des contraintes :
-$$
-C=\{(\bar{m},\bar{f})\in E_s|\ div(\bar{m},\bar{f}) = 0\ b(\bar{m},\bar{f}) = b_0 \}
-$$
-
-\section{Résolution par algorithme de séparation de proximité}
-Ces algorithmes sont des généralisation des algos de gradient conjugués. \\
-
-\textbf{Remarque : } On a $J(m,f)=\int_{[0,1]^d}\int_0^1 \frac{\|m\|^2}{f} dtdx$ donc si $f\rightarrow\infty$ on a $J\rightarrow 0$ donc ce n'est pas coercif ce qui rend l'existence de minimiseurs non triviale. Et si $f\rightarrow 0$, on a $j\rightarrow \infty$ donc les méthodes de gradient conjugués ne peuvent pas s'appliquer, le gradient n'est pas lipschitz. \\
-
-On veut résoudre le pbm suivant : 
-$$
-\min_{z=(U,V)\in E_s\times E_c} G_1(z)+G_2(z)
-$$
-où, $G_1(z) = J(U)+\iota_C(U)$ et $G_2(z)=\iota_{C_s}(z)$ et $C_s=\{z=(U,V)\in E_s\times E_c\ | \ V=I(U) \}$
+\subsection{Projection sur $\mathcal{C}_s$}
 
 
-\remarque{$G_1$ est la fonctionnelle originelle et $G_2$ vient de notre introduction des variables décalées. }\\
+\section{Variations}
+Avant de présenter des exemple numériques, introduisons une généralisation du problème. L'outillage théorique est plus conséquent mais numériquement, les changements sont mineurs. \\
+Définissons notre problème de transport discrétisé généralisé comme
+\begin{align}
+\min_{U\in\mathcal{E}_s}\mathcal{J}_{\omega}^{\beta}(\mathcal{I}(U))+\iota_{\mathcal{C}}(U)
+\end{align}
+Où, $\beta\in[0,1]$, et le vecteur de poids $\omega=(\omega_k)_{k\in\mathcal{G}_c}$ vérifie $1\leq \omega_k\leq +\infty$. La fonctionnelle généralisée est définie par : 
+\begin{align}
+\mathcal{J}_{\omega}^{\beta}(V) &= \sum_{k\in\mathcal{G}_c} \omega_kJ_{\beta}(m_k,f_k)\\
+\forall (m,f)\in\RR\times\RR,\quad &J_{\beta}=\left\{ \begin{array}{cl}
+\frac{\|m\|^2}{2f^{\beta}} & \text{si } f>0 \\
+0 &\text{si } (m,f) = (0,0)\\
++\infty & \text{sinon} 
+\end{array}\right.
+\end{align}
 
-On va alors calculer les opérateurs de proximités de $G_1$ et $G_2$.On dit que $G_1$ est \textbf{simple} dans la mesure ou : 
+Plusieurs observations, $\mathcal{J}_1^1=\mathcal{J0}$, pour tout $\beta\in [0,1]$, $\mathcal{J}_{\omega}^{\beta}$ est convexe et pour $f> 0$ nous avons 
+$$
+\det(\partial ^2J_{\omega}(m,f)) = \frac{\beta(1-\beta)\|m\|^2}{f^{3\beta+2}}
+$$
+Ainsi, $J_{\beta}$ est strictement convexe sur $\RR^n\times\RR^{+,*}$ pour $\beta \in]0,1[$. \\
 
-$$
-Prox_{\gamma G_1} (U,V) = (Prox_{\gamma C} (U),Prox_{\gamma J} (V))
-$$
+\remarques{Nous pourrions expliquer que cette variante permet de généraliser le problème de transport optimal à des variétés Riemanienne. Cependant, ce qu'il faut en retenir est essentiellement 
+\begin{enumerate}
+\item Le coefficient $\beta\in[0,1]$ agit comme un interrupteur entre l'interpolation $L^2$ ($\beta =0$) entre les deux densités et le calcul du transport optimal ($\beta =1$), i.e. le calcul de la distance $L^2$ de Wasserstein.
+\item Les poids $\omega_k$ pondèrent certaines régions de l'espace temps et permettent d'autoriser plus au moins le passage d'une densité dans une région de l'espace ; $\omega_k=+\infty$ correspond à une zone interdite. 
+\end{enumerate}}
 
-\subsection{Opérateur de proximité de $G_2$}
+Il nous faut alors généraliser la proposition \eqref{prop:proxJ} pour le calcul de l'opérateur proximal de $\mathcal{J}_{\omega}^{\beta}$. 
+\begin{proposition}
+Nous avons
+\begin{align*}
+\forall V\in\mathcal{E}_c,\ \prox_{\gamma \mathcal{J}_{\omega}^{\beta}}(V) = \left( \prox_{\gamma\omega_k J_{\beta}}(V_k)\right)_{k\in\mathcal{G}}
+\end{align*}
+Où, pour tout $V_k=(m_k,f_k)\in\RR^n\times\RR$, 
+$$
+\prox_{\gamma J_{\beta}}(m_k,f_k) =\left\{
+\begin{array}{cl}
+\left(\frac{(f^{\star}_k)^{\beta} m_k}{(f^{\star}_k)^{\beta}+\gamma} ,f^{\star}_k\right) & \text{ si } f^{\star}_k >0\\
+(0,0) & \text{ sinon }
+\end{array}\right.
+$$
+et $f^{\star}_k$ est la plus grande racine réelle de l'équation en $X$ suivante : 
+\begin{align}
+P(X) = X ^{1-\beta}(X-f_k)(X^{\beta}+\gamma)^2 -\frac{\gamma}{2}\beta\|m_k\|^2=0
+\end{align}
+\end{proposition}
+\begin{preuve}
 
-$$
-Prox_{\gamma C_s} (U,V) = arg\min_{z'\in C_s} \frac{1}{2}\|z-z'\|^2= Proj_{C_s}(U,V)
-$$
-Suivant l'article de Papadakis, Peyré et Oudet on a :
+\end{preuve}
 
-$$
-Prox_{\gamma C_s} (U,V)  = (\tilde{U},I(\tilde{U}))
-$$
-et 
+\section{Exemples numériques}
+\subsection{Cas 1D}
 
-$$
-\tilde{U} = (Id +I^{\star}I)^{-1}(U+I^{\star}(V))
-$$
-Ou $I^{\star}$ est l'adjointe de $I$. ce qui nous donne en terme de matrice : 
-$$
-\tilde{\bar{m}} = (\bar{m}+mI_m^{\star})(Id +I_mI_m^{\star})^{-1}
-$$
-et 
-$$
-\tilde{\bar{f}} = (Id +I_f^{\star}I_f)^{-1}(\bar{f}+I_f^{\star}f)
-$$
-enfin : $\tilde{m}=\tilde{\bar{m}}I_m$ et $\tilde{f}=I_f\tilde{\bar{f}}$
 
-Comme l'opérateur d'interpolation s'interprète matriciellement, son adjoint est donné par la transposée. 
 
-\subsection{Opérateur de proximité de $J$}
 
-$Prox_{\gamma J}(V)=(Prox_{\gamma J}(V_k))_{k\in G_c}$ et 
 
-$$
-Prox_{\gamma J}(m_k,f_k) = (\frac{f^{\star}_km_k}{f^{\star}_k+2\gamma},f^{\star}_k)\ si\ f^{\star}>0 \qquad (0,0)\ sinon
-$$ 
-et $f^{\star}_k$ est la plus grande racine réelle du polynôme de degré 3 donné par : 
-$$
-P(x) = (X-f_k)(X+2\gamma)^2-\gamma \|m_k\|^2
-$$
-La racine est calculée rapidement avec l’algorithme de Newton. 
+\subsection{Cas 2D}
 
-\subsection{Opérateur de proximité de $\iota_C$}
+\section{Pour aller plus loin}
 
-$$
-Prox_{\gamma C} = Proj_C
-$$
-on réécrit l'ensemble des contraintes sous la forme : 
 
-$$
-C=\{U\in E_s\ | \ AU=y\} \qquad A=(div,b)^T \qquad y = (0,b0)^T
-$$
 
-et on obtient $Proj_C(U)=(Id +A^{\star}\Delta^{-1}A)U + A^{\star} \Delta^{-1}y$ avec $\Delta^{-1}=(A^{\star}A)^{-1}$ et son problème requiert la résolution d'un problème de poisson. 
 
-\section{Algorithme de Douglas Rachford}
-On procède à l'itération suivante : $(z^l,w^l)\in (E_s\times E_c)\times (E_s\times E_c)$ avec un $w^0$ donné : 
-$$
-z^{l+1}=Prox_{\gamma G_2} (w^l)
-$$
-et 
-$$
-w^{l+1}=(1-\frac{\alpha}{2})w^l + \frac{\alpha}{2}RProx_{\gamma G_2}\circ RProx_{\gamma G_1} (w^l)
-$$
 
-Où on a posé : $RProx_{\gamma G} = 2Prox_{\gamma G}-Id$.\\
-On montre alors que pour $\alpha\in ]0,2[$ et $\gamma>0$ la méthode converge $z^l\rightarrow z^{\star}$ ce qui permet de retrouver la géodésique, car : 
-$$
-z^l=(U^l,V^l)\rightarrow (U^{\star},V^{\star}) \qquad V^{\star}=(m^{\star},f^{\star})
-$$
+
+
+
+
+
 
 
 

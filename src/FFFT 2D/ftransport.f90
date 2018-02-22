@@ -1,6 +1,6 @@
 program transport
     implicit none
-    integer, parameter :: N = 99, P = 99, Q = 99, niter = 300
+    integer, parameter :: N = 99, P = 99, Q = 99, niter = 1000000
     double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.0
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
@@ -46,6 +46,9 @@ program transport
     f0 = normalise(eps + f0)
     f1 = normalise(eps + f1)
     
+    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
+    
 	do i = 1,Q+2
 		t = (i-1)/(1.*(Q+1))
 		wU0(1:P+1,1:N+1,i,3) = (1-t)*f1 + t*f0
@@ -63,11 +66,11 @@ program transport
 		wU0 = wU1
 		wV0 = wV1
 		
-        cout(i) = J(zV)
+    cout(i) = J(zV)
 		minF(i) = minval(zV(:,:,:,3))
 		divV(i) = sum(div(Zu)**2)
         
-        if (modulo(i,50) .EQ. 0) print *, i, cout(i), divV(i)
+        if (modulo(i,100) .EQ. 0) print *, i, cout(i), divV(i)
         
     end do 
   
@@ -78,16 +81,43 @@ program transport
     end do
     close(1)  
     
+    
+    
     open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "Y ", "T ", "Z "
-    do i = 1,P+1 ! y direction
-        do k = 1,N+1 ! x direction 
-			do l = 1,Q+1 ! t direction
-           write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*p), (l-1)/(1.0*Q),  zV(i,k,l,3)
+    do i = 1,N+1 ! y direction
+        do k = 1,P+1 ! x direction 
+					do l = 1,Q+2 ! t direction
+           	write(1,*) i, k, l,  zU(i,k,l,3)
            end do
         end do
-    end do
+   	end do
     close(1)
+    open(1,file='results/vitesse1.dat');
+    write(1,*) "# ", "X ", "Y ", "T ", "Z "
+    do i = 1,N+2 ! y direction
+        do k = 1,P+1 ! x direction 
+					do l = 1,Q+1 ! t direction
+           	write(1,*) i, k, l,  zU(i,k,l,1)
+           end do
+        end do
+   	end do
+    close(1)    
+    open(1,file='results/vitesse2.dat');
+    write(1,*) "# ", "X ", "Y ", "T ", "Z "
+    do i = 1,N+1 ! y direction
+        do k = 1,P+2 ! x direction 
+					do l = 1,Q+1 ! t direction
+           	write(1,*) i, k, l,  zU(i,k,l,1)
+           end do
+        end do
+   	end do
+    close(1)    
+    
+    
+    
+    
+    
 
 	do l = 1,Q+2
 		write(charI,'(I5.5)') l
@@ -316,7 +346,7 @@ program transport
 		double precision, dimension(N+1) :: dn, depn
 		double precision, dimension(P+1) :: dp, depp
 		double precision, dimension(Q+1) :: dq, depq
-		integer :: i, j, k
+		integer :: i, j
 		
 		do i = 1,N+1
 			dn(i) = (i-1)/(1.*(N+1))
@@ -447,7 +477,7 @@ program transport
 		double precision, dimension(S3) :: a3
 		double precision, dimension(S1,S2,S3) :: tmp1, tmp2
 		integer :: u,x,v,y,w,z
-		integer :: i1,i2,i3,j
+		integer :: i1,i2,i3
 			
 		a1 = dsqrt(2d0/(1.*S1)); a1(1) = 1./dsqrt(1d0*S1)
 		a2 = dsqrt(2d0/(1.*S2)); a2(1) = 1./dsqrt(1d0*S2)
@@ -500,7 +530,7 @@ program transport
 		double precision, dimension(S3) :: a3
 		double precision, dimension(S1,S2,S3) :: tmp1, tmp2
 		integer :: u,x,v,y,w,z
-		integer :: i1,i2,i3,j
+		integer :: i1,i2,i3
 			
 		a1 = dsqrt(2d0/(1.*S1)); a1(1) = 1./dsqrt(1d0*S1)
 		a2 = dsqrt(2d0/(1.*S2)); a2(1) = 1./dsqrt(1d0*S2)
