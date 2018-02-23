@@ -1,17 +1,20 @@
 program transport
     implicit none
-    integer, parameter :: N = 31, P = 31, Q = 31, niter = 1000
-    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.0
+    integer, parameter :: N = 31, P = 31, Q = 31, niter = 10000
+    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 0.5
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
     double precision, dimension(N+1,P+1,Q+1,3) :: zV = 0, wV0 = 0, wV1 = 0
-    double precision, dimension(N+2,P+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0
+    double precision, dimension(N+2,P+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0, tmp = 0
 	integer, dimension(N+1,P+1,Q+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF, divV
     double precision :: t
     integer :: i, k, l 
   	character(10) :: charI;
 	 
+	f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))! + gauss(0.8d0,0.5d0,0.05d0)) 
+    
 !    open(1,file='fourati.dat')
 !    open(2,file='knippel.dat')
 !    do i = 1,N+1
@@ -23,9 +26,17 @@ program transport
     
 !    f0 = normalise(eps + f0)
 !    f1 = normalise(eps + f1)
-    
-    f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))
+
+	do k = 1,Q+1
+		open(1,file='maze.dat')
+		do i = 1,N+1
+!			read(1,*) obstacle(i,:,k)
+		end do
+		close(1)
+    end do 
+!    f0 = normalise(eps + gauss(10d0/128d0,26d0/128d0,0.05d0))
+!    f1 = normalise(eps + gauss(119d0/128d0,103d0/128d0,0.05d0)) 
+
     
 	do i = 1,Q+2
 		t = (i-1)/(1.*(Q+1))
@@ -36,20 +47,27 @@ program transport
     
     
     do i = 1,niter
+		! A - DR
 		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
 		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
 		zU  = projCs(wU1,wV1)
 		zV  = interp(zU)
-
+		! A - DR'
+!		tmp = projCs(2*zU - wU0,2*zV - wV0)
+!		wU1 = wU0 + alpha*(tmp- zU)
+!		wV1 = wV0 + alpha*(interp(tmp)- zV)
+!		zU  = projC(wU1)
+!		zV  = proxJ(wV1)
+		
 		wU0 = wU1
 		wV0 = wV1
 		
-    cout(i) = J(zV)
+		! record data
+		cout(i) = J(zV)
 		minF(i) = minval(zV(:,:,:,3))
 		divV(i) = sum(div(Zu)**2)
         
-        if (modulo(i,100) .EQ. 0) print *, i, cout(i), divV(i)
-        
+        if (modulo(i,100) .EQ. 0) print *, i, cout(i), divV(i), sum(zV - interp(zU))
     end do 
   
     open(1,file='results/data.dat');
@@ -58,8 +76,6 @@ program transport
 		write(1,*) i, cout(i), minF(i), divV(i)
     end do
     close(1)  
-    
-    
     
     open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "Y ", "T ", "Z "
@@ -91,21 +107,16 @@ program transport
         end do
    	end do
     close(1)    
-    
-    
-    
-    
-    
 
 	do l = 1,Q+2
 		write(charI,'(I5.5)') l
 		open(1,file='results/Transport/'//trim(charI)//'.dat'); 
 		write(1,*) "# ", "X ", "Y ", "F "
 		do i = 1,P+1 ! y direction
-		!	do k = 1,N+1 ! x direction 
-			!	write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*P),  zU(i,k,l,3)
-			!end do
-			write(1,*)  zU(i,:,l,3)
+			do k = 1,N+1 ! x direction 
+				write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*P),  zU(i,k,l,3)
+			end do
+			!write(1,*)  zU(i,:,l,3)
 		end do
 		close(1)
 	end do    
@@ -171,73 +182,54 @@ program transport
         double precision, dimension(N+1,P+1,Q+1,3) :: w, pw
         double precision, dimension(N+1,P+1,Q+1,2) :: mt
         double precision, dimension(N+1,P+1,Q+1)   :: ft, x0, x1, poly, dpoly
-        double precision, dimension(N+1,P+1,Q+1)   :: a1, a0, d
+        double precision, dimension(N+1,P+1,Q+1)   :: d0, d1, theta, x2, x3, a
         integer :: k
         
         mt = w(:,:,:,1:2); ft = w(:,:,:,3);
         
         if (b .EQ. 0) then ! Interpolation L2
-        			x1 = ft
+			x1 = ft
         else if (b .EQ. 1) then ! Transport
-        	! résolution polynôme de degré 3 par formule de Cardan
-        	! x^3 + ax^2 + bx + c = 0
-        	! a = 2*g - ft, b = g**2 - 2*g*ft, c = -ft*g**2 -0.5*g*||mt||**2
-        	! forme normale x^3 + a1x + a0
-        	a1 = -(2*g - ft)*(2*g - ft)/(1.*3) + (g**2 - 2*g*ft)
-        	a0 = 2.*(2*g - ft)**3/(1.*27) - (2*g - ft)*(g**2 - 2*g*ft)/(3.) + (-ft*g**2 -0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2))
-        	d  = a0*2 + 4.*a1**3/(27.)
-        	print *, minval(d)
+        	! résolution polynôme de degré 3
+        	! http://www.aip.de/groups/soe/local/numres/bookfpdf/f5-6.pdf
+			d0 = ((2*g - ft)**2 - 3.*(g**2 - 2*g*ft))/9.
+			d1 = (2*(2*g - ft)**3 - 9*(2*g - ft)*(g**2 - 2*g*ft) + 27*(-ft*g**2 -0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)))/54.
         	
-        	
-        	
-        		 x0 = 1; x1 = 2; k = 0;
-
-		      do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 50)
-		          x0 = x1
-		          if (b .EQ. 1) then ! Cas transport
-								poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-								dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
-						!	else if (b .EQ. 0) then ! Interpolation L2
-							!	x1 = ft
-								!exit
-							else 
-								poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-								dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
-							end if
-			
-						where (x0 .GT. eps) x1 = x0 - poly/dpoly
-						where (x0 .LT. eps) x1 = eps		
-			
-		          k = k+1
-		      end do
-        	
-        	
+        	where (d1**2 - d0**3 .LT. 0) 
+				theta = dacos(d1/dsqrt(d0**3))
+				x1 = -2*dsqrt(d0)*dcos(theta/3.) - (2*g - ft)/3.
+				x2 = -2*dsqrt(d0)*dcos((theta+2*pi)/3.) - (2*g - ft)/3.
+				x3 = -2*dsqrt(d0)*dcos((theta-2*pi)/3.) - (2*g - ft)/3.
+				x1 = max(x1,x2,x3)
+			else where
+				a = -(d1/dabs(d1))*(dabs(d1) + dsqrt(d1**2 - d0**3))**(1/3.)
+				where ( a .NE. 0)
+					x1 = (a + d0/a) -(2*g - ft)/3.
+				else where
+					x1 = -(2*g - ft)/3.
+				end where
+        	end where
+        	       	
        	else ! entre les deux
         		 x0 = 1; x1 = 2; k = 0;
 
 		      do while (maxval(dabs(x0-x1)) .GT. 1e-5  .AND. k .LT. 50)
 		          x0 = x1
-		          if (b .EQ. 1) then ! Cas transport
-								poly  = (x0-ft)*(x0+g)**2 - 0.5*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-								dpoly = 2*(x0+g)*(x0-ft) + (x0+g)**2
-						!	else if (b .EQ. 0) then ! Interpolation L2
-							!	x1 = ft
-								!exit
-							else 
-								poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
-								dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
-							end if
-			
-						where (x0 .GT. eps) x1 = x0 - poly/dpoly
-						where (x0 .LT. eps) x1 = eps		
-			
+					poly = x0**(1.0-b)*(x0-ft)*((x0**b+g)**2)-0.5*b*g*(mt(:,:,:,1)**2 + mt(:,:,:,2)**2)
+					dpoly = (1.0-b)*x0**(-b)*(x0-ft)*((x0**b+g)**2) + x0**(1-b)*((x0**b+g)**2 +2*b*(x0-ft)*x0**(b-1)*(x0**b+g) )
+							
+						where (x0 .GT. eps) 
+							x1 = x0 - poly/dpoly
+						else where 
+							x1 = eps		
+						end where
 		          k = k+1
 		      end do
         	
         end if   
 
-        where (x1 .LT. eps) x1 = eps
-        where (obstacle .GT. 0) x1 = eps
+        where ((x1 .LT. eps) .OR. (obstacle .GT. 0)) x1 = eps
+        
         pw(:,:,:,1) = (x1**b)*mt(:,:,:,1)/(x1**b+g) 
         pw(:,:,:,2) = (x1**b)*mt(:,:,:,2)/(x1**b+g) 
         pw(:,:,:,3) = x1
@@ -383,9 +375,6 @@ program transport
 		
 		do i = 1,N+1
 			do j = 1,P+1
-!				do k = 1,Q+1
-!					denom(i,j,k) = depn(i) + depp(j) + depq(k)
-!				end do
 				denom(i,j,:) = depn(i) + depp(j) + depq
 			end do 
 		end do
@@ -511,8 +500,8 @@ program transport
 				ADCT2(v,y) = a2(v)*dcos(pi*(2*y-1)*(v-1)/(2.*S2))
 			end do 
 		end do 
-		do w = 1,S2
-			do z = 1,S2
+		do w = 1,S3
+			do z = 1,S3
 				ADCT3(w,z) = a3(w)*dcos(pi*(2*z-1)*(w-1)/(2.*S3))
 			end do 
 		end do 
@@ -550,10 +539,11 @@ program transport
 		double precision, dimension(S1,S2,S3) :: tmp1, tmp2
 		integer :: u,x,v,y,w,z
 		integer :: i1,i2,i3
-			
+
 		a1 = dsqrt(2d0/(1.*S1)); a1(1) = 1./dsqrt(1d0*S1)
 		a2 = dsqrt(2d0/(1.*S2)); a2(1) = 1./dsqrt(1d0*S2)
 		a3 = dsqrt(2d0/(1.*S3)); a3(1) = 1./dsqrt(1d0*S3)
+		
 		do u = 1,S1
 			do x = 1,S1
 				ADCT(u,x) = a1(u)*dcos(pi*(2*x-1)*(u-1)/(2.*S1))
@@ -564,8 +554,8 @@ program transport
 				ADCT2(v,y) = a2(v)*dcos(pi*(2*y-1)*(v-1)/(2.*S2))
 			end do 
 		end do 
-		do w = 1,S2
-			do z = 1,S2
+		do w = 1,S3
+			do z = 1,S3
 				ADCT3(w,z) = a3(w)*dcos(pi*(2*z-1)*(w-1)/(2.*S3))
 			end do 
 		end do 
@@ -589,13 +579,4 @@ program transport
 			end do
 		end do
 	end function idct3
-	
-	
-
-	
-	
-	
-	
 end program transport
-
-
