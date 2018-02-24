@@ -1,7 +1,7 @@
 program transport
     implicit none
-    integer, parameter :: N = 100, Q = 100, niter = 5000
-    double precision, parameter :: eps = 1e-10, alpha = 1., g = 1., b = 1.0
+    integer, parameter :: N = 63, Q = 63, niter = 100000
+    double precision, parameter :: eps = 1e-10, alpha = 1., g = 1., b = 1.
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1) :: f0, f1
     double precision, dimension(Q+1,N+1,2) :: zV = 0, wV0 = 0, wV1 = 0
@@ -15,13 +15,21 @@ program transport
 	
 	!! Initialisation
     f0 = normalise(eps + gauss(0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.05d0))! + gauss(0.8d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.05d0) + 0.4*gauss(0.3d0,0.1d0))
     
-!    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
-!    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
+    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
+    f1 = normalise(eps + indicatrix(0.6d0,0.9d0))
     
- !   obstacle(23:27,15:27) = 1
+    f0 = normalise(eps + gauss(0.2d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.05d0))
     
+    f0 = normalise(eps + gauss(0.5d0,0.05d0))
+    f1 = normalise(eps + gauss(0.5d0,0.05d0))
+ 		obstacle(8:10,1:60) =	1	
+ 		obstacle(18:20,4:64) = 1
+ 		obstacle(38:40,4:64) = 1
+ 		
+ 		   
     do i = 1,Q+2
 			t = (i-1)/(1.*(Q+1))
 			wU0(i,1:N+1,2) = (1-t)*f1 + t*f0
@@ -43,18 +51,21 @@ program transport
 			minF(i) = minval(zV(:,:,2))
 			divV(i) = sum(div(Zu)**2)
 		
-        if (modulo(i,100) .EQ. 0) print *, i, cout(i)       
+        if (modulo(i,1000) .EQ. 0) print *, i, cout(i)       
     end do 
     
-	  open(1,file='results/transport.dat');
-    write(1,*) "# ", "X ", "T ", "Z "
-    do i = 1,Q+2
-           write(1,*), zU(i,:,2)
+	  open(1,file='results/transport.dat')
+	  open(2,file='results/obstacle.dat')
+    do i = Q+1,1,-1
+           write(1,*), zV(i,:,2)      
+           write(2,*), obstacle(i,:)  
     end do
-    close(1)
-    
-    
-    
+    do i = Q+1,1,-1
+    	do k = 1,N+1
+    !		write(2,*), i,k, obstacle(i,k)
+    	end do
+    end do
+    close(1); close(2)
     
     do l = 1,Q+2
 			write(charI,'(I5.5)') Q+3 - l
@@ -65,8 +76,7 @@ program transport
 			end do
 			close(1)
 	  end do 
-    
-    
+
     open(1,file='results/data.dat');
     write(1,*) "# ", "iter ", "energie ", "minF ", "divV "
     do i = 1,niter
@@ -89,18 +99,7 @@ program transport
     close(1)
 
 		open(8,file="results/plot.gnu"); 
-		write(8,*) 'set contour' 
-		write(8,*) 'set cntrparam levels 30'
-		write(8,*) 'unset key'
-		write(8,*) 'set pm3d'
-		write(8,*) 'unset colorbox'
-		write(8,*) 'set hidden3d'
-		write(8,*) 'set title "Transport Optimal"'
-		write(8,*) 'set xlabel "x"'
-		write(8,*) 'set ylabel "t"'
-	!	write(8,*) 'set palette gray'
-		write(8,*) 'set view 0,0'
-		write(8,*) 'set dgrid3d ', Q+2, ',', N+2
+		write(8,*) 'set dgrid3d ', Q+1, ',', N+1
 		close(8);
 		
     contains
@@ -302,81 +301,61 @@ program transport
 		
 		where (denom .EQ. 0) denom = 1.
 		
-		fhat = dct2(f)
+		fhat = dct2(f,Q+1,N+1)
 		uhat = -fhat/denom
-		p    = idct2(uhat)	
+		p    = idct2(uhat,Q+1,N+1)	
 	end function poisson
-	
-	function dct(f,M) result(df)
+
+		function dct2(f,S1,S2) result(df)
 		implicit none
-		integer :: M
-		double precision, dimension(M+1) :: f, df
-		double precision, dimension(M+1) :: C, H
-		double precision :: a, s
-		integer k
-		
-		do k = 1,M+1
-			C(k) = k
-		end do
-		
-		a    = dsqrt(2./(M + 1d0))
-		H    = 1
-		H(1) = 1./dsqrt(2d0)
-		
-		do k = 1,M+1
-			s = sum(f*dcos(pi*(C- 0.5)*(k-1)/(M+1.)))*H(k);   
-			df(k) = a*s
-		end do		
-	end function dct
-	
-	function idct(df,M) result(f)
-		implicit none
-		integer :: M
-		double precision, dimension(M+1) :: f, df
-		double precision, dimension(M+1) :: C, H
-		double precision :: a, s
-		integer k
-		
-		do k = 1,M+1
-			C(k) = k-1
-		end do
-		
-		a    = dsqrt(2./(M + 1d0))
-		H    = 1
-		H(1) = 1./dsqrt(2d0)
-		
-		do k = 1,M+1
-			s = sum(df*H*dcos(pi*C*(2*k-1)/(2.*(M+1))));
-			f(k) = a*s
-		end do		
-	end function idct	
-		
-	
-	function dct2(f) result(dctf)
-	implicit none
-		double precision, dimension(Q+1,N+1) :: f, dctf, tmp
-		integer :: i
-		
-		do i = 1,Q+1
-			tmp(i,:)  = dct(f(i,:),N)
+		integer :: S1, S2
+		double precision, dimension(S1,S2) :: f, df
+		double precision, dimension(S1,S1) :: ADCT
+		double precision, dimension(S2,S2) :: ADCT2
+		double precision, dimension(S1) :: a1
+		double precision, dimension(S2) :: a2
+		integer :: u,x,v,y
+			
+		a1 = dsqrt(2d0/(1.*S1)); a1(1) = 1./dsqrt(1d0*S1)
+		a2 = dsqrt(2d0/(1.*S2)); a2(1) = 1./dsqrt(1d0*S2)
+		do u = 1,S1
+			do x = 1,S1
+				ADCT(u,x) = a1(u)*dcos(pi*(2*x-1)*(u-1)/(2.*S1))
+			end do 
 		end do 
-		do i = 1,N+1
-			dctf(:,i) = dct(tmp(:,i),Q)
-		end do
+		do v = 1,S2
+			do y = 1,S2
+				ADCT2(v,y) = a2(v)*dcos(pi*(2*y-1)*(v-1)/(2.*S2))
+			end do 
+		end do 
+		
+		df = matmul(ADCT,matmul(f,transpose(ADCT2)))
 	end function dct2
 	
-	function idct2(df) result(f)
+	function idct2(df,S1,S2) result(f)
 	implicit none
-		double precision, dimension(Q+1,N+1) :: f, df, tmp
-		integer :: i 
-		
-		do i = 1,Q+1
-			tmp(i,:) = idct(df(i,:),N)
+		integer :: S1, S2
+		double precision, dimension(S1,S2) :: f, df
+		double precision, dimension(S1,S1) :: ADCT
+		double precision, dimension(S2,S2) :: ADCT2
+		double precision, dimension(S1) :: a1
+		double precision, dimension(S2) :: a2
+		integer :: u,x,v,y
+			
+		a1 = dsqrt(2d0/(1.*S1)); a1(1) = 1./dsqrt(1d0*S1)
+		a2 = dsqrt(2d0/(1.*S2)); a2(1) = 1./dsqrt(1d0*S2)
+		do u = 1,S1
+			do x = 1,S1
+				ADCT(u,x) = a1(u)*dcos(pi*(2*x-1)*(u-1)/(2.*S1))
+			end do 
 		end do 
-		do i = 1,N+1
-			f(:,i)   = idct(tmp(:,i),Q)
-		end do
+		do v = 1,S2
+			do y = 1,S2
+				ADCT2(v,y) = a2(v)*dcos(pi*(2*y-1)*(v-1)/(2.*S2))
+			end do 
+		end do 
+		
+		f = matmul(transpose(ADCT),matmul(df,ADCT2))
 	end function idct2
-	
 end program transport
 

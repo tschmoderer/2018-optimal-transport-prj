@@ -9,6 +9,7 @@
 \renewcommand{\div}{\text{div}}
 \newcommand{\proj}{\text{Proj}}
 
+\usepackage{subcaption}
 
 \setlength{\parindent}{0pt}
 \newcommand\titre{Théorie du Transport Optimal\\Étude et Applications}
@@ -698,13 +699,14 @@ qui a une interprétation en terme de mécanique des fluides très pratiques. \\
 Avant d'enatmmer la résolution numérique du problème de transport optimal, nous présentons les opérateurs proximaux qui joueront un rôle central dans notre modèle. 
 
 \newpage
-\section{Opérateurs proximaux}
+\section{Optimisation convexe non différentiable}
 \label{sec:prox}
 L'opérateur proximal d'une fonction convexe généralise la notion de projection sur un ensemble convexe. Cette notion fût introduite pour répondre aux problèmes de minimisation de fonctions non nécessairement différentiables. 
 
 Suivant la présentation de \emph{P.L. Combettes \emph{et} J.C. Pesquet} \cite{combettes} nous présentons une série de résultats sur les opérateurs proximaux, en complétant quelques preuves.
 \paragraph{Notation :}Le domaine d'une fonction $f:\ \RR^n\longrightarrow\ ]-\infty,+\infty]$ est $\mathcal{D}(f) = \{ x\in\RR^n\ |\ f(x) < +\infty \} $. Notons $\Gamma_0(\RR^n)$ l'ensemble des fonctions convexes semi-continues inférieurement à valeurs dans $]-\infty,+\infty]$ telles que $\mathcal{D}(f) \neq \emptyset$. 
-
+\subsection{Sous - différentiel}
+Commençons par introduire une notion de différentiation plus faible. 
 \begin{definition}{Sous - différentiel}
 Soit $f\in\Gamma_0(\RR^n)$, le sous - différentiel de $f$ est l'application suivante,
 $$
@@ -727,7 +729,7 @@ Considérons deux cas,
 u(y-x) + f(x) \leq f(y)\\
 u(y-x) + x \leq |y|\\
 \end{align*}
-En particulier, pour $y = 0$ nous obtenons $x(1-u) \leq 0$, ainsi $u\geq 1$. Et donc en prenant $y > x$ (en particulier, $y>0$) nous obtenons $u(y-x) + x \geq y$ ce qui est contraire à notre définition sauf si $u=1$. 
+En particulier, pour $y = 0$ nous obtenons $x(1-u) \leq 0$, ainsi $u\geq 1$. Et en prenant $y > x$ (en particulier, $y>0$) nous obtenons $u(y-x) + x \leq y$, ce qui implique $u\leq 1$et donc $u=1$
 \item $\mathrm{x=0}$ Soit $u\in \partial f(0)$, alors $u$ doit vérifier pour tout $y\in \RR$,
 \begin{align*}
 uy\leq |y|
@@ -792,7 +794,7 @@ Ainsi $\langle p,k_n \rangle = \langle \nabla f(x),k_n\rangle$. En faisant tendr
 Cette propriété est cohérente avec l'exemple précédent, $\partial f(x) =f'(x)$ partout où $f$ est différentiable, c'est à dire $x\neq 0$. 
 
 \begin{propriete}
-Si $f = \alpha f_1+\beta f_2$, avec $f_1,\ f_2\in\Gamma_0(\RR^n)$ et $\alpha,\ \beta \geq 0$. Alors 
+Si $f = \alpha f_1+\beta f_2$, avec $f_1,\ f_2,\ \alpha f_1+\beta f_2\in\Gamma_0(\RR^n)$ et $\alpha,\ \beta \geq 0$. Alors 
 \begin{align*}
 \partial f(x) &= \alpha \partial f_1(x) + \beta \partial f_2(x) \\
 &= \left\{u\in\RR^n\ |\ \exists (u_1,u_2)\in \partial f_1(x)\times f_2(x),\ u = \alpha u_1 + \beta u_2 \right\}
@@ -805,16 +807,26 @@ Si $f = \alpha f_1+\beta f_2$, avec $f_1,\ f_2\in\Gamma_0(\RR^n)$ et $\alpha,\ \
 $$
 \langle u,y-x\rangle + \alpha f_1(x) +\beta f_2(x) \leq  \alpha f_1(y) +\beta f_2(y) 
 $$
-En particulier en prenant $u\in \alpha\partial f_1(x) +\beta \partial f_2(x) $, au sens donné dans la propriété, cette inégalité est vérifiée. 
+En particulier en prenant $u\in \alpha\partial f_1(x) +\beta \partial f_2(x) $, au sens donné dans la propriété, cette inégalité est vérifiée. \\
 
-\paragraph{$\alpha\partial f_1(x) +\beta \partial f_2(x) \supset
-\partial (\alpha f_1 +\beta f_2)(x)$ :}Soit $u\in\partial (\alpha f_1 +\beta f_2)(x)$, par contradiction, supposons que  $u\notin \alpha\partial f_1(x) +\beta \partial f_2(x)$, c'est à dire : 
-$$
-\forall (u_1,u_2)\in \partial f_1(x) \times \partial f_2(x),\quad u\neq \alpha u_1+\beta u_2
-$$
-{\Huge EMPTY}
+L'inclusion inverse demande plus de travail et des notions non introduites ici. Elle peut être trouvée à \url{https://maunamn.wordpress.com/8-the-subdifferential-sum-rule/} (théorème 8.2).
+
+%\paragraph{$\alpha\partial f_1(x) +\beta \partial f_2(x) \supset
+%\partial (\alpha f_1 +\beta f_2)(x)$ :}Soit $u\in\partial (\alpha f_1 +\beta f_2)(x)$, par contradiction, supposons que  $u\notin \alpha\partial f_1(x) +\beta \partial f_2(x)$, c'est à dire : 
+%$$
+%\forall (u_1,u_2)\in \partial f_1(x) \times \partial f_2(x),\quad u\neq \alpha u_1+\beta u_2
+%$$
+%{\Huge EMPTY}
 \end{preuve}
-\exemple{Calculons le sous différentielle de $f(x)+\frac{1}{2}\|x-y\|^2$, pour une certaine fonction $f\in\Gamma_0(\RR^n)$ et $y\in_RR^n$ fixé. 
+\exemple{Calculons le sous différentielle de $P:x\mapsto f(x)+\frac{1}{2}\|x-y\|^2$, pour une certaine fonction $f\in\Gamma_0(\RR^n)$ et $y\in\RR^n$ fixé. \\
+Par la propriété précédente, 
+$$
+\partial P(x)=\partial f(x)+\partial(\frac{1}{2}\|\cdot\|^2)(x)
+$$
+Comme la norme 2 est différentiable, $\partial(\frac{1}{2}\|\cdot-y\|^2)(x) = \{x-y\}$. Ainsi, 
+$$
+\partial P(x)=\partial f(x)+\{x-y\}
+$$
 }
 
 La notion de sous - différentiel est centrale car elle permet de caractériser les minimiseurs d'une fonction (même non différentiable).
@@ -835,18 +847,18 @@ Soit $x^{\star}$ le minimum global de $f$,
 \end{align*}
 
 \end{preuve}
-
+\subsection{Opérateur proximal}
 L'opérateur proximal est un outil important dans l'optimisation de fonctions convexes non différentiables. C'est une application minimisant une fonction fortement convexe dépendant de la fonction originale $f$. En trouvant un compromis entre atteindre le minimum de la fonction non différentiable $f$ et en forçant une proximité avec l'argument, nous approchons le minimum de $f$. 
 
 \begin{definition}{Opérateur proximal}
-Soit $f\in\Gamma_0(\RR^n)$. L'opérateur proximal de $f$ est noté $\prox_f$ et il est défini pour tout $x\in\RR^n$ par : 
+Soit $f\in\Gamma_0(\RR^n)$. L'opérateur proximal de $f$, noté $\prox_f$, est défini pour tout $x\in\RR^n$ par : 
 $$
 \prox_f(x) = \argmin_{y\in\RR^n} f(y) +\frac{1}{2}\|x-y\|^2
 $$
 \end{definition}
 \exemple{Prenons, l'indicatrice d'un ensemble convexe non vide $C$ : 
 $$
-\mathrm{i}_C = \left\{
+\iota_C = \left\{
 \begin{array}{cc}
 0 & x\in C\\
 +\infty & x \notin C
@@ -855,19 +867,23 @@ $$
 $$
 Alors, 
 \begin{align*}
-prox_{\mathrm{i}_C}(x) &= \arg \min_{y\in\RR^n} \mathrm{i}_C(y) + \frac{1}{2}\|x-y\|^2\\
+\prox_{\iota_C}(x) &= \arg \min_{y\in\RR^n} \iota_C(y) + \frac{1}{2}\|x-y\|^2\\
 &= \arg\min_{y\in C} \frac{1}{2}\|x-y\|^2\\
 &= \mathrm{P}_C (x)\\ 
 \end{align*}
 Où, $\mathrm{P}_C$ désigne la projection orthogonale sur $C$. 
 }\\
+
 Sur la figure \ref{fig:proximal} (tirée de \cite{parikh2014proximal}), nous avons en \textbf{gras} la frontière de la fonction $f$, les lignes fines sont les lignes de niveaux de $f$. Nous évaluons $\prox_f$ sur les points bleus ce qui les associent aux points rouges correspondant. Les trois points dans le domaine restent dans le domaine et se déplacent vers le minimum, et les deux à l'extérieur du domaine se placent sur la frontière de celui-ci en direction du minimum. 
 \begin{figure}[!h]
 \centering
 \includegraphics[scale=0.7]{img/proximal.png}
 \caption{\label{fig:proximal}Illustration de l'opérateur proximal}
-\end{figure}
-Un scalaire $\gamma >0 $ peut être introduit dans cette définition $prox_{\gamma f}$, ce paramètre contrôle le poids apporté à la minimisation de $f$. Un $\gamma$ grand, forcera de se rapprocher fortement du minimum de $f$, alors qu'un $\gamma$ petit favorisera les points proches de $x$. Le résultat important est le suivant. 
+\end{figure}\\
+
+\newpage
+Un scalaire $\gamma >0 $ peut être introduit dans cette définition $\prox_{\gamma f}$, ce paramètre contrôle le poids apporté à la minimisation de $f$. Un $\gamma$ grand, forcera de se rapprocher fortement du minimum de $f$, alors qu'un $\gamma$ petit favorisera les points proches de $x$.\\
+Le résultat important de la théorie des opérateurs proximaux est le suivant. 
 \begin{propriete}
 Soit une fonction $f\in\Gamma_0(\RR^n)$. Alors, $\prox_f(x)$ existe et est unique pour tout $x\in\RR^n$.\\
 De plus, il est caractérisé par : 
@@ -893,13 +909,13 @@ Or,
 &=\frac{1}{2} \|x-p\|^2 + \frac{1}{2}\|y-p \|^2 +\frac{1}{2}\left( \langle x-p,y-x\rangle + \langle x-y,y-p\rangle\right)\\
 &= \frac{1}{2} \|x-p\|^2 + \frac{1}{2}\|y-p \|^2 -\frac{1}{2}\|x-y\|^2
 \end{align*}
-Ainsi,
+Ainsi, $\forall y\in\RR^n$ :
 \begin{align*}
 \frac{1}{2} \|x-p\|^2 + \frac{1}{2}\|y-p \|^2 -\frac{1}{2}\|x-y\|^2 + f(p) &\leq f(y) \\
 \frac{1}{2} \|x-p\|^2 + f(p) &\leq f(y) + \frac{1}{2}\|x-y\|^2\\
 \end{align*}
 Donc $p=\prox_f(x)$.
-\paragraph{$\Rightarrow$} Soit $(x,p)\in \RR^n\times\RR^n$ telle que $p=\prox_f(x)$. Cela signifie que $p$ minimise l'application $y\mapsto f(y)+\frac{1}{2}\|x-y\|^2$, par la caractérisation du minimum par le sous différentiel, $0\in\partial \left(f(\cdot)+\frac{1}{2}\|x-\cdot\|^2 \right)(p)$. Par la règle de la somme des sous différentielles et l'exemple, $\exists u\in\partial f$ telle que $0=u+(p-x)$. \\
+\paragraph{$\Rightarrow$} Soit $(x,p)\in \RR^n\times\RR^n$ telle que $p=\prox_f(x)$. Cela signifie que $p$ minimise l'application $y\mapsto f(y)+\frac{1}{2}\|x-y\|^2$, par la caractérisation du minimum par le sous différentiel, $0\in\partial \left(f(\cdot)+\frac{1}{2}\|x-\cdot\|^2 \right)(p)$. Par la règle de la somme des sous différentielles et l'exemple, $\exists u\in\partial f(p)$ telle que $0=u+(p-x)$. \\
 Ainsi, $u=x-p\in\partial f(p)$. 
 \end{preuve}
  
@@ -914,45 +930,42 @@ $$
 \vspace{-1cm}
 \paragraph{$\Rightarrow$} Supposons que $x^{\star}$ minimise $f$ alors, $\forall y\in\RR^2$,
 $$
-f(x^{\star}) +\frac{1}{2}\|x^{\star}-x^{\star}\|^2\leq f(y)+\frac{1}{2}\|x^{\star}-y\|^2
+f(x^{\star}) +\frac{1}{2}\|x^{\star}-x^{\star}\|^2 = f(x^{\star})\leq f(y)\leq f(y)+\frac{1}{2}\|x^{\star}-y\|^2
 $$
 Donc, $\prox_f(x^{\star}) = x^{\star}$.
-\paragraph{$\Leftarrow$} Utilisons la caractérisation de minimisation donnée par le sous - différentiel. Le point $\tilde{x}$ minimise $f(x) +\frac{1}{2}\|x-y\|^2$, c'est à dire $\tilde{x} = \prox_f(y)$, si et seulement si 
+\paragraph{$\Leftarrow$} Utilisons la caractérisation de minimisation donnée par le sous - différentiel. Le point $\tilde{x}$ minimise $x\mapsto f(x) +\frac{1}{2}\|x-y\|^2$, c'est à dire $\tilde{x} = \prox_f(y)$, si et seulement si 
 $$
-0\in \partial f(\tilde{x}) + (\tilde{x}-y)
+0\in \partial f(\tilde{x}) + \{\tilde{x}-y\}
 $$
-Où la somme est entendue au sens de la somme entre un ensemble et un singleton, comme dans l'exemple précédent. \\
-En prenant $x^{\star} = y=\tilde{x}$, nous obtenons $0\in\partial f(x^{\star})$. Et donc $x^{\star}$ minimise $f$.
+Par l'exemple précédent. \\
+Prenons $y=\tilde{x}:=x^{\star}$, alors nous obtenons $0\in\partial f(x^{\star})$. Et donc $x^{\star}$ minimise $f$.
 \end{preuve}
 
-Cela suggère des algorithmes de point fixe. Cela fonctionnerait si $\prox_f$ était une contraction (i.e. c - lipschitzienne, $0<c<1$). Ce n'est pas le cas, cependant nous avons une propriété de non expansivité qui est suffisante pour une itération de point fixe : 
-$$
-\|prox_f(x)-prox_f(y)\|^2\leq \langle prox_f(x)-prox_f(y),x-y\rangle
-$$
-C'est un cas particulier d'opérateur non expansif (comme par exemple, $-Id$ ou les rotations, \cite{browder1965nonexpansive,brezis1973ope}). 
-\begin{definition}{Application non expansive}
-Une application $N:\ \RR^n\rightarrow \RR^n$ est dite non expansive si 
-$$
-\forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\| \leq \|x-y\|
-$$
-C'est à dire que $N$ est 1-lipschitzienne. Nous avons la caractérisation suivante, $N$ est non expansive si et seulement si 
-$$
-\forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\|^2 \leq  \langle N(x)-N(y),x-y\rangle
-$$
-\end{definition}
+Cela suggère des algorithmes de point fixe pour approcher le minimum de $f$. 
 
-Si $N$ est un opérateur non expansif alors $\forall \alpha \in ]0,1[$ l'opérateur $T = (1-\alpha)I + \alpha N$ a les mêmes poinst fixes que $N$, et qu'en itérant $T$, il y a convergence vers les poinst fixes. C'est à dire, la suite 
-$$
-x_{n+1} = (1-\alpha )x_n +N(x_n)
-$$
-converge vers un point fixe de $N$.
-
-
-
-
-
+%Cela fonctionnerait si $\prox_f$ était une contraction (i.e. c - lipschitzienne, $0<c<1$). Ce n'est pas le cas, cependant nous avons une propriété de non expansivité qui est suffisante pour une itération de point fixe : 
+%$$
+%\|prox_f(x)-prox_f(y)\|^2\leq \langle prox_f(x)-prox_f(y),x-y\rangle
+%$$
+%C'est un cas particulier d'opérateur non expansif (comme par exemple, $-Id$ ou les rotations, \cite{browder1965nonexpansive,brezis1973ope}). 
+%\begin{definition}{Application non expansive}
+%Une application $N:\ \RR^n\rightarrow \RR^n$ est dite non expansive si 
+%$$
+%\forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\| \leq \|x-y\|
+%$$
+%C'est à dire que $N$ est 1-lipschitzienne. Nous avons la caractérisation suivante, $N$ est non expansive si et seulement si 
+%$$
+%\forall (x,y)\in\RR^n\times\RR^n,\quad \|N(x)-N(y)\|^2 \leq  \langle N(x)-N(y),x-y\rangle
+%$$
+%\end{definition}
+%
+%Si $N$ est un opérateur non expansif alors $\forall \alpha \in ]0,1[$ l'opérateur $T = (1-\alpha)I + \alpha N$ a les mêmes poinst fixes que $N$, et qu'en itérant $T$, il y a convergence vers les poinst fixes. C'est à dire, la suite 
+%$$
+%x_{n+1} = (1-\alpha )x_n +N(x_n)
+%$$
+%converge vers un point fixe de $N$.
  
-Soit le problème de minimisation: \\
+Regardons le problème de minimisation suivant, cette forme nous intéressera particulièrement dans la suite, \\
 
 \fbox{
   \parbox{\textwidth}{
@@ -985,12 +998,12 @@ $$
 Omettons le paramètre $\gamma$ qui ne change rien à la preuve. $f_1+f_2$ est une fonction convexe, infinie à l'infini donc l'existence d'un minimiseur est immédiate.
 \begin{align*}
 x^{\star} =\argmin_x f_1(x) + f_2(x) &\Longleftrightarrow 0\in \partial (f_1+f_2)(x^{\star}) \\
-&\Longleftrightarrow \exists (x_1,x_2)\in \partial(f_1)(x^{\star})\times\partial(f_2)(x^{\star}) \text{ telle que } 0=x_1+x_2
+&\Longleftrightarrow \exists (x_1,x_2)\in \partial f_1(x^{\star})\times\partial f_2(x^{\star}) \text{ telle que } 0=x_1+x_2
 \end{align*}
-Comme le support de $f_1+f_2$ est non vide, $\exists\ y$ tel que $x^{\star}-y\in \partial(f_1)(x)$ et $y-x^{\star}\in\partial(f_2)(x)$.
+Prenons  $y$ tel que $x_1=x^{\star} - y$, ainsi $x^{\star}-y\in \partial f_1(x^{\star})$ et $y-x^{\star}\in\partial f_2(x^{\star})$.
 \begin{align*}
-&\Longleftrightarrow x^{\star}=prox_{f_2} (y) \text{ et } (2x^{\star}-y)-x^{\star}\in\partial(f_1)(x^{\star})\\
-&\Longleftrightarrow x^{\star} = prox_{f_1}(2x^{\star}-y)
+&\Longleftrightarrow x^{\star} =\prox_{f_2} (y) \text{ et } (2x^{\star}-y)-x^{\star}\in\partial(f_1)(x^{\star})\\
+&\Longleftrightarrow x^{\star} =\prox_{f_2} (y) \text{ et } x^{\star}=\prox_{f_1}(2x^{\star}-y)
 \end{align*}
 \end{preuve}
 
@@ -998,10 +1011,10 @@ Suivant les idées d'algorithmes de point fixe sur les opérateurs proximaux, no
 \begin{algorithm}
 \caption{Douglas-Rachford}
 \begin{algorithmic}
-\STATE Soit $\epsilon \in ]0,1[,\ \gamma >0,\ y_0\in \RR^n$
+\STATE Soient $\gamma >0$ et $y_0\in \RR^n$
 \FOR{$n=0,\ 1,\ \ldots$}
 \STATE $x_n = \prox_{\gamma f_2} y_n$
-\STATE $\lambda_n \in [\epsilon,2-\epsilon]$
+\STATE $\lambda_n \in ]0,2[$
 \STATE $y_{n+1} = y_n + \lambda_n(\prox_{\gamma f_1} (2x_n-y_n)-x_n)$
 \ENDFOR
 \end{algorithmic}
@@ -1012,17 +1025,26 @@ Toute suite $(x_n)$ générée par l'algorithme de Douglas - Rachford converge v
 \end{propriete}
 
 \begin{preuve}
-L'itération sur $y_n$ peut se réécrire comme une opération de point fixe, $y_{n+1}=F(y_n)$, avec $F:y\mapsto y+\prox_{\gamma f_1}(2\prox_{\gamma f_2}(y)-y)-\prox_{\gamma f_2}(y)$. Or, 
+L'itération sur $y_n$ peut se réécrire comme une opération de point fixe, $y_{n+1}=F(y_n)$, avec $F:y\mapsto y+\prox_{ f_1}(2\prox_{f_2}(y)-y)-\prox_{f_2}(y)$.\\
+Montrons que $y$ est un point fixe de $F$ si et seulement si $x=\prox_{f_2}(y)$ satisfait $0\in\partial f_1(x)+\partial f_2(x)$, i.e. :
+$$
+y=F(y) \Longleftrightarrow 0\in\partial f_1(\prox_{f_2}(y))+\partial f_2(\prox_{f_2}(y))
+$$ 
+
+Calculons, 
 \begin{align*}
-\Longleftrightarrow\quad x=\prox_{\gamma f_2}(y) &,\quad y = F(y) \\
-\Longleftrightarrow\quad x=\prox_{\gamma f_2}(y) &,\quad x = \prox_{\gamma f_1}(2x-y) \\
-\Longleftrightarrow\quad y+x\in\partial f_2(x)   &, \quad x-y\in\partial f_1(x)
+x=\prox_{f_2}(y) &,\quad y = F(y) \\
+\Longleftrightarrow\quad x=\prox_{ f_2}(y) &,\quad x = \prox_{f_1}(2x-y) \\
+\Longleftrightarrow\quad y-x\in\partial f_2(x)   &, \quad x-y\in\partial f_1(x)
 \end{align*}
-Alors, si $y=F(y)$, cela implique que $x=prox_{\gamma f_2}(y)$ vérifie 
+Alors, si $y=F(y)$, cela implique que $x=\prox_{f_2}(y)$ vérifie 
 $$
-0=(y-x)+(x-y)\in \partial\gamma(f_1+f_2)(x)
+0=(y-x)+(x-y)\in \partial(f_1+f_2)(x)
 $$
-Réciproquement, si $z\in\partial \gamma f_1(x)$ et $-z\in\partial \gamma f_2(x)$, alors $y=x-z$ est un point fixe de $F$.\\
+Réciproquement, si $z\in\partial f_1(x)$ et $-z\in\partial f_2(x)$, alors $y=x-z$ est un point fixe de $F$. Ce qui montre le résultat annoncé.\\
+La continuité des $\prox$ entraînant celle de $F$, la suite $y_n$ converge 
+
+
 
 Le paramètre $\lambda_n$, relaxe l'équation de point fixe : $y_{n+1}=y_n + \lambda_n(F(y_n)-y_n)$. 
 \end{preuve}
@@ -1040,10 +1062,10 @@ Dans cette section, nous présentons différentes manières d'approcher numériq
 
 Nous présentons la méthode implémenté par Papadakis et al. dans \cite{papadakis}. Cette méthode repose sur l'utilisation de grilles décentrées pour obtenir de bonnes approximations des dérivées. Cependant, je tiens à souligner que le déploiement de cette artillerie n'est pas nécessaire à la résolution numérique du problème, par exemple une méthode plus simple est présentée ici\footnote{\url{http://www.numerical-tours.com/matlab/optimaltransp\_2\_benamou\_brenier/}}.\\
 
-Dans cette section nous nous plaçons dans un domaine spatial de dimension 1. La méthode présentée s'étend sans grande difficultés en dimensions supérieures. 
+Dans cette section nous nous plaçons dans un domaine spatial de dimension 1. La méthode présentée s'étend sans grandes difficultés en dimensions supérieures. 
 
 \subsection{Grilles centrées et décalées}
-Mettons sur le carré espace temps unité $[0,1]^2$. Discrétisons l'espace en $N+1$ points et le temps en $Q+1$ points. Discrétisons alors l'espace temps de la façon suivante : 
+Mettons nous sur le carré espace temps unité $[0,1]^2$. Discrétisons l'espace en $N+1$ points et le temps en $Q+1$ points, de manière à obtenir une grille centrée :
 $$
 \mathcal{G}_c = \left\{(x_i=\frac{i}{N},t_j=\frac{j}{Q})\ |\ 0\leq i\leq N,\ 0\leq j\leq Q\right\}
 $$
@@ -1054,17 +1076,17 @@ $$
 \label{fig:centered}
 \end{figure}
 
-Notons $\mathcal{E}_c=(\RR^2)^{\mathcal{G}_c}$ l'espace de dimension finie de variables définies sur la grille centrées et posons : 
+Notons $\mathcal{E}_c=(\RR^2)^{\mathcal{G}_c}$ l'espace de dimension finie des variables définies sur la grille centrées et posons : 
 $$
 V = (m_{ij},f_{ij})_{0\leq i\leq N}^{0\leq j\leq Q}
 $$
 La discrétisation centrée de $(m,f)$. \\
 
-Comme annoncé en introduction de cette section, nous introduisons à présent des grilles décalées (une dans la direction de l'espace et une autre dans la direction temporelle).  Cela dans le but d'obtenir de bonne approximations des opérateurs de dérivées. 
+Comme annoncé en préambule de cette section, nous introduisons à présent des grilles décalées (une dans la direction de l'espace et une autre dans la direction temporelle). Cela dans le but d'obtenir de bonne approximations des opérateurs de dérivées. 
 
 \begin{align}
-\mathcal{G}_s^x = \left\{(x_i=\frac{i+1/2}{N},t_j=\frac{j}{Q})\ |\ -1\leq i\leq N,\ 0\leq j\leq Q\right\} \\
-\mathcal{G}_s^t = \left\{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{Q})\ |\ 0\leq i\leq N,\ -1\leq j\leq Q\right\}
+\mathcal{G}_s^x = &\left\{(x_i=\frac{i+1/2}{N},t_j=\frac{j}{Q})\ |\ -1\leq i\leq N,\ 0\leq j\leq Q\right\} \\
+\mathcal{G}_s^t = &\left\{(x_i=\frac{i}{N},t_j=\frac{j+1/2}{Q})\ |\ 0\leq i\leq N,\ -1\leq j\leq Q\right\}
 \end{align}
 
 \begin{figure}[!h]
@@ -1301,26 +1323,213 @@ P(X) = X ^{1-\beta}(X-f_k)(X^{\beta}+\gamma)^2 -\frac{\gamma}{2}\beta\|m_k\|^2=0
 \end{align}
 \end{proposition}
 \begin{preuve}
-
+C'est essentiellement la même que celle de la proposition \eqref{prop:proxJ}.
 \end{preuve}
 
 \section{Exemples numériques}
+Dans cette section, nous nous attacherons à démontrer l'efficacité de la méthode en montrant quelques résultats numériques. 
+Les codes utilisés pour générer ces exemples sont disponibles à ce lien : \url{https://github.com/tschmoderer/transport-prj}. L'implémentation en Fortran, avec la projection sur les contraintes par la transformée en cosinus discrète est de loin la plus efficace (dossiers FFFT1D et FFFT2D). Notons ici, quelques pistes d'optimisation du code. Premièrement, la projection sur la contrainte $\mathcal{C}_s$ se fait par une descente de gradient (très rapide, 16 itérations en moyenne dans le cas 2D), cependant dans l'artcile de Papadakis, il est mentionné que cette projection peut se faire en calculant explictement l'opérateur inverse une fois pour toute et de l'appliquer dans chaque direction. \\
+Une ammélioration du calccul de $\prox_{\mathcal{J}}$ est envisageable,dans la mesure où, lorque que $\beta$ est un rationnale, cela revient à résoudre une équation polynomiale. Une autre éthode que celel de Newton Raphston pourrait aussi être utuiliser (mathode de Hayley). \\
+Enfin, sans doute le plus important, une recherche des apramètre $\alpha$ et $\gamma$ optimaux pourrait être envisagée. 
+
 \subsection{Cas 1D}
+\subsubsection{Gaussiennes}
+Commençons par le cas le plus simple, $f_0$ et $_1$ sont deux gaussienne de même variance $0.05$. Ici, le carré espace temps a été discrétisé en $N +1=100$ par $Q+1=100$ points. La parmètres sont fixés à $\alpha = 1$ et $\gamma = 1$.\\
+Illustrons également la convergence de l'algorithme vers un minimum du problème, ici sur $100000$ itérations. Visualisons également le transport de la densité initiale vers la densité finale. Sans surprise, nous obtenons une ligne droite.
+
+
+\begin{figure}[!h]
+\centering 
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGaussian100x100/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGaussian100x100/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGaussian100x100/energie.png}
+	\caption{$\mathcal{J}(m,f)$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGaussian100x100/transport.png}
+	\caption{Le Transport}
+	\end{subfigure}	
+	\caption{Données pour le transport de deux gaussiennes}
+\end{figure}
+
+\subsubsection{Mélange de gaussiennes}
+Voyons un exemple un peu plus complexe, la densité initiale est donnée par une gaussienne de variance $0.05$, la densité finale est la somme d'une gaussienne de varance $0.05$ et d'une autre gaussienne de vairance $0.1$. 
+
+\begin{figure}[!h]
+\centering 
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DMixture/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DMixture/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DMixture/energie.png}
+	\caption{$\mathcal{J}(m,f)$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DMixture/transport.png}
+	\caption{Le Transport}
+	\end{subfigure}	
+	\caption{Données pour le transport d'une gaussienne sur deux gaussiennes}
+\end{figure}
+
+Nous voyons que l'algorithme gère bien la séparation des densités. 
+
+
+
+\newpage
+
+
+Amusons nous un peu et regardons quelques densités exotiques. 
+\subsubsection{Indicatrices}
+Ici, $f0= \chi_{[0.2,0.3]}$ et $f_1=\chi_{[0.6,0.9]}$.
+\begin{figure}[!h]
+\centering 
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DIndicatrix/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DIndicatrix/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DIndicatrix/energie.png}
+	\caption{$\mathcal{J}(m,f)$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DIndicatrix/transport.png}
+	\caption{Le Transport}
+	\end{subfigure}	
+	\caption{Données pour le transport d'indicatrices}
+\end{figure}
+\newpage
+
+
+\subsubsection{Coût généralisé}
+Reprenons nos deux braves gaussiennes du premier exemple, et regardons l'effete du paramètre $\beta$ sur le transport. 
+\begin{figure}[!h]
+\centering 
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/transport0.png}
+	\caption{$\beta = 0$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/transport25.png}
+	\caption{$\beta = 1/4$}
+	\end{subfigure}	
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/transport50.png}
+	\caption{$\beta = 1/2$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/transport75.png}
+	\caption{$\beta = 3/4$}
+	\end{subfigure}	
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DGeneralise/transport100.png}
+	\caption{$\beta = 1$}
+	\end{subfigure}	
+	\caption{Les transports de deux gaussienne pour différente valeurs de $\beta$}
+\end{figure}
+
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Obstacle}
+
+Une autre caractériqtique que nous pouvons faire varier est la présence d'obstcla esur le parcours. Prenons deux braves gaussiennes centrées spatialement et de même variance $0.05$ et mettons un obstacle en plein milieu du passage. 
+
+
+
+\begin{figure}[!h]
+\centering 
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DObstacle/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DObstacle/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DObstacle/resultat.png}
+	\caption{Un obstacle au milieu du passage}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.48\linewidth}
+	\includegraphics[width=\textwidth]{img/1DLabyrinthe/resultat.png}
+	\caption{Un "labyrinthe"}
+	\end{subfigure}	
+	\caption{Transport de deux gaussienne avec des obstacles}
+\end{figure}
+
+\newpage
 
 
 
 
 
 \subsection{Cas 2D}
+\subsubsection{Gaussienne}
 
-\section{Pour aller plus loin}
+\subsubsection{Coût généralisé}
+
+\subsubsection{Labyrinthe}
+\subsubsection{Morphing}
 
 
-
-
-
-
-
+\newpage
+\section{Conclusion}
 
 
 
