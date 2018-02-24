@@ -1,18 +1,18 @@
 program transport
     implicit none
-    integer, parameter :: N = 31, P = 31, Q = 31, niter = 10000
-    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 0.5
+    integer, parameter :: N = 31, P = 31, Q = 31, niter = 1000
+    double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
     double precision, dimension(N+1,P+1,Q+1,3) :: zV = 0, wV0 = 0, wV1 = 0
     double precision, dimension(N+2,P+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0, tmp = 0
-	integer, dimension(N+1,P+1,Q+1) :: obstacle = 0
+  	integer, dimension(N+1,P+1,Q+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF, divV
     double precision :: t
     integer :: i, k, l 
   	character(10) :: charI;
 	 
-	f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
+  	f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
     f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))! + gauss(0.8d0,0.5d0,0.05d0)) 
     
 !    open(1,file='fourati.dat')
@@ -139,10 +139,10 @@ program transport
     end do
     close(1)
 
-	open(8,file='results/plot.gnu'); 
-	write(8,*) 'set dgrid3d ', P+1, ',', N+1
-	write(8,*) 'set zr [', minval(minF) , ':', maxval(zU(:,:,:,3)), ']'
-	close(8);
+		open(8,file='results/plot.gnu'); 
+		write(8,*) 'set dgrid3d ', P+1, ',', N+1
+		write(8,*) 'set zr [', minval(minF) , ':', maxval(zU(:,:,:,3)), ']'
+		close(8);
   
     contains
 

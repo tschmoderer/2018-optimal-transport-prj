@@ -8,5 +8,5 @@
  set xlabel "x"
  set ylabel "t"
  set view 0,0
- set dgrid3d           52 ,          52
+ set dgrid3d          102 ,         102
  splot "results/transport.dat" with lines

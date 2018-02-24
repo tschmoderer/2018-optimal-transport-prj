@@ -1,55 +1,52 @@
 program transport
     implicit none
-    integer, parameter :: N = 50, Q = 50, niter = 2000
-    double precision, parameter :: eps = 1e-10, alpha = 1.0, g = 1.0, b = 1.0
+    integer, parameter :: N = 100, Q = 100, niter = 5000
+    double precision, parameter :: eps = 1e-10, alpha = 1., g = 1., b = 1.0
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1) :: f0, f1
     double precision, dimension(Q+1,N+1,2) :: zV = 0, wV0 = 0, wV1 = 0
     double precision, dimension(Q+2,N+2,2) :: zU = 0, wU0 = 0, wU1 = 0
-	integer, dimension(Q+1,N+1) :: obstacle = 0
-	double precision :: t
+		integer, dimension(Q+1,N+1) :: obstacle = 0
+		double precision :: t
     double precision, dimension(niter) :: cout, minF, divV
     integer :: i, k, l 
   	character(10) :: charI;
 	
 	
 	!! Initialisation
-    f0 = normalise(eps + gauss(0.5d0,0.05d0))
-    f1 = normalise(eps + gauss(0.5d0,0.05d0))! + gauss(0.8d0,0.05d0))
+    f0 = normalise(eps + gauss(0.2d0,0.05d0))
+    f1 = normalise(eps + gauss(0.8d0,0.05d0))! + gauss(0.8d0,0.05d0))
     
 !    f0 = normalise(eps + indicatrix(0.2d0,0.3d0))
 !    f1 = normalise(eps + indicatrix(0.8d0,0.9d0))
     
-    obstacle(23:27,15:27) = 1
+ !   obstacle(23:27,15:27) = 1
     
     do i = 1,Q+2
-		t = (i-1)/(1.*(Q+1))
-		wU0(i,1:N+1,2) = (1-t)*f1 + t*f0
+			t = (i-1)/(1.*(Q+1))
+			wU0(i,1:N+1,2) = (1-t)*f1 + t*f0
     end do 
     wV0 = interp(wU0)
     zU = wU0; zV = wV0
     
-    
-    
-    !! DR
+     !! DR
     do i = 1,niter
-		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
-		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
-		zU  = projCs(wU1,wV1)
-		zV  = interp(zU)
+			wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
+			wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
+			zU  = projCs(wU1,wV1)
+			zV  = interp(zU)
 
-		wU0 = wU1
-		wV0 = wV1
+			wU0 = wU1
+			wV0 = wV1
 		
-        cout(i) = J(zV)
-		minF(i) = minval(zV(:,:,2))
-		divV(i) = sum(div(Zu)**2)
+      cout(i) = J(zV)
+			minF(i) = minval(zV(:,:,2))
+			divV(i) = sum(div(Zu)**2)
 		
-        if (modulo(i,50) .EQ. 0) print *, i, cout(i)
-        
+        if (modulo(i,100) .EQ. 0) print *, i, cout(i)       
     end do 
     
-	open(1,file='results/transport.dat');
+	  open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "T ", "Z "
     do i = 1,Q+2
         do k = 1,N+2
@@ -90,22 +87,23 @@ program transport
     end do
     close(1)
 
-	open(8,file="results/plot.gnu"); 
-	write(8,*) 'set contour' 
-	write(8,*) 'set cntrparam levels 30'
-	write(8,*) 'unset key'
-	write(8,*) 'set pm3d'
-	write(8,*) 'unset colorbox'
-	write(8,*) 'set hidden3d'
-	write(8,*) 'set title "Transport Optimal"'
-	write(8,*) 'set xlabel "x"'
-	write(8,*) 'set ylabel "t"'
-!	write(8,*) 'set palette gray'
-	write(8,*) 'set view 0,0'
-	write(8,*) 'set dgrid3d ', Q+2, ',', N+2
-	write(8,*) 'splot "results/transport.dat" with lines'
-	close(8);
-	call system("gnuplot -p results/plot.gnu");
+		open(8,file="results/plot.gnu"); 
+		write(8,*) 'set contour' 
+		write(8,*) 'set cntrparam levels 30'
+		write(8,*) 'unset key'
+		write(8,*) 'set pm3d'
+		write(8,*) 'unset colorbox'
+		write(8,*) 'set hidden3d'
+		write(8,*) 'set title "Transport Optimal"'
+		write(8,*) 'set xlabel "x"'
+		write(8,*) 'set ylabel "t"'
+	!	write(8,*) 'set palette gray'
+		write(8,*) 'set view 0,0'
+		write(8,*) 'set dgrid3d ', Q+2, ',', N+2
+		write(8,*) 'splot "results/transport.dat" with lines'
+		close(8);
+		call system("gnuplot -p results/plot.gnu");
+		
     contains
 
 !! Gauss

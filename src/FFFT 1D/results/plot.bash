@@ -21,15 +21,63 @@ done
 
 ffmpeg -framerate 10 -pattern_type glob -i 'Transport/*.png' transport.mp4 -y
 
-gnuplot <<- EOF 
-#    set term png
-    set multiplot layout 3,1 rowsfirst   
- 	set xlabel "iter"
- 	plot "data.dat" u 1:2 with lines title 'Energie' 	 
- 	plot "data.dat" u 1:3 with lines title 'minF' 	
- 	plot "data.dat" u 1:4 with lines title 'divV'
-#    set output "data.png"
+gnuplot <<- EOF
+	set term png
+	set output "energie.png"
+	set xlabel "Iteration"
+	set ylabel "J(m,f)"
+	set logscale
+ 	plot "data.dat" u 1:2 lt 4 with lines title 'Energie' 	 
 EOF
+
+gnuplot <<- EOF
+	set term png
+	set output "f0.png"
+	set xlabel "x"
+	set ylabel "Densité"
+ 	plot "f0.dat" u 1:2 lt -1 with lines title 'Densité initiale' 	 
+EOF
+
+gnuplot <<- EOF
+	set term png
+	set output "f1.png"
+	set xlabel "x"
+	set ylabel "Densité"
+ 	plot "f1.dat" u 1:2 lt -1 with lines title 'Densité finale' 	 
+EOF
+
+gnuplot <<- EOF
+	set term png
+	set output "transport.png"
+	load "plot.gnu"	 
+	unset tics
+	splot "transport.dat" with lines
+EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
