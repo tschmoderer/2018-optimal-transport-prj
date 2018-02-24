@@ -49,11 +49,12 @@ program transport
 	  open(1,file='results/transport.dat');
     write(1,*) "# ", "X ", "T ", "Z "
     do i = 1,Q+2
-        do k = 1,N+2
-           write(1,*) (k-1)/(1.*N +1), (Q - i + 2)/(1.*Q+1),  zU(i,k,2)
-        end do
+           write(1,*), zU(i,:,2)
     end do
     close(1)
+    
+    
+    
     
     do l = 1,Q+2
 			write(charI,'(I5.5)') Q+3 - l
@@ -100,9 +101,7 @@ program transport
 	!	write(8,*) 'set palette gray'
 		write(8,*) 'set view 0,0'
 		write(8,*) 'set dgrid3d ', Q+2, ',', N+2
-		write(8,*) 'splot "results/transport.dat" with lines'
 		close(8);
-		call system("gnuplot -p results/plot.gnu");
 		
     contains
 
