@@ -4,6 +4,7 @@ src/prototype/Fortran/results/*
 src/prototype/Fortran/transport
 
 transport
+ftransport
 
 *.mod
 src/protorype/Fortran 1D/results/*.dat
