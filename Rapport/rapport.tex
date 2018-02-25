@@ -1042,9 +1042,7 @@ $$
 0=(y-x)+(x-y)\in \partial(f_1+f_2)(x)
 $$
 Réciproquement, si $z\in\partial f_1(x)$ et $-z\in\partial f_2(x)$, alors $y=x-z$ est un point fixe de $F$. Ce qui montre le résultat annoncé.\\
-La continuité des $\prox$ entraînant celle de $F$, la suite $y_n$ converge 
-
-
+La continuité des $\prox$ entraînant celle de $F$, la suite $y_n$ converge. Et donc $x_n$ converge également et vers un minimum du problème \eqref{eq:pbmminimi}.\\
 
 Le paramètre $\lambda_n$, relaxe l'équation de point fixe : $y_{n+1}=y_n + \lambda_n(F(y_n)-y_n)$. 
 \end{preuve}
@@ -1069,12 +1067,7 @@ Mettons nous sur le carré espace temps unité $[0,1]^2$. Discrétisons l'espace
 $$
 \mathcal{G}_c = \left\{(x_i=\frac{i}{N},t_j=\frac{j}{Q})\ |\ 0\leq i\leq N,\ 0\leq j\leq Q\right\}
 $$
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.8\linewidth]{img/grille_centree.png}
-\caption{Grille centrée pour $N=6$ et $Q=3$}
-\label{fig:centered}
-\end{figure}
+
 
 Notons $\mathcal{E}_c=(\RR^2)^{\mathcal{G}_c}$ l'espace de dimension finie des variables définies sur la grille centrées et posons : 
 $$
@@ -1091,20 +1084,30 @@ Comme annoncé en préambule de cette section, nous introduisons à présent des
 
 \begin{figure}[!h]
 \centering
-\begin{minipage}{0.49\textwidth}
-\centering
-\includegraphics[width=0.9\linewidth]{img/grille_decentree_x.png}
-\caption{Grille décentrée en espace}
-\label{fig:staggeredX}
-\end{minipage}
-\hfill
-\begin{minipage}{0.49\textwidth}
-\centering
-\includegraphics[width=0.9\linewidth]{img/grille_decentree_t.png}
-\caption{Grille décentrée en temps}
-\label{fig:staggeredT}
-\end{minipage}
+	\begin{subfigure}[b]{0.3\linewidth}
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/grille_centree.png}
+	\caption{Grille centrée}
+	\label{fig:centered}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\linewidth}
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/grille_decentree_x.png}
+	\caption{Grille décentrée en espace}
+	\label{fig:staggeredX}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\linewidth}
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/grille_decentree_t.png}
+	\caption{Grille décentrée en temps}
+	\label{fig:staggeredT}
+	\end{subfigure}
+	\caption{Grilles de discrétisation pour $N=6$ et $Q=3$}
 \end{figure}
+
+
 
 Ainsi, $\mathbb{G}_s^x$ contient $(N+2)\times(Q+1)$ points et $\mathcal{G}_s^t$ en contient $(N+1)\times(Q+2)$ points. Notons $\mathcal{E}_s=\RR^{\mathbb{G}_s^x}\times\RR^{\mathbb{G}_s^t}$ l'espace des variables sur les grilles décentrées. Et notons 
 $$
@@ -1323,7 +1326,7 @@ P(X) = X ^{1-\beta}(X-f_k)(X^{\beta}+\gamma)^2 -\frac{\gamma}{2}\beta\|m_k\|^2=0
 \end{align}
 \end{proposition}
 \begin{preuve}
-C'est essentiellement la même que celle de la proposition \eqref{prop:proxJ}.
+C'est essentiellement la même preuve que celle de la proposition \eqref{prop:proxJ}.
 \end{preuve}
 
 \section{Exemples numériques}
@@ -1332,6 +1335,7 @@ Les codes utilisés pour générer ces exemples sont disponibles à ce lien : \u
 Une ammélioration du calccul de $\prox_{\mathcal{J}}$ est envisageable,dans la mesure où, lorque que $\beta$ est un rationnale, cela revient à résoudre une équation polynomiale. Une autre éthode que celel de Newton Raphston pourrait aussi être utuiliser (mathode de Hayley). \\
 Enfin, sans doute le plus important, une recherche des apramètre $\alpha$ et $\gamma$ optimaux pourrait être envisagée. 
 
+\newpage
 \subsection{Cas 1D}
 \subsubsection{Gaussiennes}
 Commençons par le cas le plus simple, $f_0$ et $_1$ sont deux gaussienne de même variance $0.05$. Ici, le carré espace temps a été discrétisé en $N +1=100$ par $Q+1=100$ points. La parmètres sont fixés à $\alpha = 1$ et $\gamma = 1$.\\
@@ -1362,6 +1366,7 @@ Illustrons également la convergence de l'algorithme vers un minimum du problèm
 	\caption{Données pour le transport de deux gaussiennes}
 \end{figure}
 
+\newpage
 \subsubsection{Mélange de gaussiennes}
 Voyons un exemple un peu plus complexe, la densité initiale est donnée par une gaussienne de variance $0.05$, la densité finale est la somme d'une gaussienne de varance $0.05$ et d'une autre gaussienne de vairance $0.1$. 
 
@@ -1426,18 +1431,18 @@ Ici, $f0= \chi_{[0.2,0.3]}$ et $f_1=\chi_{[0.6,0.9]}$.
 
 
 \subsubsection{Coût généralisé}
-Reprenons nos deux braves gaussiennes du premier exemple, et regardons l'effete du paramètre $\beta$ sur le transport. 
+Reprenons nos deux braves gaussiennes du premier exemple, et regardons l'effet du paramètre $\beta$ sur le transport. 
 \begin{figure}[!h]
 \centering 
-	\begin{subfigure}[b]{0.48\linewidth}
-	\includegraphics[width=\textwidth]{img/1DGeneralise/f0.png}
-	\caption{Densité initiale}
-	\end{subfigure}
-	~
-	\begin{subfigure}[b]{0.48\linewidth}
-	\includegraphics[width=\textwidth]{img/1DGeneralise/f1.png}
-	\caption{Densité finale}
-	\end{subfigure}
+%	\begin{subfigure}[b]{0.48\linewidth}
+%	\includegraphics[width=\textwidth]{img/1DGeneralise/f0.png}
+%	\caption{Densité initiale}
+%	\end{subfigure}
+%	~
+%	\begin{subfigure}[b]{0.48\linewidth}
+%	\includegraphics[width=\textwidth]{img/1DGeneralise/f1.png}
+%	\caption{Densité finale}
+%	\end{subfigure}
 	
 	\begin{subfigure}[b]{0.48\linewidth}
 	\includegraphics[width=\textwidth]{img/1DGeneralise/transport0.png}
@@ -1467,22 +1472,6 @@ Reprenons nos deux braves gaussiennes du premier exemple, et regardons l'effete 
 \end{figure}
 
 \newpage
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \subsubsection{Obstacle}
 
 Une autre caractériqtique que nous pouvons faire varier est la présence d'obstcla esur le parcours. Prenons deux braves gaussiennes centrées spatialement et de même variance $0.05$ et mettons un obstacle en plein milieu du passage. 
@@ -1520,11 +1509,187 @@ Une autre caractériqtique que nous pouvons faire varier est la présence d'obst
 
 
 \subsection{Cas 2D}
+L'extension du code en deux dimensions d'espaces est assez immédiate. 
 \subsubsection{Gaussienne}
+Prenons deux gaussienne de même variance 
+\begin{figure}[!h]
+\centering 
+\hspace{-0.5cm}
+	\begin{subfigure}[b]{0.3\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.35\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/energie.png}
+	\caption{Energie}
+	\end{subfigure}
+	~
+	
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/C_00010.png}
+	\caption{$t=0.2$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/C_00020.png}
+	\caption{$t=0.4$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/C_00030.png}
+	\caption{$t=0.6$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DGaussian/C_00040.png}
+	\caption{$t=0.8$}
+	\end{subfigure}
+	\caption{Transport de deux gaussienne $N=P=Q=50$}
+\end{figure}
+
+Encore une fois, le transport optimal déterminé est une ligne droite, c'est cohérent avec ce que nous savons. \\ 
+Voyons comment l'algorithme se comporte avec une combinaison de gaussiennes. Partons de la même gaussienne que précédemment et prenons comme densité d'arrivé deux gaussienne de variances différentes. 
+
+\begin{figure}[!h]
+\centering 
+\hspace{-0.5cm}
+	\begin{subfigure}[b]{0.3\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/f0.png}
+	\caption{Densité initiale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.3\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/f1.png}
+	\caption{Densité finale}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.35\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/energie.png}
+	\caption{Energie}
+	\end{subfigure}
+	~
+	
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/C_00007.png}
+	\caption{$t=0.2$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/C_00014.png}
+	\caption{$t=0.4$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/C_00021.png}
+	\caption{$t=0.6$}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.22\linewidth}
+	\includegraphics[width=\textwidth]{img/2DMixture/C_00028.png}
+	\caption{$t=0.8$}
+	\end{subfigure}
+	\caption{Transport de deux gaussienne $N=P=Q=31$}
+\end{figure}
+
+
+
+
+
+\newpage
+
 
 \subsubsection{Coût généralisé}
 
+Essayons de faire varier le paramètre $\beta$\\
+
+\begin{figure}
+\centering
+\begin{tabular}{ccccccc}
+\rotatebox[origin=p]{90}{$\quad\qquad\ \beta = 0$} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/f0.png} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/0_C_00007.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/0_C_00014.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/0_C_00021.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/0_C_00028.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/f1.png} \\ [-20pt]
+
+\rotatebox[origin=c]{90}{$\quad\qquad\ \beta = 0.25$} &
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/f0.png} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/25_C_00007.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/25_C_00014.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/25_C_00021.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/25_C_00028.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/f1.png} \\ [-20pt]
+
+\rotatebox[origin=c]{90}{$\quad\qquad\ \beta = 0.5$} &
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/f0.png} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/50_C_00007.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/50_C_00014.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/50_C_00021.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/50_C_00028.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/f1.png} \\ [-20pt]
+
+\rotatebox[origin=c]{90}{$\quad\qquad\ \beta = 0.75$} &
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/f0.png} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/75_C_00007.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/75_C_00014.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/75_C_00021.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/75_C_00028.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/f1.png} \\ [-20pt]
+
+\rotatebox[origin=c]{90}{$\quad\qquad\ \beta = 1$} &
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/f0.png} & 
+\includegraphics[width=0.15\linewidth]{img/2DGeneralise/100_C_00007.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/100_C_00014.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/100_C_00021.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/100_C_00028.png} & \includegraphics[width=0.15\linewidth]{img/2DGeneralise/f1.png} \\ [-20pt]
+
+& $t=0$ & $t=0.2$ & $t=0.4$ & $t=0.6$ & $t=0.8$ & $t=1$ \\
+\end{tabular}
+\caption{Évolution de $f^{\star}(\cdot,t)$ pour différentes valeurs de $\beta$ et $t$. La première et la dernière image de chaque ligne sont les densités initiale et finale}
+\end{figure}
+
+
+
+
+\newpage
 \subsubsection{Labyrinthe}
+Amusons nous à mettre des obstacle sur le passage de la densité, prenons deux gaussienne centrée sur le domaine et de variance $0.01$.\\
+
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.45\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/f0.png}
+\caption{Densité initiale}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.45\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/f1.png}
+\caption{Densité finale}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.18\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/T_00007.png}
+\caption{$t=0.2$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.18\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/T_00014.png}
+\caption{$t=0.45$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.18\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/T_00018.png}
+\caption{$t=0.55$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.18\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/T_00021.png}
+\caption{$t=0.6$}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.18\linewidth}
+\includegraphics[width=\linewidth]{img/2DObstacle/T_00028.png}
+\caption{$t=0.8$}
+\end{subfigure}
+
+\caption{Transport de deux gaussienne avec un obstacle pour $t\in[0.45,0.55]$}
+\end{figure}
+
+Passons à un de mes exemple préféré, celui ou l'obstacle est un labyrinthe. En entrant les densité initiale et finale, le transport se déplacera dans le labyrinthe en suivant le chemin le plus court. 
+
+
+
+
+
+\newpage
 \subsubsection{Morphing}
 
 
