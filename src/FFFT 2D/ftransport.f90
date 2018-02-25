@@ -1,71 +1,80 @@
 program transport
     implicit none
-    integer, parameter :: N = 31, P = 31, Q = 31, niter = 1000
+    integer, parameter :: N = 255, P = 255, Q = 200, niter = 1000
     double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
     double precision, dimension(N+1,P+1,Q+1,3) :: zV = 0, wV0 = 0, wV1 = 0
-    double precision, dimension(N+2,P+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0, tmp = 0
+    double precision, dimension(N+2,P+2,Q+2,3) :: zU = 0, wU0 = 0, wU1 = 0
   	integer, dimension(N+1,P+1,Q+1) :: obstacle = 0
     double precision, dimension(niter) :: cout, minF, divV
     double precision :: t
     integer :: i, k, l 
   	character(10) :: charI;
 	 
-  	f0 = normalise(eps + gauss(0.2d0,0.2d0,0.05d0))
-    f1 = normalise(eps + gauss(0.8d0,0.8d0,0.05d0))! + gauss(0.8d0,0.5d0,0.05d0)) 
+  	f0 = normalise(eps + gauss(0.5d0,0.5d0,0.1d0))
+    f1 = normalise(eps + gauss(0.5d0,0.5d0,0.1d0))! + 0.6*gauss(0.8d0,0.5d0,0.1d0)) 
     
-!    open(1,file='fourati.dat')
-!    open(2,file='knippel.dat')
-!    do i = 1,N+1
-!		read(1,*) f0(i,:)
-!		read(2,*) f1(i,:)
-!    end do
-!    close(1)
-!    close(2)    
+!    obstacle(14:18,4:28,14:18) = 1
     
-!    f0 = normalise(eps + f0)
-!    f1 = normalise(eps + f1)
+    open(1,file='star.dat')
+    open(2,file='donut.dat')
+    do i = 1,N+1
+	!	read(1,*) f0(i,:)
+ 	!	read(2,*) f1(i,:)
+    end do
+    close(1)
+    close(2)    
+    
+  !  f0 = normalise(eps + f0)
+  !  f1 = normalise(eps + f1)
 
-	do k = 1,Q+1
+	 do k = 1,Q+1
 		open(1,file='maze.dat')
-		do i = 1,N+1
-!			read(1,*) obstacle(i,:,k)
+		do i = N+1,1,-1
+!				read(1,*) obstacle(i,:,k)
 		end do
 		close(1)
     end do 
-!    f0 = normalise(eps + gauss(10d0/128d0,26d0/128d0,0.05d0))
-!    f1 = normalise(eps + gauss(119d0/128d0,103d0/128d0,0.05d0)) 
+!    f0 = normalise(eps + gauss(25d0/128d0,5d0/128d0,0.05d0))
+!    f1 = normalise(eps + gauss(102d0/128d0,126d0/128d0,0.05d0)) 
+
+    open(1,file='joconde.dat')
+    open(2,file='marilyn.dat')
+    do i = 1,N+1
+		read(1,*) f0(i,:)
+ 		read(2,*) f1(i,:)
+    end do
+    close(1)
+    close(2)    
+    
+    f0 = normalise(eps + f0)
+    f1 = normalise(eps + f1)
+
 
     
-	do i = 1,Q+2
-		t = (i-1)/(1.*(Q+1))
-		wU0(1:P+1,1:N+1,i,3) = (1-t)*f1 + t*f0
+	  do i = 1,Q+2
+			t = (i-1)/(1.*(Q+1))
+			wU0(1:P+1,1:N+1,i,3) = (1-t)*f0 + t*f1
     end do 
     wV0 = interp(wU0)
     zU = wU0; zV = wV0
     
     
     do i = 1,niter
-		! A - DR
-		wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
-		wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
-		zU  = projCs(wU1,wV1)
-		zV  = interp(zU)
-		! A - DR'
-!		tmp = projCs(2*zU - wU0,2*zV - wV0)
-!		wU1 = wU0 + alpha*(tmp- zU)
-!		wV1 = wV0 + alpha*(interp(tmp)- zV)
-!		zU  = projC(wU1)
-!		zV  = proxJ(wV1)
+			! A - DR
+			wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
+			wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
+			zU  = projCs(wU1,wV1)
+			zV  = interp(zU)
 		
-		wU0 = wU1
-		wV0 = wV1
+			wU0 = wU1
+			wV0 = wV1
 		
-		! record data
-		cout(i) = J(zV)
-		minF(i) = minval(zV(:,:,:,3))
-		divV(i) = sum(div(Zu)**2)
+			! record data
+			cout(i) = J(zV)
+			minF(i) = minval(zV(:,:,:,3))
+			divV(i) = sum(div(Zu)**2)
         
         if (modulo(i,100) .EQ. 0) print *, i, cout(i), divV(i), sum(zV - interp(zU))
     end do 
@@ -87,30 +96,10 @@ program transport
         end do
    	end do
     close(1)
-    open(1,file='results/vitesse1.dat');
-    write(1,*) "# ", "X ", "Y ", "T ", "Z "
-    do i = 1,N+2 ! y direction
-        do k = 1,P+1 ! x direction 
-					do l = 1,Q+1 ! t direction
-           	write(1,*) i, k, l,  zU(i,k,l,1)
-           end do
-        end do
-   	end do
-    close(1)    
-    open(1,file='results/vitesse2.dat');
-    write(1,*) "# ", "X ", "Y ", "T ", "Z "
-    do i = 1,N+1 ! y direction
-        do k = 1,P+2 ! x direction 
-					do l = 1,Q+1 ! t direction
-           	write(1,*) i, k, l,  zU(i,k,l,1)
-           end do
-        end do
-   	end do
-    close(1)    
-
+    
 	do l = 1,Q+2
 		write(charI,'(I5.5)') l
-		open(1,file='results/Transport/'//trim(charI)//'.dat'); 
+		open(1,file='results/Transport/3D_'//trim(charI)//'.dat'); 
 		write(1,*) "# ", "X ", "Y ", "F "
 		do i = 1,P+1 ! y direction
 			do k = 1,N+1 ! x direction 
@@ -121,28 +110,51 @@ program transport
 		close(1)
 	end do    
     
+	  do l = 1,Q+2
+			write(charI,'(I5.5)') l
+			open(1,file='results/Transport/C_'//trim(charI)//'.dat'); 
+			do i = 1,N+1 	
+					write(1,*) zU(i,:,l,3)
+				end do
+			close(1)
+		end do  
+	
+		do l = 1,Q+1
+			write(charI,'(I5.5)') l
+			open(1,file='results/Obstacle/O_'//trim(charI)//'.dat'); 
+			open(2,file='results/Obstacle/T_'//trim(charI)//'.dat'); 
+			do i = 1,N+1 	
+					write(1,*) obstacle(i,:,l)
+					write(2,*) zV(i,:,l,3)
+				end do
+			close(1); close(2)
+		end do  
+	
     open(1,file='results/f0.dat');
-    write(1,*) "# ", "X ", "Y "
-    do i = 1,P+1
-		do k = 1,N+1
-			write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*N), f0(i,k)
-        end do
+    do i = 1,N+1
+			write(1,*) f0(i,:)
     end do
     close(1)
 
     open(1,file='results/f1.dat');
-    write(1,*) "# ", "X ", "Y "
-    do i = 1,P+1
-		do k = 1,N+1
-			write(1,*) (k-1)/(1.0*N), (i-1)/(1.0*N), f1(i,k)
-        end do
+    do i = 1,N+1
+			write(1,*) f1(i,:)
     end do
     close(1)
 
 		open(8,file='results/plot.gnu'); 
 		write(8,*) 'set dgrid3d ', P+1, ',', N+1
+		close(8);
+	
+		open(8,file='results/plot3D.gnu'); 
 		write(8,*) 'set zr [', minval(minF) , ':', maxval(zU(:,:,:,3)), ']'
 		close(8);
+  
+  	open(8,file='results/plotC.gnu'); 
+		write(8,*) 'set cntrparam levels incremental' , 1E-3, ',' , &
+		(maxval(dabs(zU(:,:,:,3))) - 1E-3)/15., ',' , maxval(dabs(zU(:,:,:,3)))
+		close(8);
+  
   
     contains
 
@@ -153,11 +165,11 @@ program transport
         double precision, dimension(N+1,P+1) :: f
         integer :: i,j
         do i = 1,N+1
-			do j = 1,Q+1
-				x = (i-1)/(1.0*N)
-				y = (j-1)/(1.0*Q)
-				f(i,j) = exp(-0.5*((x-muX)**2 + (y-muY)**2)/sigma**2)
-			end do
+					do j = 1,P+1
+						x = (i-1)/(1.0*N)
+						y = (j-1)/(1.0*P)
+						f(i,j) = exp(-0.5*((x-muX)**2 + (y-muY)**2)/sigma**2)
+					end do
         end do 
     end function gauss
 	
