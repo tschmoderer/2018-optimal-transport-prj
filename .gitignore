@@ -1,14 +1,9 @@
 # Ajout personnel
-src/prototype/Fortran/files/*
-src/prototype/Fortran/results/*
-src/prototype/Fortran/transport
 
+# EXE 
 transport
 ftransport
 
-*.mod
-src/protorype/Fortran 1D/results/*.dat
-src/protorype/Fortran 1D/transport
 a.out
 *~
 *.o
