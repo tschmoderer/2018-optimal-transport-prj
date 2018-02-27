@@ -23,6 +23,7 @@ gnuplot <<- EOF
 	unset tics 
 	set pm3d
 	set palette rgb -21,-22,-23
+	set palette gray
 	set contour
 	set cntrparam levels 15
 	unset colorbox
@@ -44,6 +45,7 @@ gnuplot <<- EOF
 	unset tics 
 	set pm3d
 	set palette rgb -21,-22,-23
+	set palette gray
 	set contour
 	set cntrparam levels 15
 	unset colorbox
@@ -84,6 +86,39 @@ EOF
 convert ${postFile} -transparent white ${postFile}
 done
 
+
+#Morphing
+files="$(ls -1v Transport/C_* | grep .dat)"
+
+for file in $files; do 
+postFile="${file/.dat/.png}"
+file="${file}"
+
+gnuplot <<- EOF 
+  set term png
+  set output "${postFile}"
+  
+  load "plot.gnu"
+  load "plotC.gnu"
+  
+	set title "Transport Optimal Généralisé"
+	set xlabel "x"
+	set ylabel "y"
+	unset tics
+
+	set pm3d map
+	set palette gray
+	unset colorbox
+	unset key
+
+	set hidden3d
+	
+  plot "${file}" matrix with image
+EOF
+done
+
+ffmpeg -framerate 10 -pattern_type glob -i 'Transport/C_*.png' transport_morphing.mp4 -y
+
 #deuxième film
 files="$(ls -1v Obstacle/T_* | grep .dat)"
 
@@ -119,43 +154,6 @@ composite -gravity center ${obstacle} ${postFile} ${postFile}
 done
 
 ffmpeg -framerate 10 -pattern_type glob -i 'Obstacle/T_*.png' transport_obstacle.mp4 -y
-
-
-
-
-#Morphing
-files="$(ls -1v Transport/C_* | grep .dat)"
-
-for file in $files; do 
-postFile="${file/.dat/.png}"
-file="${file}"
-
-gnuplot <<- EOF 
-  set term png
-  set output "${postFile}"
-  
-  load "plot.gnu"
-  load "plotC.gnu"
-  
-	set title "Transport Optimal Généralisé"
-	set xlabel "x"
-	set ylabel "y"
-	unset tics
-	
-	set pm3d map
-	set palette gray
-	unset colorbox
-	unset key
-
-	set hidden3d
-	
-  plot "${file}" matrix with image
-EOF
-done
-
-ffmpeg -framerate 10 -pattern_type glob -i 'Transport/C_*.png' transport_morphing.mp4 -y
-
-
 
 #Make films
 files="$(ls -1v Transport/3D_* | grep .dat)"

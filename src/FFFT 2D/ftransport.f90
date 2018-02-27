@@ -1,6 +1,6 @@
 program transport
     implicit none
-    integer, parameter :: N = 255, P = 255, Q = 200, niter = 1000
+    integer, parameter :: N = 255, P = 255, Q = 200, niter = 2
     double precision, parameter :: eps = 1e-10, alpha = 1.98, g = 1./230, b = 1.
     double precision, parameter :: pi = 4.D0*DATAN(1.D0)
     double precision, dimension(N+1,P+1) :: f0, f1
@@ -39,8 +39,8 @@ program transport
 !    f0 = normalise(eps + gauss(25d0/128d0,5d0/128d0,0.05d0))
 !    f1 = normalise(eps + gauss(102d0/128d0,126d0/128d0,0.05d0)) 
 
-    open(1,file='joconde.dat')
-    open(2,file='marilyn.dat')
+    open(1,file='input/joconde.dat')
+    open(2,file='input/marylin.dat')
     do i = 1,N+1
 		read(1,*) f0(i,:)
  		read(2,*) f1(i,:)
@@ -60,12 +60,15 @@ program transport
     wV0 = interp(wU0)
     zU = wU0; zV = wV0
     
-    
+    print *, 'Go DR'
     do i = 1,niter
 			! A - DR
 			wU1 = wU0 + alpha*(projC(2*zU - wU0) - zU)
+			print *, 'Fin projC'
 			wV1 = wV0 + alpha*(proxJ(2*zV - wV0) - zV)
+			print *, 'Fin ProxJ'
 			zU  = projCs(wU1,wV1)
+			print *, 'Fin projCs'
 			zV  = interp(zU)
 		
 			wU0 = wU1
@@ -77,6 +80,7 @@ program transport
 			divV(i) = sum(div(Zu)**2)
         
         if (modulo(i,100) .EQ. 0) print *, i, cout(i), divV(i), sum(zV - interp(zU))
+     print *, 'Fin Iter'
     end do 
   
     open(1,file='results/data.dat');
@@ -91,7 +95,7 @@ program transport
     do i = 1,N+1 ! y direction
         do k = 1,P+1 ! x direction 
 					do l = 1,Q+2 ! t direction
-           	write(1,*) i, k, l,  zU(i,k,l,3)
+!           	write(1,*) i, k, l,  zU(i,k,l,3)
            end do
         end do
    	end do
@@ -489,7 +493,7 @@ program transport
 	implicit none
 		integer :: S1, S2, S3
 		double precision, dimension(S1,S2,S3) :: f, df
-		double precision, dimension(S1,S1) :: ADCT
+		double precision, dimension(S1,S1) :: ADCT 
 		double precision, dimension(S2,S2) :: ADCT2
 		double precision, dimension(S3,S3) :: ADCT3
 		double precision, dimension(S1) :: a1
@@ -542,7 +546,7 @@ program transport
 	implicit none
 		integer :: S1, S2, S3
 		double precision, dimension(S1,S2,S3) :: f, df
-		double precision, dimension(S1,S1) :: ADCT
+		double precision, dimension(S1,S1) :: ADCT 
 		double precision, dimension(S2,S2) :: ADCT2
 		double precision, dimension(S3,S3) :: ADCT3
 		double precision, dimension(S1) :: a1
