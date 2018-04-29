@@ -1,9 +1,21 @@
-# Ajout personnel
+## Ajout personnel
+
+# Rapport 
+Rapport/dessin/*
+Rapport/img/*
+Rapport/video/*
+Rapport/*.tex
+
+# Ressources
+ressources/*
 
 # EXE 
 transport
 ftransport
 a.out
+
+# Prototype
+src/prototype/*
 
 *~
 *.o
