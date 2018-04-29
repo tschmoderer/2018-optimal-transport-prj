@@ -20,4 +20,4 @@ For more detailed information see : http://www.gpeyre.com/
 This work is under GNU GENERAL PUBLIC LICENSE, you can use this work with suitable citation. 
 
 ## Contact 
-If any trouble detected, any help needed or any contribution please contact timothee.schmoderer -at- netcourrier.com
+If any trouble detected, any help needed or any contribution please contact : timothee.schmoderer -at- netcourrier.com
