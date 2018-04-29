@@ -18,6 +18,7 @@ For more detailed information see : http://www.gpeyre.com/
   
 ## Example
 For some example on 2D density, you can watch : https://www.youtube.com/playlist?list=PLJ92u2ph2rW-cRQQNv39aexr4nDht8Q_I
+
 In this playlist, I apply optimal transport to finding shortest path in a labyrinth, morphing between image ..
 
 ## Credits
