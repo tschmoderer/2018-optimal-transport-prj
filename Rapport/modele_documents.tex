@@ -1,0 +1,410 @@
+% Pour le bon support de la langue française : 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+
+\usepackage{lipsum} % \lipsum créera un texte test
+\usepackage[margin=2.4cm]{geometry} %pour des marges
+
+\usepackage{framed} % des contours
+\usepackage[framed]{ntheorem} % un théoreme
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\makeatletter
+\renewcommand{\ALG@name}{Algorithme}
+\makeatother
+
+\usepackage[all]{xy}
+%
+\usepackage{listings}
+
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdfnewwindow=true,      % links in new PDF window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+%\let\urlorig\url
+%\renewcommand{\url}[1]{%
+%   \begin{otherlanguage}{english}\urlorig{#1}\end{otherlanguage}%
+%}
+
+
+% Bibliographie dans la Table des matières
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+
+
+
+\usepackage{tikz}               % Tracer des graphes
+\tikzset{every picture/.style={execute at begin picture={
+\shorthandoff{:;!?};}
+}}
+
+
+\usepackage{thumbpdf}           % Fichier pdf généré 
+                                % contien une              
+                                % miniature de chaque slide 
+
+ \usepackage{dsfont}
+\usepackage{lastpage}           % Avoir total de pages dans le footer.
+\usepackage{graphicx}           % Pour les images et figures
+\usepackage{wrapfig}            % Pour détourer les figures
+\usepackage{fancybox}           % De chouettes encadrements
+\usepackage{lettrine}           % Pour de beaux paragraphes
+\usepackage{setspace}           % Pour changer l'interligne
+\usepackage{eurosym}            % Pour le signe \euro
+\usepackage{xcolor}             % Pour mettre d la couleur
+\usepackage{colortbl}           % Couleur dans tableaux
+\usepackage{tabularx}           % pour des tableaux à taille de la page
+\usepackage{longtable}          % Pour les grands tableaux
+\usepackage[tight]{shorttoc}    % Pour faire un sommaire à la française.
+\newcommand{\sommaire}{\shorttoc{Sommaire}{1}}
+\usepackage{array}              % De beaux tableaux
+\usepackage{multirow}           % Tableaux sur plusieurs lignes
+                                % \multirow{nlignes}{largeur ou *}{contenu}
+\usepackage{amsmath}            % Un peu de maths
+\usepackage{amssymb}            % Encore des maths
+\usepackage{mathtools}
+\usepackage{empheq}             % Pour encadrer les équations
+
+
+\usepackage{stmaryrd}			% pour les crochets d'intervalles entiers 
+
+
+\usepackage{pgfpages}           % Pour avoir 2 pages sur A4 paysage
+\usepackage{datetime}           % Jouer facilement avec les dates
+% Pour la physique : 
+\usepackage{numprint}           % Pour faire des groupes de 3 nombres
+\usepackage[squaren,Gray,cdot]{SIunits}
+
+\usepackage{pgf}
+\usetikzlibrary{arrows}
+
+\usepackage{nameref} %pour les entetes 
+\makeatletter
+\newcommand*{\currentname}{\@currentlabelname}
+\makeatother
+
+\definecolor{vert}{rgb}{0,0.6,0}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{vert},    % comment style
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{mauve},     % string literal style
+  basicstyle=\small\ttfamily,%
+  frame=single,
+  %extendedchars=true,
+ literate=%
+         {é}{{\'e}}1
+         {É}{{\'E}}1
+         {à}{{\`a}}1
+         {ê}{{\^e}}1
+         {è}{{\`e}}1
+}
+
+%%%
+% Commandes
+\newcommand{\ndiv}{\nmid} %x\ndiv y <==> x ne divise pas y
+\newcommand{\modulo}[3]{#1\equiv #2 \;[#3]}
+\newcommand{\nmodulo}[3]{#1\not\equiv #2 \;[#3]}
+
+
+% Ajout d'une image avec label
+\newcommand{\image}[3]{
+% \image{fichier}{label}{description}
+\begin{center}
+% Nécessite le package float
+\begin{figure}[H]
+\includegraphics[width=0.9\textwidth]{#1}
+\caption{\label{#2}{#3}}
+\end{figure}
+\end{center}
+}
+
+% Ajout d'une image largeur page avec label
+\newcommand{\imagebig}[3]{
+% \imagebig{fichier}{label}{description}
+\begin{center}
+% Nécessite le package float
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{#1}
+\caption{\label{#2}{#3}}
+\end{figure}
+\end{center}
+}
+
+% Une image qui prend toute la page
+\newcommand{\imagefull}[1]{
+    \newgeometry{margin=0cm}
+\begin{center}
+\begin{figure}[H]
+\includegraphics[width=0.96\paperwidth]{#1}
+\end{figure}
+\end{center}
+\restoregeometry
+\nopagebreak
+}
+
+% Un encadré grisé
+\newcommand{\encadregris}[1]{
+\begin{center}
+\colorbox{gray!20}{
+\begin{minipage}{0.95\textwidth}
+{#1}
+\end{minipage}
+}
+\end{center}
+}
+
+% Un mot grisé
+\newcommand{\motgris}[1]{
+\colorbox{gray!20}{{#1}}
+}
+
+% Un encadré
+\newcommand{\encadre}[1]{
+\begin{center}
+\fbox{
+\begin{minipage}{\textwidth}
+{#1}
+\end{minipage}
+}
+\end{center}
+}
+
+%Une boite coloré
+\newenvironment{colbox}[1]
+{\def\FrameCommand{\colorbox{#1}}%
+   \MakeFramed{\advance\hsize-\width \FrameRestore}}
+{\endMakeFramed}
+
+\colorlet{shadecolor}{blue!8}
+
+%%%%%%%%%% Des Maths %%%%%%%%%%%%%%
+
+\newcommand{\RR}{\ensuremath{\mathbb{R}}}
+\newcommand{\CC}{\ensuremath{\mathbb{C}}}
+\newcommand{\ZZ}{\ensuremath{\mathbb{Z}}}
+\newcommand{\QQ}{\ensuremath{\mathbb{Q}}}
+\newcommand{\NN}{\ensuremath{\mathbb{N}}}
+\newcommand{\PP}{\ensuremath{\mathbb{P}}}
+\newcommand{\KK}{\ensuremath{\mathbb{K}}}
+\newcommand{\EE}{\ensuremath{\mathbb{E}}}
+\renewcommand{\SS}{\ensuremath{\mathbb{S}}}
+\newcommand{\TT}{\ensuremath{\mathbb{T}}}
+
+\newcounter{theo}[section] % créer un nouveau compteur
+\renewcommand\thetheo{\thesection.\arabic{theo}}
+\newcounter{prop}[section]
+\renewcommand\theprop{\thesection.\arabic{prop}}
+
+\newenvironment{theoreme}[1]
+{\refstepcounter{theo}\begin{shaded}\textbf{Théorème \thetheo~ : } \textit{#1}\vspace{0.3em}
+\hrule
+\medbreak}
+{\end{shaded}}
+
+
+\newenvironment{propriete}
+{\begin{shaded}\textbf{Propriété : }\\ }
+{\end{shaded}}
+
+\newenvironment{proposition}
+{\refstepcounter{prop}\begin{shaded}\textbf{Proposition \theprop~ : }\\ }
+{\end{shaded}}
+
+\newenvironment{corollaire}
+{\begin{shaded}\textbf{Corollaire : }\\ }
+{\end{shaded}}
+
+
+\newenvironment{lemme}
+{\begin{shaded}\textbf{Lemme : }\\ }
+{\end{shaded}}
+
+
+\newenvironment{definition}[1]
+{\stepcounter{theo}\begin{shaded}\textbf{Définition \thetheo~ : } \textit{#1}\vspace{0.3em}
+\hrule
+\medbreak}
+{\end{shaded}}
+
+
+\newenvironment{boxeq}{\setlength{\fboxsep}{15pt}
+\setlength{\mylength}{\linewidth}%
+\addtolength{\mylength}{-2\fboxsep}%
+\addtolength{\mylength}{-2\fboxrule}%
+\Sbox
+\minipage{\mylength}%
+\setlength{\abovedisplayskip}{0pt}%
+\setlength{\belowdisplayskip}{0pt}%
+\equation}%
+{\endequation\endminipage\endSbox
+\[\fbox{\TheSbox}\]}
+  
+
+\newcounter{exos}
+\newcommand{\exo}[1]{\stepcounter{exos}\Ovalbox{Exercice \theexos} \textbf{#1}}
+\newcommand{\attention}[1]{\textcolor{red!90}{\textbf{Attention :} #1 }}
+\newcommand{\remarque}[1]{\textcolor{blue!90}{\textbf{Remarque :} #1 }}
+\newcommand{\exemple}[1]{\textcolor{magenta!80}{\textbf{Exemple :} #1 }}
+\newcommand{\remarques}[1]{\textcolor{blue!90}{\textbf{Remarques :} #1 }}
+
+
+\newenvironment{preuve}
+{\begin{leftbar}\textbf{Preuve :} \\ }
+{\hfill\ensuremath{\Box}\end{leftbar}\medbreak}
+
+
+
+
+% flèche
+\newcommand{\ra}[0]{
+    $\rightarrow$
+}
+
+
+
+
+% Image détourée
+% \wrapimg{align}{width}{img}
+\newcommand{\wrapimg}[3]{
+\begin{wrapfigure}{#1}{#2}
+\includegraphics[width={#2}]{#3}
+\end{wrapfigure}
+}
+
+\newcommand{\hdr}[0]{
+    \hdashrule{1cm}{1pt}{1pt}
+}
+
+\newcommand*{\etoile}
+{
+\begin{center}
+*\par
+*\hspace*{3ex}*
+\end{center}
+}
+
+
+% listes avec puces carrées
+\newcommand{\carlst}[1]{
+    \begin{itemize}
+    \renewcommand\labelitemi{\petitcarre}
+    {#1}
+    \end{itemize}
+}
+
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\interior}[1]{%
+  {\kern0pt#1}^{\mathrm{o}}%
+}
+
+
+\usepackage{tikz,tkz-tab}
+\csname @addtoreset\endcsname{section}{part} 
+
+\newcommand{\fonction}[5]{\ensuremath{\begin{array}[t]{l|ccl}
+#1: & #2 & \longrightarrow & #3 \\
+    & #4 & \longmapsto & #5 \end{array}}}
+
+
+
+
+
+
+% MISE EN FORME DU TITRE
+\makeatletter
+\renewcommand{\maketitle}{
+\begin{minipage}[l]{.8\linewidth}
+\includegraphics[width=120px]{img/logo.png} %logo insa
+\end{minipage} \hfill
+\begin{minipage}[r]{.46\linewidth}
+\includegraphics[width=100px]{img/logo_univ.png}
+\end{minipage}
+
+\vspace{1cm}
+\begin{center}
+\boxput*(0,1){\colorbox{white}{Projet de Fin d’Études}}{
+\setlength{\fboxsep}{10pt}
+\framebox[\textwidth]{
+\begin{minipage}{8cm}
+\vspace{0.2cm}
+\center
+\Large
+\@title
+\end{minipage}
+}}
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+Département de Génie Mathématique\\
+Semestre 9 - \dateDoc
+\end{center}
+
+\vspace{2cm}
+\includegraphics[width=\linewidth]{img/main.png}
+
+\vfill
+\begin{minipage}[l]{0.4\textwidth}
+\large
+\emph{Auteur :}\\
+\@author\\
+\end{minipage}
+\hfill
+\begin{minipage}[r]{0.4\textwidth}
+\large
+\flushright
+\emph{A l'attention de :} \\
+Carole \textsc{Le Guyader}\\ % Supervisor's Name
+Vincent \textsc{Duval}\\
+\end{minipage}
+\newpage
+}
+\makeatother
+%%%
+
+
+%\begin{center}
+%\vspace{2ex}
+%{\huge \textsc{\@title}}
+%\vspace{1ex}
+%\\
+%\linia\\
+%\@author \hfill \@date
+%\vspace{4ex}
+%\end{center}
+
+%\begin{tcolorbox}[enhanced,attach boxed title to top center={yshift=-3mm,yshifttext=-1mm},
+ % colback=blue!5!white,colframe=blue!75!black,colbacktitle=red!80!black,
+  %title=My title,fonttitle=\bfseries,
+  %boxed title style={size=small,colframe=red!50!black} ]
+  %This box uses a \textit{boxed title}. The box of the title can
+  %be formatted independently from the main box.
+%\end{tcolorbox}
+
+
+
+
+
+
+
